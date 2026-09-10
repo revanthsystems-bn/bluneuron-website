@@ -1,0 +1,17 @@
+# Backup folders / old versions
+backup_*/
+Bluneuron_Red_Version/
+
+# Heavy raw media assets (source art, not used by the live site)
+Pictures/
+
+# Local working documents
+*.docx
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Lead data (never commit real submissions)
+data/leads.csv
