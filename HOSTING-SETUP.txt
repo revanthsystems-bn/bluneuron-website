@@ -1,0 +1,45 @@
+BLUNEURON — "LAUNCHING SOON" PAGE + LEAD CAPTURE
+================================================
+
+WHERE THE FORM DATA GOES
+------------------------
+Every "Get Early Access" submission is appended as a row to:
+
+    data/leads.csv        (on your GoDaddy hosting)
+
+Columns: timestamp_utc, name, email, phone, ip, user_agent
+It also emails a copy to the address set in save.php (see step 3).
+A copy is additionally kept in the visitor's own browser as a fallback.
+
+
+HOW TO DEPLOY (GoDaddy cPanel / Web Hosting — the kind with "File Manager")
+-------------------------------------------------------------------------
+1. In cPanel open  File Manager  ->  public_html
+2. Upload EVERYTHING from this folder into public_html, keeping the structure:
+       index.html
+       save.php
+       assets/            (css, js, images)
+       data/              (contains .htaccess + index.html — keep them)
+       Logo/  Pictures/   (optional — only needed if you reference them)
+   (You do NOT need: the other .html pages, README.md, the .docx,
+    HOSTING-SETUP.txt, or the backup_* folders.)
+3. Open  save.php  ->  line with  $NOTIFY_EMAIL  ->  change it to your real
+   email (or set it to ''  to turn email off and rely on the CSV only).
+4. Visit your domain. Fill the form once as a test.
+5. Back in File Manager open  public_html/data/leads.csv  ->  "Download"
+   (or "View") to see the entry. Open it in Excel / Google Sheets.
+
+That's it. No accounts, no monthly fees.
+
+
+NOTES
+-----
+* Requires PHP (all standard GoDaddy "Web Hosting" / cPanel plans have it).
+  If you are on GoDaddy "Website Builder" (drag-and-drop, no File Manager),
+  PHP will not run — tell your developer to switch to a hosted form service.
+* The data/ folder is blocked from public web access by data/.htaccess.
+  For maximum safety you can move leads.csv above public_html later.
+* Upload save.php and index.html together. If the page is live but save.php
+  is missing, the form shows an error asking visitors to email instead.
+* To change the launch date, edit  data-launch="2026-10-20T12:00:00"
+  in index.html (inside the <div class="countdown" ...> tag).
