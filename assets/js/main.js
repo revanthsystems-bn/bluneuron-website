@@ -93,10 +93,9 @@
   }
 
   /* ---------- VIP sign-up form ----------
-     Submits to the form's `action` (save.php by default), which appends
-     the row to data/leads.csv on the server. Also keeps a local copy in
-     localStorage as a safety net and fires a bubbling `bluneuron:signup`
-     event for any other integration. */
+     Submits to the form's `action` (Web3Forms by default), which emails the
+     row to the key owner. Also keeps a local copy in localStorage as a safety
+     net and fires a bubbling `bluneuron:signup` event for any other integration. */
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   var STORE_KEY = 'bluneuron_waitlist';
 
@@ -143,15 +142,26 @@
         ts: new Date().toISOString()
       };
 
+      // Build the request body from every field in the form — this picks up the
+      // hidden Web3Forms inputs (access_key, subject, from_name) automatically.
+      var payload = {};
+      new FormData(form).forEach(function (v, k) { payload[k] = v; });
+      payload.ts = entry.ts;
+      delete payload.redirect; // only used by the no-JS fallback POST
+
       if (submitBtn) { submitBtn.disabled = true; }
 
       fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-        body: JSON.stringify(entry)
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
       }).then(function (res) {
-        if (!res.ok) throw new Error('bad status ' + res.status);
-        showSuccess(entry);
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok || data.success === false) {
+            throw new Error((data && data.message) || ('bad status ' + res.status));
+          }
+          showSuccess(entry);
+        });
       }).catch(function () {
         // network / server error — keep a local copy and let the visitor retry or email us
         try {

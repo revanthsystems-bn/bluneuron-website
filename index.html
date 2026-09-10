@@ -47,7 +47,7 @@
     <h1 class="hero__title">Something new<br><span class="hero__title-accent">is taking shape.</span></h1>
     <p class="hero__sub">High-energy tech innovations, reimagined.<br>Be the first to experience what's next.</p>
 
-    <div class="countdown" id="countdown" data-launch="2026-10-20T12:00:00" role="timer" aria-label="Time remaining until launch">
+    <div class="countdown" id="countdown" data-launch="2026-09-25T12:00:00" role="timer" aria-label="Time remaining until launch">
       <div class="countdown__unit"><span class="countdown__num" data-cd="days">00</span><span class="countdown__label">Days</span></div>
       <div class="countdown__unit"><span class="countdown__num" data-cd="hours">00</span><span class="countdown__label">Hours</span></div>
       <div class="countdown__unit"><span class="countdown__num" data-cd="minutes">00</span><span class="countdown__label">Minutes</span></div>
@@ -86,9 +86,15 @@
     <h2 class="modal__title" id="eaTitle">Get early access.</h2>
     <p class="modal__lead">Leave your details and we'll reach out the moment it's ready.</p>
 
-    <!-- Submissions POST to save.php, which appends them to data/leads.csv on the server.
-         main.js sends this via fetch and falls back to a normal POST without JS. -->
-    <form class="vip-form" data-vip action="save.php" method="post" novalidate>
+    <!-- Submissions POST to Web3Forms (https://web3forms.com). Leads are emailed to the
+         address that owns the access key. main.js sends this via fetch (JSON) and the
+         form also works as a normal POST without JS.
+         SETUP: replace the access_key value below with your own key from web3forms.com. -->
+    <form class="vip-form" data-vip action="https://api.web3forms.com/submit" method="post" novalidate>
+      <input type="hidden" name="access_key" value="8e9288cf-4bcf-4179-b5b8-5b44c5340e5e">
+      <input type="hidden" name="subject" value="New Bluneuron early-access signup">
+      <input type="hidden" name="from_name" value="Bluneuron — Launching Soon">
+      <input type="hidden" name="redirect" value="https://www.bluneuron.com/?sent=1">
       <label class="field">
         <span class="field__label">Full name</span>
         <input type="text" name="name" autocomplete="name" placeholder="Your name">
@@ -101,9 +107,10 @@
         <span class="field__label">Phone / WhatsApp <span class="field__opt">(optional — for instant launch alerts)</span></span>
         <input type="tel" name="phone" autocomplete="tel" placeholder="+91 00000 00000">
       </label>
-      <!-- honeypot: hidden from people, bots tend to fill it -->
+      <!-- honeypots: hidden from people, bots tend to fill them. `botcheck` is Web3Forms' built-in spam trap. -->
       <div class="vip-hp" aria-hidden="true">
         <label>Company <input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+        <label>Leave this empty <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off"></label>
       </div>
       <button type="submit" class="cta cta--full">Get Early Access</button>
       <p class="vip-error" data-vip-error hidden>
