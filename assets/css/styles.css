@@ -285,3 +285,12 @@ body.modal-open { overflow: hidden; }
     transition-duration: 0.001ms !important;
   }
 }
+
+/* CTA Subnote Incentive */
+.cta__subnote {
+  margin-top: 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #5b6b82;
+  letter-spacing: -0.01em;
+}
