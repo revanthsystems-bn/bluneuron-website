@@ -8,6 +8,7 @@ import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import NotifyProvider from '@/components/notify/NotifyProvider';
 import { SITE_URL } from '@/lib/site';
+import { Analytics } from '@vercel/analytics/next';
 
 /**
  * The hero display face. Inter Tight rather than the `--font-sans` stack:
@@ -69,6 +70,7 @@ export default function RootLayout({ children }) {
             </NotifyProvider>
           </CartProvider>
         </MotionConfig>
+        <Analytics />
       </body>
     </html>
   );
