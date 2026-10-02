@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+.vercel/
+
+# Environment — only .env.example is committed, and it holds variable NAMES only.
+# Never commit a file with a real key in it.
+.env
+.env.local
+.env*.local
+.env.development
+.env.production
+
+# Logs and local test output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Local working folders — screenshots and scratch output are build artefacts of
+# a working session, not source.
+screenshots/
+scratchpad/
+_archive/
+
+# Tooling / editor / agent state
+.claude/
+.vscode/
+.idea/
+*.swp
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
