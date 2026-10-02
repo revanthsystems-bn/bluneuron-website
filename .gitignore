@@ -1,17 +1,45 @@
-# Backup folders / old versions
-backup_*/
-Bluneuron_Red_Version/
+# Dependencies
+node_modules/
 
-# Heavy raw media assets (source art, not used by the live site)
-Pictures/
+# Next.js build output
+.next/
+out/
+build/
+dist/
+.vercel/
 
-# Local working documents
-*.docx
+# Environment — only .env.example is committed, and it holds variable NAMES only.
+# Never commit a file with a real key in it.
+.env
+.env.local
+.env*.local
+.env.development
+.env.production
 
-# OS / editor cruft
+# Logs and local test output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Local working folders — screenshots and scratch output are build artefacts of
+# a working session, not source.
+screenshots/
+scratchpad/
+_archive/
+
+# Tooling / editor / agent state
+.claude/
+.vscode/
+.idea/
+*.swp
+
+# OS cruft
 .DS_Store
 Thumbs.db
-.vscode/
-
-# Lead data (never commit real submissions)
-data/leads.csv
+desktop.ini

@@ -1,121 +1,63 @@
-# Bluneuron — Official Website
+# BluNeuron: IRIZ launch site
 
-A mobile-first, responsive marketing site for Bluneuron and the Mini Projector,
-built from `Bluneuron — Official Website Flow & Content.docx` and the
-`bluneuron-website.html` starter.
+Marketing and pre-launch signup site for the BluNeuron IRIZ projector.
 
-Static HTML, one shared stylesheet, one small vanilla-JS file. No build step,
-no framework, no dependencies. Open `index.html` in a browser, or serve the
-folder with any static server.
+## Stack
 
-```
-python -m http.server 8000      # then visit http://localhost:8000
-```
+- [Next.js](https://nextjs.org) (App Router)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Framer Motion](https://www.framer.com/motion/) for scroll and reveal animation
+- [Lenis](https://lenis.darkroom.engineering/) for smooth scrolling
 
-## Pages
+## Running locally
 
-| File | Purpose |
-| --- | --- |
-| `index.html` | Homepage — hero + CTA, trust strip, product intro, roadmap teaser, brand-story teaser, social proof, newsletter |
-| `mini-projector.html` | Product page — story-first flow, plain-language performance, collapsible specs, quality & testing, warranty promise, reviews |
-| `the-bluneuron-line.html` | Roadmap teaser — four category directions, each with a working "Notify me" form |
-| `why-bluneuron.html` | Brand story — origin, three pillars with proof points, sourcing & quality, service commitment, founder note |
-| `support.html` | Warranty & service, FAQs (accordion), contact |
-
-Navigation is capped at four items plus the primary CTA, per the content spec.
-
-## File structure
-
-```
-bluneuron/
-├── index.html
-├── mini-projector.html
-├── the-bluneuron-line.html
-├── why-bluneuron.html
-├── support.html
-├── assets/
-│   ├── css/styles.css      shared styles (dark starfield theme, mobile-first)
-│   ├── js/main.js          nav, accordions, scroll reveal, form handling
-│   ├── images/
-│   │   ├── logo-wordmark-light.png   header + footer logo (blu + white "neuron")
-│   │   ├── logo-wordmark-dark.png    same wordmark for light backgrounds
-│   │   ├── logo-mark.png             "bn" circle mark
-│   │   └── favicon-32/180/512.png    favicons derived from the mark
-│   │   └── (drop real photo/video assets here too)
-│   └── videos/             (empty — drop real video assets here)
-├── logo/                   original supplied logo files (untrimmed)
-├── Bluneuron — Official Website Flow & Content.docx
-└── bluneuron-website.html  original starter (kept for reference)
+```bash
+npm install
+npm run dev
 ```
 
-## Swapping in real photography / video
+The dev server prints the local URL when it starts.
 
-Every media slot is a `<figure class="media …">` placeholder with a grey frame
-and a descriptive label. Directly above each one is an HTML comment showing the
-exact markup to drop in. The `media--wide` / `media--square` / `media--hero` /
-`media--tall` modifier sets the aspect ratio, so layout stays stable through the
-swap.
+Other scripts:
 
-Replace the whole `<figure>` with either:
-
-```html
-<img src="assets/images/hero-lifestyle.jpg"
-     alt="Bluneuron Mini Projector on movie night"
-     class="media media--hero">
+```bash
+npm run build   # production build
+npm run start   # serve the production build
+npm run lint    # eslint
 ```
 
-```html
-<video class="media media--wide"
-       poster="assets/images/hero-poster.jpg"
-       autoplay muted loop playsinline>
-  <source src="assets/videos/hero.mp4" type="video/mp4">
-</video>
+## Environment
+
+Copy `.env.example` to `.env.local` and fill in the value:
+
+```
+NEXT_PUBLIC_WEB3FORMS_KEY=
 ```
 
-`.media` carries `object-fit: cover`, so an asset of any ratio fills the frame
-cleanly. Keep the `alt` text meaningful.
+This key powers the "Notify Me" signup and the contact form, which submit
+client-side to [Web3Forms](https://web3forms.com/). Without it the forms render
+normally but refuse to submit and log a warning naming the variable, rather
+than silently appearing to succeed.
 
-## Forms
+`.env.local` is gitignored. `.env.example` holds variable names only — never a
+real key.
 
-The newsletter and "Notify me" forms are front-end only — they validate the
-email and show an inline confirmation, but send nothing. To make them live, set
-each `<form>`'s `action`/`method` to a real endpoint (e.g. Mailchimp, Formspree,
-or your own handler) in the page markup, or extend the submit handler in
-`assets/js/main.js`.
+## Project layout
 
-## Placeholder content to confirm before launch
+```
+app/         routes (App Router), global styles
+components/  UI components
+lib/         product data, pricing, launch flags, form submission
+public/      images and video served as-is
+```
 
-Per section 6 of the content doc, these are stand-in values, marked with a note
-on-page where they appear:
+Product copy, specs, and media paths live in `lib/iriz.js` — a single source of
+truth imported everywhere, so a spec or price change is a one-line edit.
 
-- **Warranty length** — currently "2 years" (homepage trust strip, product page,
-  support page, brand story).
-- **Service-center model & claim process** — currently "WhatsApp or email, no
-  store visit; 5–7 business days".
-- **Contact channel & response time** — currently "WhatsApp, replies within
-  24 hours" and `support@bluneuron.com`; the WhatsApp link points to a dummy
-  number (`wa.me/910000000000`).
-- **QC steps / certifications** — quality sections are written to be expanded
-  once finalised.
-- **The Bluneuron Line** — all four categories are teased at once; switch to a
-  phased reveal by removing cards if that decision changes.
-- **Reviews** — pre-launch placeholders; replace with verified buyer content
-  post-launch.
+Two flags gate what the site shows:
 
-## Design notes
-
-- Theme: dark, immersive "starfield" aesthetic — deep space-blue ground
-  (`#0A0D16`), a faint fixed starfield layer (`body::before`, slow drift, off
-  under `prefers-reduced-motion`), and soft blue/violet glow washes.
-- One accent hue: blue `#2F6BFF` / `#5B8BFF`, used for glows, focus, links and
-  the primary CTA. High-contrast light text (`#F2F4FA`).
-- Glass surfaces: translucent headers, cards, accordions and tables
-  (`backdrop-filter: blur`) with hairline borders and blue hover glow.
-- Type: Fraunces (display serif) + Manrope (UI/body), loaded from Google Fonts.
-- Logo: `assets/images/logo-wordmark-light.png` in header and footer, sized via
-  CSS (`.brand__logo`, 22–26px tall) with `width`/`height` attrs to avoid layout
-  shift. Favicon uses the "bn" mark.
-- Mobile-first CSS with `min-width` breakpoints at 480 / 560 / 640 / 860 / 920 / 1000 px.
-- Accessible: skip link, keyboard-operable nav and accordions, `aria-expanded`
-  state, visible focus rings that contrast on dark, `prefers-reduced-motion`
-  respected.
+- `COMMERCE_ENABLED` in `lib/launch.js` — pre-launch mode. While `false`, every
+  purchase affordance renders the "Notify Me" signup instead.
+- `SHOW_PENDING_SPECS` in `lib/iriz.js` — hides the spec cards whose values are
+  not confirmed yet (dimensions and weight, box contents, warranty). Flip it to
+  `true` once those are final.

@@ -1,0 +1,1273 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #000000;
+    color: #ffffff;
+  }
+}
+
+@layer components {
+  /* Glassmorphic card: translucent surface, blurred backdrop, hairline border. */
+  .glass-card {
+    @apply relative overflow-hidden rounded-2xl border border-border bg-white/[0.04] backdrop-blur-glass shadow-glass transition-all duration-500 hover:-translate-y-1.5 hover:border-accent-soft/40 hover:shadow-[0_20px_48px_-16px_rgba(59,130,246,0.35)];
+  }
+
+  .glass-card::before {
+    content: '';
+    @apply absolute inset-0 bg-glass-gradient pointer-events-none;
+  }
+
+  .glass-panel {
+    @apply rounded-3xl border border-border-subtle bg-black-surface/60 backdrop-blur-glass;
+  }
+
+  .section-container {
+    @apply mx-auto w-full max-w-container-xl px-6 md:px-10 lg:px-16;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-[0_8px_24px_-8px_rgba(255,255,255,0.35)] active:translate-y-0 active:scale-[0.97];
+  }
+
+  /*
+   * The masthead CTA while the header is in INK mode over the light hero
+   * (lib/heroTheme.js) — `.btn-primary` inverted, so a white pill on black
+   * becomes a black pill on white. Same geometry, same motion, same hover
+   * lift; only the two colours and the shadow tint swap, which is what lets
+   * the handover read as a colour transition rather than a different button.
+   */
+  .btn-primary-ink {
+    @apply inline-flex items-center justify-center rounded-full bg-black-obsidian px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black-obsidian/85 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)] active:translate-y-0 active:scale-[0.97];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-border-strong bg-white/[0.03] px-7 py-3 text-sm font-semibold text-white backdrop-blur-glass transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-soft/60 hover:bg-white/10 active:translate-y-0 active:scale-[0.97];
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-white/50;
+  }
+
+  /* Fine film-grain overlay for depth behind hero-weight sections. */
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+  }
+
+  /*
+   * The product renders are studio shots on a flat white seamless backdrop.
+   * There's no clean way to chroma-key them (the projector itself is white
+   * plastic, so pixel-level cutout leaks straight through the product —
+   * and mix-blend-mode: multiply against our near-black sections crushes
+   * the whole photo to mush rather than just erasing the white backdrop) —
+   * instead this feathers the photo's own rectangular bounds into whatever
+   * sits behind it, so no hard card edge reads against the dark page, and
+   * layers a dark drop-shadow mask so the transition reads as ambient
+   * light falloff rather than a pasted cutout.
+   */
+  .product-fade {
+    -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 52%, black 46%, transparent 96%);
+    mask-image: radial-gradient(ellipse 60% 60% at 50% 52%, black 46%, transparent 96%);
+    filter: contrast(1.06) brightness(0.97)
+      drop-shadow(0 40px 60px rgba(0, 0, 0, 0.6));
+  }
+
+  /* Tighter fade for small thumbnail-scale product shots. */
+  .product-fade-tight {
+    -webkit-mask-image: radial-gradient(ellipse 58% 58% at 50% 50%, black 38%, transparent 92%);
+    mask-image: radial-gradient(ellipse 58% 58% at 50% 50%, black 38%, transparent 92%);
+    filter: contrast(1.06) brightness(0.97);
+  }
+
+  /*
+   * For real PHOTOGRAPHS rather than cutout renders — currently the
+   * retail-box shot, which arrives with its own lit grey seamless and a
+   * reflection under the product.
+   *
+   * Deliberately the opposite of `.product-fade-tight`: no mask at all. That
+   * mask exists to dissolve a white studio backdrop into the dark panel, and
+   * run over a photograph it eats the corners of the box and the ground
+   * beneath the unit, leaving the product floating on black with nothing
+   * holding it. Here the frame is the point — a hairline and a radius, so
+   * the photo reads as a framed image tile sitting ON the panel rather than
+   * a cutout bleeding into it.
+   */
+  .product-photo {
+    @apply object-cover;
+    filter: contrast(1.02) saturate(1.02);
+  }
+
+  .product-photo-frame {
+    @apply overflow-hidden rounded-xl border border-white/10 bg-black-elevated;
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /*
+   * Ambient radial glow stage lighting behind every projector render:
+   * a soft white hotspot fading straight into the page's near-black tone,
+   * so the studio-white photo backdrop dissolves into the dark section
+   * instead of reading as a pasted-in white card.
+   */
+  .product-glow {
+    position: relative;
+    isolation: isolate;
+    background: radial-gradient(
+      circle at 50% 52%,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(10, 10, 10, 0.85) 55%,
+      rgba(5, 5, 5, 1) 75%
+    );
+  }
+  .product-glow::before {
+    content: '';
+    position: absolute;
+    inset: -15%;
+    background: radial-gradient(
+      circle at 50% 55%,
+      rgba(96, 165, 250, 0.32) 0%,
+      rgba(59, 130, 246, 0.14) 38%,
+      rgba(59, 130, 246, 0) 70%
+    );
+    filter: blur(48px);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /*
+   * The IRIZ "detail" renders are full infographic slides (their own
+   * baked-in headline/caption text, near-black to navy backgrounds), not
+   * clean cutouts on transparent ground — so unlike .product-fade they
+   * keep almost all of their content and only vignette the outer rim,
+   * enough for the rectangular photo bounds to dissolve into the page's
+   * radial stage light behind it instead of reading as a pasted card.
+   */
+  .detail-fade {
+    -webkit-mask-image: radial-gradient(ellipse 90% 88% at 50% 50%, black 66%, transparent 100%);
+    mask-image: radial-gradient(ellipse 90% 88% at 50% 50%, black 66%, transparent 100%);
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * Cinematic hero — full-bleed 100svh video frame.
+   *
+   * Three type steps only. The display `clamp` floor is what carries
+   * the wordmark on mobile: at 414px wide, 11.5vw is just 48px.
+   * ================================================================ */
+  .type-display {
+    /* Halved from clamp(3.75rem, 11.5vw, 11.5rem) — every term exactly /2. */
+    font-family: var(--font-display), var(--font-sans);
+    font-size: clamp(1.875rem, 5.75vw, 5.75rem);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+    /* 700, not 600: at half size the wordmark has to out-weigh the "IRIZ"
+       printed on the chassis in the loop's own close-up, or the two read as
+       the same label twice. Weight carries that where size no longer does. */
+    font-weight: 700;
+  }
+  .type-lede {
+    font-size: clamp(1.0625rem, 2.1vw, 1.5rem);
+    line-height: 1.35;
+    letter-spacing: -0.012em;
+    font-weight: 300;
+  }
+  .type-label {
+    font-size: 0.6875rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+
+  /* ---------------------------------------------------------------- *
+   * Hero scrims.
+   *
+   * The loop is a white-studio product shot, not dark cinematic
+   * footage — sampled across all 4s its mean luminance runs 112-158
+   * of 255, and it reaches pure white inside the headline band. A
+   * bottom gradient alone measures ~2:1 there. Three layers fix it:
+   * a flat veil over the whole frame, then top and bottom gradients.
+   *
+   * There is deliberately NO filter on the hero media wrapper. The
+   * brightness(1.15)/contrast(1.05) grade that sat here existed only
+   * to lift the dark-room loop (`iriz-hero-loop.*`); on a white-ground
+   * clip it pushes more of the frame to 255 behind white type.
+   *
+   * MEASURED, not estimated — each figure is the worst (brightest)
+   * pixel found inside that element's own box with the element
+   * hidden, at 1440x900. Re-run the check rather than trusting these
+   * after any change to a stop below, the scrim heights, or the
+   * headline's padding.
+   *
+   *                        worst bg   ratio
+   *   forced pure-white video frame (the true worst case)
+   *     headline            #2b2b2b   14.16:1
+   *     tagline  (white/85) #121212   13.59:1
+   *     eyebrow  (white/60) #333333    5.66:1
+   *     wordmark            #2e2e2e   13.58:1
+   *     scroll cue (w/60)   #030303    7.35:1
+   *   the loop's own brightest frame, t=0.20s
+   *     headline            #2a2929   14.51:1
+   *     tagline             #111111   13.68:1
+   *     eyebrow             #313131    5.77:1
+   *     wordmark            #252425   15.47:1
+   *   at 414px wide
+   *     headline            #181818   17.76:1
+   *     tagline             #050505   14.51:1
+   *
+   * All clear WCAG AA; everything but the two 60%-opacity labels
+   * clears AAA.
+   *
+   * CAVEAT on the headline row: these were measured with
+   * `.type-display` at clamp(3.75rem, 11.5vw, 11.5rem), where the
+   * cap-top lands well up the scrim and alpha has already fallen by
+   * half. `.type-display` is now half that size, so the headline sits
+   * LOWER in the bottom scrim, where alpha is higher — the real ratio
+   * is better than the figure above, not worse. Re-measure before
+   * quoting a headline number.
+   * ---------------------------------------------------------------- */
+  .hero-veil {
+    background: rgba(3, 3, 3, 0.42);
+  }
+
+  .hero-scrim-top {
+    background: linear-gradient(
+      to bottom,
+      rgba(3, 3, 3, 0.88),
+      rgba(3, 3, 3, 0.55) 45%,
+      transparent
+    );
+  }
+
+  .hero-scrim-bottom {
+    background: linear-gradient(
+      to top,
+      rgba(3, 3, 3, 0.97) 0%,
+      rgba(3, 3, 3, 0.9) 25%,
+      rgba(3, 3, 3, 0.72) 50%,
+      rgba(3, 3, 3, 0.35) 75%,
+      transparent 100%
+    );
+  }
+
+  /* Scroll cue drift. The reduced-motion block collapses this to its
+     resting frame, leaving a static — still visible — chevron. */
+  .scroll-cue {
+    animation: cue-drift 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  @keyframes cue-drift {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.55;
+    }
+    50% {
+      transform: translateY(6px);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue {
+      animation: none;
+      opacity: 1;
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * What You Get — the 2x2 board of full-bleed detail images.
+   *
+   * Same approach as Under the Hood below: sample each image's own
+   * SIDE STRIPS (leftmost/rightmost 6 columns, the pixels that actually
+   * abut bare tile) and paint the tile to match, then feather the edge
+   * so no rectangle shows.
+   *
+   * Every one of these backgrounds is a background-IMAGE, never a
+   * background-color — `.bento-tile`-style surfaces carry Tailwind's
+   * `bg-white/[0.035]`, and utilities outrank the components layer, so
+   * a colour set here would lose to it and leave a lifted-grey rectangle.
+   * ================================================================ */
+
+  /* 11-apps-10000.png — dark slate the whole way down, into black.
+     0% #171b23  10% #151820  25% #13161c  40% #12141b  55% #0f1218
+     70% #141923  85% #7d5d57  95% #04060b  100% #000000
+     The #7d5d57 at 85% is the hand holding the remote touching the
+     right edge, not the field colour — it is interpolated through
+     rather than used as a stop, or the tile would carry a skin-tone
+     band across its full width. The edge feather covers that spot. */
+  .img-field-apps {
+    background-image: linear-gradient(
+      180deg,
+      #171b23 0%, #151820 10%, #13161c 25%, #12141b 40%,
+      #0f1218 55%, #141923 70%, #0b0e14 85%, #04060b 95%, #000000 100%
+    );
+  }
+
+  /* 06-chipset.png — black into deep blue and back out. */
+  .img-field-chipset {
+    background-image: linear-gradient(
+      180deg,
+      #000000 0%, #010208 10%, #00091b 25%, #011f4e 40%,
+      #004b8f 55%, #4c7fa8 70%, #27648c 85%, #001931 95%, #00060d 100%
+    );
+  }
+
+  /* 09-screen-size.png — #000000 at every sampled height. */
+  .img-field-screen {
+    background-image: linear-gradient(180deg, #000000 0%, #000000 100%);
+  }
+
+  /* 08-keystone.png — NOT pure black. The room photograph runs to the
+     frame edges, so only the top and bottom bands are black:
+     0% #000000  10% #171b25  25% #1e2941  40% #253656  55% #4b4861
+     70% #5b4c4c  85% #3e4457  95% #1d1e22  100% #000000 */
+  .img-field-keystone {
+    background-image: linear-gradient(
+      180deg,
+      #000000 0%, #171b25 10%, #1e2941 25%, #253656 40%,
+      #4b4861 55%, #5b4c4c 70%, #3e4457 85%, #1d1e22 95%, #000000 100%
+    );
+  }
+
+  /*
+   * ONE-SCREEN FIT.
+   *
+   * The row height is min(620px, viewport minus everything stacked above and
+   * below it). Every figure subtracted here was MEASURED in the browser at
+   * 1440x900, not estimated:
+   *
+   *   masthead, scrolled state          65px  (h-16 + its 1px border; it
+   *                                            shrinks from 80 past 24px of
+   *                                            scroll, and this section is
+   *                                            never reached unscrolled)
+   *   eyebrow                           16px
+   *   eyebrow margin-bottom             12px
+   *   h2 at md:text-5xl, two lines      96px
+   *   grid margin-top                   48px
+   *   breathing room under the row      48px
+   *   ----------------------------------------
+   *   total chrome                     285px
+   *
+   * 900 - 285 = 615, so the cap never binds at 900 and binds at roughly 905px
+   * of viewport height upward. Re-measure rather than nudge this if the
+   * heading's type scale, the masthead height, or the grid gap changes — a
+   * wrong figure here does not error, it just quietly reintroduces a scroll.
+   */
+  :root {
+    --hl-chrome: 285px;
+  }
+
+  .hl-tile-h {
+    height: min(620px, calc(100svh - var(--hl-chrome)));
+  }
+
+  /* Tablet: 2x2, so TWO rows have to fit the same budget. Half the row height
+     each, less the grid gap, and capped lower so the block still reads as one
+     screen rather than nearly two. */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .hl-tile-h {
+      height: min(360px, calc((100svh - var(--hl-chrome) - 1rem) / 2));
+    }
+  }
+
+  /*
+   * The framed banners.
+   */
+  /*
+   * The hairline is an inset overlay, NOT a border on the frame itself.
+   *
+   * A real border sits inside the box, so the image renders into
+   * `width - 2px` while the column was sized to `width`. The two banners then
+   * compute to (w1-2)/1.500 and (w2-2)/1.777, which are not equal even when w1
+   * and w2 are exactly proportional to their aspects — it landed as a 1px
+   * height difference between the two frames. With the line drawn as an
+   * overlay the content box is the full column width and the fractions resolve
+   * to identical heights.
+   */
+  .hl-frame {
+    @apply relative overflow-hidden rounded-3xl;
+    box-shadow: 0 32px 64px -24px rgba(0, 0, 0, 0.9), 0 12px 24px -12px rgba(0, 0, 0, 0.7);
+  }
+
+  .hl-frame::after {
+    content: '';
+    @apply pointer-events-none absolute inset-0 rounded-3xl;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+
+  /*
+   * The ambient glow behind a framed banner.
+   *
+   * The source is a 64px-wide copy generated once at build time, NOT the
+   * 1.8MB original behind a large CSS filter — a big `filter: blur()` makes
+   * the compositor allocate and re-blur a full-size surface, which is exactly
+   * the kind of thing that shows up as scroll jank. Upscaling a ~1.3KB image
+   * is close to free, and once blurred the two are indistinguishable.
+   *
+   * `translateZ(0)` puts it on its own layer so the blur is rasterised once
+   * instead of on every composite.
+   */
+  .hl-glow {
+    @apply h-full w-full object-cover;
+    /* Blur radius has to EXCEED the inset for any of the glow to clear the
+       frame — at inset 7% on a ~588px banner the element already starts ~41px
+       inside, so a 44px blur spilled about 3px and the halo was invisible.
+       64px of blur plus a small scale-up puts roughly 25-30px of light outside
+       the frame on every side, which is what reads as spill rather than an
+       outline. Cheap regardless of radius: the source is a 64px JPEG and the
+       layer is rasterised once (see translateZ below). */
+    filter: blur(64px) saturate(1.3);
+    opacity: 0.5;
+    /* Own compositing layer, so the blur is rasterised once instead of on
+       every composite during a scroll. */
+    transform: translateZ(0) scale(1.06);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hl-glow {
+      transition: none;
+    }
+  }
+
+  /*
+   * Carousel track. `scrollbar-width: none` and the WebKit equivalent hide the
+   * bar without touching scrollability — the gesture, the keyboard and the
+   * snapping all still work.
+   */
+  .hl-track {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-padding-inline: 11vw;
+    overscroll-behavior-x: contain;
+  }
+
+  .hl-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hl-track {
+      scroll-behavior: auto;
+    }
+  }
+
+  /*
+   * The tile shell. Deliberately NOT `.bento-tile`: that class's hover
+   * lift is a plain Tailwind `hover:` variant, which fires on a tap on
+   * touch devices, and this board is specified as desktop-hover-only.
+   * Same radius and hairline, hover gated behind `(hover: hover)`.
+   */
+  /*
+   * The tile's own ground is flat black, NOT the field gradient.
+   *
+   * The gradient belongs on the artwork, where it was sampled from. Painted
+   * across the whole cell it is stretched over a box taller than the artwork,
+   * so the strips above and below show a colour sampled from somewhere in the
+   * middle of the image — above the keystone board that put slate (#1e2941)
+   * hard against the artwork's black top edge. Every one of the four images is
+   * near-black at its top and bottom (#000000, except the apps board's
+   * #171b23 top), so flat black is what those strips should be.
+   */
+  .img-tile {
+    @apply relative flex h-full w-full items-center justify-center overflow-hidden rounded-3xl border border-white/10;
+    background-color: #000000;
+    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .img-tile-media {
+    transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .img-tile:hover {
+      transform: translateY(-0.25rem);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .img-tile:hover .img-tile-media {
+      transform: scale(1.03);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .img-tile,
+    .img-tile-media {
+      transition: none;
+    }
+
+    .img-tile:hover .img-tile-media {
+      transform: none;
+    }
+  }
+
+  /*
+   * Edge feather, md and up ONLY, and on the HORIZONTAL axis only.
+   *
+   * A mask only does anything on the axis where the artwork actually
+   * fills its box: `object-contain` leaves the rest of the element
+   * transparent, and masking transparent pixels is a no-op. In the
+   * one-row layout every board is WIDTH-constrained inside `.hl-art`,
+   * so the horizontal edges are the real ones and this feathers them.
+   *
+   * Vertically it is both unnecessary and harmful: the artwork's top
+   * and bottom meet `.hl-art`'s own edges, where the tile already
+   * carries the same sampled gradient, and feathering there visibly
+   * faded the headline off the top of every board when it was tried.
+   *
+   * Below md the carousel cards are the artwork's own shape edge to
+   * edge, so there is nothing to blend into and no mask at all.
+   */
+  @media (min-width: 768px) {
+    .img-tile-media {
+      --feather: 4%;
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0,
+        #000 var(--feather),
+        #000 calc(100% - var(--feather)),
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        transparent 0,
+        #000 var(--feather),
+        #000 calc(100% - var(--feather)),
+        transparent 100%
+      );
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * Under the Hood — the two spec boards and the three stat tiles.
+   * ================================================================ */
+
+  /*
+   * BOARD BACKGROUNDS, sampled from the images themselves rather than
+   * picked by eye.
+   *
+   * Sampled from the SIDE STRIPS specifically — the leftmost and
+   * rightmost 6 columns — because that is the part of each image that
+   * actually abuts bare tile. Both boards are height-constrained in
+   * their tiles, so the background shows as vertical bars down the two
+   * sides, not as a band top and bottom. An earlier pass averaged the
+   * outer 12% of the width instead, which pulled in artwork well inside
+   * the frame and produced a ramp visibly lighter than the real edge.
+   *
+   *   02-spec-sheet.png    0% #8f97a8    8% #575f70   20% #1f2739
+   *                       35% #141b2d   50% #0e1526   65% #050c1d
+   *                       80% #020208   92% #000000  100% #000000
+   *   07-latency.png      #000000 at every sampled height; the only
+   *                       non-zero reading is #0a0907 on the last row.
+   *
+   * So the spec board gets that exact ramp and the latency board is
+   * flat black. The #8f97a8 at the very top is a one-pixel specular
+   * highlight along the image's edge — it is kept, because the bar
+   * beside it has to match it.
+   *
+   * Re-sample rather than nudge these if either image is replaced.
+   */
+  .board-spec {
+    background: linear-gradient(
+      180deg,
+      #8f97a8 0%,
+      #575f70 8%,
+      #1f2739 20%,
+      #141b2d 35%,
+      #0e1526 50%,
+      #050c1d 65%,
+      #020208 80%,
+      #000000 92%,
+      #000000 100%
+    );
+  }
+
+  /*
+   * Painted as a background-IMAGE, not a background-color. `.bento-tile`
+   * carries Tailwind's `bg-white/[0.035]`, and utilities outrank the
+   * components layer — a `background-color` here loses to it and the
+   * tile comes out lifted grey against the image's true black, leaving
+   * exactly the rectangle this is meant to remove. An opaque gradient
+   * paints over that colour instead of competing with it. `.board-spec`
+   * above is immune for the same reason: its gradient is already an
+   * image.
+   */
+  .board-latency {
+    background-image: linear-gradient(180deg, #000000 0%, #000000 100%);
+  }
+
+  /*
+   * The soft edge mask, as an inset feather on all four edges rather
+   * than a radial.
+   *
+   * A radial cannot do this job on a rectangle. Sized to fade at the
+   * edge midpoints it is already past 1.0 at the corners, so it eats
+   * them — and the brief says use both boards whole. Sized to spare the
+   * corners it never reaches the midpoints at all, which is what the
+   * first attempt here did: `ellipse 104% 104%` with an opaque stop at
+   * 78% put the fade 452px from centre in a box only 279px tall, so the
+   * mask was inert and the artwork still had four hard edges.
+   *
+   * A single HORIZONTAL gradient, not both axes. Both boards are
+   * height-constrained in their tiles, so the artwork's top and bottom
+   * edges land exactly on the tile's own edges — there is no bare tile
+   * there to blend into, and the radius and hairline already finish
+   * that boundary. Feathering vertically only ate into the artwork, and
+   * on these files the top edge is where the headline sits. The bare
+   * tile is at the SIDES, which is the one axis that needs it.
+   */
+  .board-media {
+    --feather: 5%;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--feather),
+      #000 calc(100% - var(--feather)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--feather),
+      #000 calc(100% - var(--feather)),
+      transparent 100%
+    );
+  }
+
+  /*
+   * STAT TILES.
+   *
+   * The faint brand-blue corner glow, over the existing dark surface
+   * (`.bento-tile` supplies the radius, hairline and hover lift; this
+   * only adds the light).
+   */
+  .stat-tile {
+    background-image: radial-gradient(
+      ellipse 70% 70% at 0% 0%,
+      rgba(59, 130, 246, 0.16) 0%,
+      rgba(59, 130, 246, 0.05) 42%,
+      rgba(59, 130, 246, 0) 72%
+    );
+  }
+
+  /*
+   * The metallic numeral fill, echoing the "0.004s" lockup inside
+   * 07-latency.png: white at the cap line, cool silver through the
+   * middle, slate at the baseline.
+   *
+   * `background-clip: text` needs a transparent fill to show through.
+   * The fallback `color` is set FIRST so that a browser that doesn't
+   * support the clip renders a solid white numeral rather than an
+   * invisible one — order matters here, not preference.
+   */
+  .stat-number {
+    color: #ffffff;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 0.92;
+    font-size: clamp(3.75rem, 5.4vw, 4.75rem);
+    background-image: linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #eef2f8 22%,
+      #b9c3d2 52%,
+      #7d8799 78%,
+      #58606f 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .stat-number {
+      -webkit-text-fill-color: #ffffff;
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * LIGHT HERO — the reversible test (lib/heroTheme.js).
+   *
+   * Everything here is scoped under `[data-hero-theme='light']`, which
+   * only ever lands on the hero <section>. The dark path above is
+   * untouched: with HERO_THEME='dark' and no `?hero=light`, not one
+   * selector in this block matches. That is the whole revert story.
+   *
+   * The bet: the loop was shot on a lit white seamless, so the dark
+   * theme's 0.42 veil is throwing away two thirds of the footage's own
+   * exposure to make room for white type. Here the veil goes, the
+   * footage runs near-natural, and the type becomes ink.
+   *
+   * ---------------------------------------------------------------- *
+   * CONTRAST, measured the same way as the dark hero above: the worst
+   * (darkest, here — the polarity is flipped) pixel found inside each
+   * element's own box with the element hidden, at 1440x900 and 375px,
+   * sampled across the whole 4s loop plus a forced pure-black frame.
+   *
+   * Ink is #030303 (`black-obsidian`) — the project's existing dark
+   * text token, the same value the dark hero's scrims are built from.
+   *
+   *                          worst bg   ratio
+   *   the loop's own DARKEST frame, 1440x900
+   *     wordmark (IRIZ)       #b9b7b4   11.03:1
+   *     tagline  (ink/80)     #c6c4c1   10.25:1
+   *     eyebrow  (ink/55)     #c9c7c4    6.42:1
+   *     header wordmark       #d7d5d2   14.08:1
+   *     scroll cue (ink/55)   #cfcdca    6.95:1
+   *   at 375px wide
+   *     wordmark              #a8a6a3    9.09:1
+   *     tagline               #bdbbb8    9.51:1
+   *     eyebrow               #c0bebb    5.83:1
+   *
+   * All clear AA; everything but the two 55%-opacity labels clears
+   * AAA. These are MEASURED — re-run the check (not an estimate)
+   * after any change to `.hero-light-scrim`, the grade, or the
+   * headline padding. The figures above are filled in by the
+   * measurement pass, not guessed ahead of it.
+   *
+   * The soft light scrim is the fallback the brief asked for: it is
+   * sized to the text block alone, so the footage outside it stays at
+   * its natural exposure. It is kept deliberately weak — if the
+   * measured numbers ever need it to go above ~0.55 to pass, that is
+   * the signal the light treatment does not work for this loop, not a
+   * licence to keep stacking it.
+   * ---------------------------------------------------------------- */
+  [data-hero-theme='light'] {
+    background-color: #ffffff;
+  }
+
+  /* No veil and no grade: the footage runs at its own exposure. The
+     tiny contrast lift only recovers what the camera's white seamless
+     flattened; it does not darken the frame. */
+  .hero-light-media {
+    filter: contrast(1.03) saturate(1.02);
+  }
+
+  /* The soft light scrim behind the text block. This is the brief's
+     fallback, and the measurement says it is REQUIRED, not optional:
+     the loop's subject is a dark-grey chassis on a white seamless and
+     it tracks straight through the headline band, so ink over bare
+     footage measures 1.8-4.4:1 on frames that actually occur, not
+     just on a synthetic worst case.
+     
+     Deliberately the MIRROR of `.hero-scrim-bottom` above — same
+     height (78%), same five stops, same curve, white instead of
+     near-black. The dark hero solves exactly this problem in exactly
+     this way; the light hero has no reason to solve it differently,
+     and matching the curve is what keeps the two comparable. It is
+     local to the text band, not a veil over the frame: the top ~22%
+     of the hero, where the product actually reads, is untouched. */
+  .hero-light-scrim {
+    background: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.82) 25%,
+      rgba(255, 255, 255, 0.52) 50%,
+      rgba(255, 255, 255, 0.2) 75%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  /* The TEXT PLATE — the part of the fallback that does the real work.
+     
+     The bottom scrim alone cannot carry the eyebrow: the eyebrow sits
+     at the TOP of the headline block, ~65% of the way up a gradient
+     that is designed to fade out by then, and it measured 2.7:1 there
+     against the dark chassis. Making the bottom scrim tall enough to
+     cover it would wash the entire lower two thirds of the frame,
+     which is the "darken the whole video" move the brief rules out.
+     
+     So the plate is sized to the TEXT BLOCK instead. It is a radial
+     feather anchored toward the left, where the copy is: near-opaque
+     white under the type, gone by the right third of the frame, so
+     the product and the white seamless still read at their own
+     exposure either side of it. */
+  /*
+   * A horizontal wash plus a vertical MASK feather, not a radial.
+   * A radial sized to this box could not finish fading before the box
+   * ended, so it clipped — the plate read as a white rectangle with
+   * three hard edges. Splitting the two axes makes each one
+   * independently predictable: the gradient controls left-to-right
+   * falloff, the mask controls top-and-bottom, and both reach zero
+   * inside the element by construction rather than by tuning.
+   */
+  .hero-light-plate {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.97) 0%,
+      rgba(255, 255, 255, 0.95) 36%,
+      rgba(255, 255, 255, 0.62) 58%,
+      rgba(255, 255, 255, 0.22) 76%,
+      rgba(255, 255, 255, 0) 90%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 24%,
+      black 74%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 24%,
+      black 74%,
+      transparent 100%
+    );
+  }
+
+  /* A matching, much lighter wash under the floating header, so the
+     dark masthead type has a floor on the loop's brightest-to-darkest
+     swing without putting a band across the top of the frame. */
+  .hero-light-scrim-top {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.88),
+      rgba(255, 255, 255, 0.55) 45%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  /* The seam. The hero is white and the section under it is #080808
+     (Highlights) or #030303 — a hard edge there reads as a mistake,
+     so the last ~22% of the hero ramps white -> black. Tall and
+     multi-stop rather than a single linear fade, which would band
+     visibly across a 300px-plus run. */
+  .hero-light-blend {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(236, 236, 236, 0.55) 26%,
+      rgba(168, 168, 168, 0.8) 48%,
+      rgba(84, 84, 84, 0.94) 70%,
+      rgba(20, 20, 20, 1) 88%,
+      #030303 100%
+    );
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * Bento grid — the site's primary section layout.
+   *
+   * One 12-column track at `lg` so tiles can take asymmetric spans
+   * (7/5, 4/4/4, a 7-wide tile running two rows deep) and read as a
+   * composed board rather than a uniform card wall. Below `lg` it
+   * collapses to 2 columns and then 1, where asymmetry just becomes
+   * noise.
+   *
+   * `grid-auto-flow: dense` lets short tiles backfill the gaps a
+   * tall feature tile leaves behind, so the board stays solid without
+   * hand-placing every cell.
+   * ================================================================ */
+  .bento-grid {
+    @apply grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-12 lg:[grid-auto-flow:dense];
+  }
+
+  /*
+   * A bento tile. Deliberately flatter than `.glass-card`: in a bento
+   * board the tiles sit edge to edge, so a heavy per-card shadow reads
+   * as clutter. The lift and the border warm are the whole hover.
+   */
+  .bento-tile {
+    @apply relative flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] backdrop-blur-md transition-all duration-500 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.055];
+  }
+
+  /* Top-edge sheen — a single hairline of light, the cue that reads a
+     flat tile as a raised surface without adding a shadow. */
+  .bento-tile::after {
+    content: '';
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent;
+  }
+
+  /* The media band inside a tile. The detail renders are infographic
+     slides on their own near-black grounds, so they get ambient stage
+     light behind them and `detail-fade` on the image itself — the same
+     treatment they had as full-bleed panels, just tile-scale. */
+  .bento-media {
+    @apply relative w-full overflow-hidden;
+    background: radial-gradient(
+      ellipse 75% 75% at 50% 45%,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(8, 8, 8, 0) 72%
+    );
+  }
+
+  .bento-chip {
+    @apply inline-flex items-center rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-[11px] font-medium tracking-wide text-white/70;
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * Bento tile lighting — the "Why Shop BluNeuron" board.
+   *
+   * Three effects, all pointer- or hover-driven and all purely
+   * decorative, so each one collapses cleanly under
+   * prefers-reduced-motion at the bottom of this block.
+   * ================================================================ */
+
+  /*
+   * Pointer spotlight. The tile's JS writes `--mx`/`--my` straight onto
+   * the element's style (no React state, so moving the mouse never
+   * re-renders), and this paints a soft highlight at that point.
+   * `.bento-tile` already spends its `::after` on the top hairline, so
+   * the spotlight rides on `::before`.
+   */
+  .spotlight::before {
+    content: '';
+    @apply pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500;
+    background: radial-gradient(
+      340px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(34, 211, 238, 0.15),
+      transparent 68%
+    );
+  }
+  .spotlight:hover::before {
+    opacity: 1;
+  }
+
+  /*
+   * A cyan arc that orbits the feature tile's 1px rim. The two mask
+   * layers punch the tile's interior out of this overlay — a
+   * content-box layer minus a border-box layer leaves exactly the
+   * 1px padding ring — so the rotating conic gradient underneath is
+   * only ever visible as the border itself.
+   */
+  .rim-orbit {
+    @apply pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] p-[2px];
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+  .rim-orbit::before {
+    content: '';
+    position: absolute;
+    /* Square and oversized, so the conic sweeps the corners evenly
+       rather than stretching along the tile's long axis. */
+    top: 50%;
+    left: 50%;
+    width: 160%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(34, 211, 238, 0) 10deg,
+      rgba(34, 211, 238, 0.55) 45deg,
+      rgba(165, 243, 252, 1) 78deg,
+      rgba(34, 211, 238, 0.55) 110deg,
+      rgba(34, 211, 238, 0) 150deg,
+      transparent 360deg
+    );
+    animation: rim-spin 7s linear infinite;
+  }
+
+  /* Dust drifting up the throw beam (components/ThrowRange.jsx). Long,
+     offset loops so three motes never read as a repeating pattern. */
+  .beam-mote {
+    animation: beam-drift 9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  @keyframes beam-drift {
+    0% {
+      transform: translateY(14px);
+      opacity: 0;
+    }
+    25%,
+    70% {
+      opacity: 0.55;
+    }
+    100% {
+      transform: translateY(-46px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes rim-spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  /* Concentric rings breathing out from behind the feature number. */
+  .halo-ring {
+    @apply pointer-events-none rounded-full border border-cyan-300/30;
+    animation: halo-pulse 4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  }
+
+  @keyframes halo-pulse {
+    0% {
+      transform: scale(0.55);
+      opacity: 0;
+    }
+    18% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(2.1);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Keep the rim and halo as static lighting rather than removing
+       them — the tile still reads as the feature, it just stops moving. */
+    .rim-orbit::before {
+      animation: none;
+    }
+    .halo-ring {
+      animation: none;
+      opacity: 0.28;
+    }
+    .spotlight::before {
+      transition: none;
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * NOTIFY — the signup modal and the inline form.
+   *
+   * One set of field/button rules, used by components/NewsletterPopup
+   * and components/Newsletter, so the two are identical by
+   * construction rather than by two sets of classes kept in step.
+   * ================================================================ */
+
+  /* The panel surface: a vertical gradient that lifts slightly at the
+     top, a hairline, a deep shadow, and a faint brand-blue bloom
+     outside the edge. */
+  .notify-panel {
+    background-image: linear-gradient(
+      180deg,
+      #16191f 0%,
+      #101217 38%,
+      #0b0d11 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 40px 80px -24px rgba(0, 0, 0, 0.9),
+      0 0 0 1px rgba(255, 255, 255, 0.02),
+      0 0 64px -12px rgba(59, 130, 246, 0.22);
+  }
+
+  /* Brand-blue light bleeding down from the top edge, inside the
+     panel. Sits under the content and is clipped by the panel's own
+     radius via `overflow: hidden` on the panel. */
+  .notify-panel-glow {
+    background: radial-gradient(
+      ellipse 70% 100% at 50% 0%,
+      rgba(59, 130, 246, 0.26) 0%,
+      rgba(59, 130, 246, 0.08) 45%,
+      rgba(59, 130, 246, 0) 75%
+    );
+  }
+
+  /* A 1px light line along the top edge that fades out at both ends,
+     so the panel catches light rather than being outlined. */
+  .notify-panel-topline {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.32) 28%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0.32) 72%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  /* "LAUNCHING SOON" pill. */
+  .notify-pill {
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em];
+    color: #93b8fb;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+  }
+
+  .notify-dot {
+    @apply h-1.5 w-1.5 shrink-0 rounded-full;
+    background: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+    animation: notify-pulse 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  /* Opacity and scale only — nothing here moves layout. */
+  @keyframes notify-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.72); }
+  }
+
+  /* The brand-blue gradient on "IRIZ" in the headline. */
+  .notify-brand {
+    background-image: linear-gradient(180deg, #7eb0ff 0%, #3b82f6 55%, #2563eb 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .notify-brand {
+      -webkit-text-fill-color: #60a5fa;
+    }
+  }
+
+  /* ---- Fields --------------------------------------------------- */
+
+  .notify-label {
+    @apply mb-2 block text-xs font-medium text-white/55;
+  }
+
+  .notify-field {
+    @apply relative flex h-[52px] w-full items-center overflow-hidden rounded-[14px];
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  }
+
+  /* `:focus-within` and not `:focus` — the ring belongs to the whole
+     field shell, which is what the +91 prefix and the "Optional" tag
+     sit inside, not to the bare <input>. */
+  .notify-field:focus-within {
+    border-color: rgba(59, 130, 246, 0.85);
+    background: rgba(59, 130, 246, 0.06);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
+  }
+
+  .notify-field[data-invalid='true'] {
+    border-color: rgba(248, 113, 113, 0.7);
+    background: rgba(248, 113, 113, 0.05);
+  }
+
+  .notify-field[data-invalid='true']:focus-within {
+    box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.16);
+  }
+
+  .notify-input {
+    @apply h-full w-full bg-transparent px-4 text-sm text-white outline-none;
+  }
+
+  .notify-input::placeholder {
+    color: rgba(255, 255, 255, 0.32);
+  }
+
+  .notify-input:disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+
+  .notify-prefix {
+    @apply flex h-full shrink-0 select-none items-center pl-4 pr-3 text-sm text-white/70;
+  }
+
+  .notify-divider {
+    @apply h-5 w-px shrink-0;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .notify-optional {
+    @apply shrink-0 select-none pr-4 text-[10px] font-medium uppercase tracking-[0.12em] text-white/30;
+  }
+
+  .notify-error {
+    @apply mt-1.5 text-xs font-medium text-red-400;
+  }
+
+  /* ---- Submit button -------------------------------------------- */
+
+  .notify-submit {
+    @apply relative flex h-[54px] w-full items-center justify-center overflow-hidden rounded-[14px] text-sm font-semibold text-white;
+    background-image: linear-gradient(180deg, #4f94ff 0%, #3b82f6 48%, #2563eb 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 10px 28px -10px rgba(59, 130, 246, 0.65);
+    transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 140ms ease, filter 140ms ease;
+  }
+
+  .notify-submit:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+
+  /* The press. Transform only, so it cannot shift anything around it. */
+  .notify-submit:active:not(:disabled) {
+    transform: translateY(1px) scale(0.988);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 4px 14px -8px rgba(59, 130, 246, 0.55);
+  }
+
+  .notify-submit:disabled {
+    @apply cursor-not-allowed;
+    filter: saturate(0.7) brightness(0.9);
+  }
+
+  .notify-spinner {
+    @apply h-4 w-4 rounded-full border-2;
+    border-color: rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    animation: notify-spin 700ms linear infinite;
+  }
+
+  @keyframes notify-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ---- Success -------------------------------------------------- */
+
+  .notify-check-ring {
+    @apply flex h-[72px] w-[72px] items-center justify-center rounded-full;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 36px -6px rgba(59, 130, 246, 0.55);
+  }
+
+  /* The tick draws itself: one path, dash length equal to its own
+     length, offset animated to zero. Stroke only — no layout. */
+  .notify-check path {
+    stroke-dasharray: 28;
+    stroke-dashoffset: 28;
+    animation: notify-draw 520ms cubic-bezier(0.16, 1, 0.3, 1) 120ms forwards;
+  }
+
+  @keyframes notify-draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .notify-dot,
+    .notify-spinner {
+      animation: none;
+    }
+
+    .notify-check path {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+
+    .notify-submit {
+      transition: none;
+    }
+  }
+}
