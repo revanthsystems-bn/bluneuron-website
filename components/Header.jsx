@@ -22,9 +22,16 @@ const NAV_ITEMS = [
 /**
  * `overlay` is for the homepage, where the cinematic hero runs full-bleed to
  * the top of the viewport. In that mode the masthead floats over the video —
- * fixed rather than sticky, so it claims no layout height — and stays
- * transparent until the first scroll, letting the hero's top scrim carry the
- * contrast (measured at 10.7:1 for the wordmark; see app/globals.css).
+ * fixed rather than sticky, so it claims no layout height.
+ *
+ * It used to float TRANSPARENT until the first scroll and let the hero's top
+ * scrim carry the contrast. That worked only while a flat 0.42 veil darkened
+ * the whole loop. The bright hero has no veil, so over the hero the bar now
+ * wears its own frosted plate instead (`.hero-header-frost`): a dark wash
+ * over blur(14px) saturate(1.2), which holds the logo, links and burger at AA
+ * without putting any more darkness on the footage. The links and the burger
+ * go FULL WHITE while they sit on it, and back to white/80 past the hero —
+ * measured, see app/globals.css.
  *
  * ---------------------------------------------------------------------
  * `heroTheme` is the light-hero test (lib/heroTheme.js). With 'light', the
@@ -36,6 +43,11 @@ const NAV_ITEMS = [
  *
  *   `scrolled`  (> 24px)  — the existing height/background shrink.
  *   `pastHero`            — whether the masthead has cleared the hero.
+ *
+ * Both hero themes now switch their over-hero treatment on `pastHero`, not on
+ * `scrolled`: `ink` for the light test, `frosted` for the bright dark hero.
+ * Keying the frost to `scrolled` would drop the full black glass bar onto the
+ * video 24px into a 100svh section.
  *
  * They used to be one flag, because with a dark hero "scrolled at all" and
  * "over something dark" were the same thing. Over a LIGHT hero they are not:
@@ -70,6 +82,9 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
 
   // Ink mode: floating over a LIGHT hero that has not scrolled away yet.
   const ink = overlay && heroTheme === 'light' && !pastHero;
+  // Frosted mode: the same moment on the BRIGHT dark hero. Mutually exclusive
+  // with `ink` by construction — they test opposite values of `heroTheme`.
+  const frosted = overlay && heroTheme !== 'light' && !pastHero;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -94,18 +109,24 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
     return () => observer.disconnect();
   }, [overlay]);
 
-  // Background: transparent while floating over an unscrolled hero, or
-  // anywhere in ink mode; the dark glass only once dark page is behind it.
-  const transparent = ink || (overlay && !scrolled);
+  // Background: transparent only in ink mode, where the hero itself is white
+  // and the bar is dark-on-light. Over the bright dark hero the frost carries
+  // it; past either hero, the normal black glass.
+  const transparent = ink;
 
   return (
     <header
       className={[
         'top-0 z-40 border-b transition-colors duration-500',
         overlay ? 'fixed inset-x-0' : 'sticky',
-        transparent
-          ? 'border-transparent bg-transparent'
-          : `border-border-subtle backdrop-blur-glass ${scrolled ? 'bg-black/90' : 'bg-black/80'}`,
+        transparent ? 'border-transparent bg-transparent' : 'border-border-subtle',
+        // `border-border-subtle` is rgba(255,255,255,0.08) — the hairline the
+        // frosted plate is specified with, and the same one the black glass
+        // already used, so it is set once above for both.
+        frosted ? 'hero-header-frost' : '',
+        transparent || frosted
+          ? ''
+          : `backdrop-blur-glass ${scrolled ? 'bg-black/90' : 'bg-black/80'}`,
       ].join(' ')}
     >
       <motion.div style={{ scaleX: progress }} className="absolute inset-x-0 top-0 h-px origin-left bg-accent" />
@@ -134,12 +155,19 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
               positioned and `aria-hidden`, so the accessibility tree still
               sees exactly one wordmark. */}
           <span className="relative inline-flex h-5">
+            {/* `priority`, so the mark is preloaded and painted with the first
+                frame rather than lazily after it. Over a bright hero a missing
+                logo is not a subtle regression — there is no dark bar left for
+                the gap to hide in. (It replaces a `preload` prop that was not
+                a next/image prop at all and did nothing but reach the DOM.)
+                Only the white copy gets it; the ink copy is for the light test
+                and is never the first thing painted. */}
             <Image
               src="/brand/wordmark-white.png"
               alt="BluNeuron"
               width={1715}
               height={327}
-              preload
+              priority
               className={`h-5 w-auto transition-opacity duration-500 ${ink ? 'opacity-0' : 'opacity-100'}`}
             />
             <Image
@@ -161,7 +189,9 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors duration-500 ${
                 ink
                   ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
-                  : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  : frosted
+                    ? 'text-white hover:bg-white/10'
+                    : 'text-white/80 hover:bg-white/5 hover:text-white'
               }`}
             >
               {item.label}
@@ -194,7 +224,9 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
             className={`rounded-full p-2 transition-colors duration-500 lg:hidden ${
               ink
                 ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
-                : 'text-white/80 hover:bg-white/5 hover:text-white'
+                : frosted
+                  ? 'text-white hover:bg-white/10'
+                  : 'text-white/80 hover:bg-white/5 hover:text-white'
             }`}
             onClick={() => setMobileOpen((v) => !v)}
           >

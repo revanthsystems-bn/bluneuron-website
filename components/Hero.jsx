@@ -21,8 +21,9 @@ import { HERO } from '@/lib/iriz';
  * ---------------------------------------------------------------------
  * THEMES (lib/heroTheme.js). `theme` is 'dark' (the committed default) or
  * 'light' (the test). The two share this component's structure and nothing
- * else: the dark path renders the veil + two black scrims it has always had,
- * the light path renders a text-local white wash, a header wash, and the tall
+ * else: the dark path renders a graded loop under two LOCAL black fades (the
+ * flat full-frame veil it used to carry is gone — see app/globals.css), the
+ * light path renders a text-local white wash, a header wash, and the tall
  * bottom blend into the dark section below. Each layer is rendered or not —
  * none of them is restyled in place — so neither path can silently inherit a
  * value meant for the other.
@@ -41,12 +42,20 @@ export default function Hero({ theme = 'dark' }) {
   // fails AA. 75% takes the same ground to 6.3:1. White-on-dark tolerates a
   // low alpha far better than dark-on-light, because the composite moves
   // toward the bright background rather than away from it.
-  const eyebrowClass = light ? 'text-black-obsidian/75' : 'text-white/60';
+  // Full white on the dark path, not the 60% it ran at under the veil.
+  // Measured: at white/60 the eyebrow reaches only 1.47:1 at 1280 over this
+  // loop, and no plate gentle enough to keep the picture bright can lift a
+  // 60%-alpha label to AA. At full white the same spot measures 5.65:1.
+  const eyebrowClass = light ? 'text-black-obsidian/75' : 'text-white';
   const displayClass = light ? 'text-black-obsidian' : 'text-white';
   const taglineClass = light ? 'text-black-obsidian/90' : 'text-white/85';
+  // On the dark path the cue sits mid-frame on footage nothing darkens any
+  // more, so it is full white and carries its own shadow (`.hero-cue` /
+  // `.scroll-cue`, app/globals.css) rather than leaning on a scrim. It was
+  // white/60 when the veil was there to hold it up.
   const cueClass = light
     ? 'text-black-obsidian/75 group-hover:text-black-obsidian'
-    : 'text-white/60 group-hover:text-white';
+    : 'text-white hero-cue';
 
   return (
     <section
@@ -58,12 +67,15 @@ export default function Hero({ theme = 'dark' }) {
     >
       {/* The loop, edge to edge.
 
-          DARK: no grade on this wrapper — the loop is a white-studio shot and
-          brightening it only pushes more of the frame to 255 behind the copy.
+          DARK: `.hero-media` is the bright grade — brightness(1.08)
+          contrast(1.04). It sits on this WRAPPER and not on the <video> so
+          that the poster frame the video paints before playback and the
+          reduced-motion still that renders with no video at all are graded
+          identically; app/globals.css has the reasoning.
           LIGHT: `.hero-light-media` is a contrast/saturation nudge only, no
           brightness term. The point of the light test is to show the footage
           near its own exposure, so nothing here may darken it. */}
-      <div className={`absolute inset-0 ${light ? 'hero-light-media' : ''}`}>
+      <div className={`absolute inset-0 ${light ? 'hero-light-media' : 'hero-media'}`}>
         <HeroBackdrop />
       </div>
 
@@ -91,16 +103,18 @@ export default function Hero({ theme = 'dark' }) {
         </>
       ) : (
         <>
-          {/* Scrims. The loop is a white-studio shot, so a bottom gradient
-              alone leaves the headline at ~2:1 — it needs the flat veil
-              underneath as well, at 0.42. The contrast maths is in
-              app/globals.css. */}
-          <span aria-hidden className="hero-veil pointer-events-none absolute inset-0" />
-          <span aria-hidden className="hero-scrim-top pointer-events-none absolute inset-x-0 top-0 h-52" />
-          <span
-            aria-hidden
-            className="hero-scrim-bottom pointer-events-none absolute inset-x-0 bottom-0 h-[78%]"
-          />
+          {/* Scrims — LOCAL ONLY. The flat full-frame veil that used to sit
+              here is gone: it was 0.42 black over every pixel of a shot that
+              was filmed on a lit white seamless, and it is where the darkness
+              came from. What is left is a short fade behind the text block and
+              a light one under the masthead.
+
+              Both are sized in app/globals.css (45%/50% tall and 7rem/6rem)
+              rather than with utilities here, because each gradient's stops
+              are positions INSIDE its own box — split the height from the
+              stops across two files and they drift apart on the next edit. */}
+          <span aria-hidden className="hero-scrim-top pointer-events-none absolute inset-x-0 top-0" />
+          <span aria-hidden className="hero-scrim-bottom pointer-events-none absolute inset-x-0 bottom-0" />
         </>
       )}
 
@@ -124,17 +138,36 @@ export default function Hero({ theme = 'dark' }) {
               feathered edge lands off-screen left and well clear of the copy
               elsewhere — a plate whose falloff is visible behind the text
               reads as a box. */}
-          {light && (
+          {light ? (
             <span
               aria-hidden
               className="hero-light-plate pointer-events-none absolute -inset-y-28 -left-[50vw] -right-[6vw] sm:-right-[12vw]"
+            />
+          ) : (
+            /* The dark path's equivalent, and the layer that carries the copy
+               now that the full-frame veil is gone. Anchored to this wrapper,
+               which hugs the TYPE — anchored to the padded container instead,
+               its feathered top lands mid-headline and the eyebrow falls
+               outside it entirely. Bled half a viewport to the left so the
+               gradient's dark end is always off-screen; app/globals.css has
+               the measurements that set its strength. */
+            <span
+              aria-hidden
+              className="hero-text-plate pointer-events-none absolute -inset-y-20 -left-[50vw] -right-[6vw]"
             />
           )}
           <Reveal amount={0.2}>
             <p className={`type-label relative ${eyebrowClass}`}>{HERO.eyebrow}</p>
           </Reveal>
+          {/* The wordmark — the ONLY string on the site set in Zen Dots
+              (`.font-iriz`, app/globals.css). `.type-display` still supplies
+              the size ramp; the utility overrides family, weight, tracking and
+              leading over the top of it. Same text node as before, so the h1's
+              accessible name is still exactly "IRIZ". */}
           <Reveal amount={0.2} delay={0.08}>
-            <h1 className={`type-display relative mt-5 ${displayClass}`}>{HERO.display}</h1>
+            <h1 className={`type-display font-iriz relative mt-5 ${displayClass}`}>
+              {HERO.display}
+            </h1>
           </Reveal>
           <Reveal amount={0.2} delay={0.16}>
             <p className={`type-lede relative mt-5 max-w-xl ${taglineClass}`}>{HERO.tagline}</p>

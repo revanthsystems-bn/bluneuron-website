@@ -1,4 +1,4 @@
-import { Inter_Tight } from 'next/font/google';
+import { Inter_Tight, Zen_Dots } from 'next/font/google';
 import { MotionConfig } from 'framer-motion';
 import './globals.css';
 import SmoothScroll from '@/components/SmoothScroll';
@@ -23,6 +23,44 @@ const interTight = Inter_Tight({
   subsets: ['latin'],
   variable: '--font-display',
   display: 'swap',
+});
+
+/**
+ * The IRIZ wordmark face. Zen Dots is a display-only geometric face used for
+ * exactly one string on the site — the hero wordmark — so it is NOT applied to
+ * anything inheritable: it is exposed as `--font-iriz` and reached only
+ * through the `.font-iriz` utility in app/globals.css.
+ *
+ * ONE WEIGHT. Zen Dots ships 400 and nothing else (see the family entry in
+ * next/dist/compiled/@next/font/dist/google/font-data.json), so there is no
+ * bold to fall back on — `.font-iriz` pins font-weight to 400 rather than
+ * letting `.type-display`'s 700 synthesise a smeared faux-bold.
+ *
+ * `adjustFontFallback` is next/font/google's default; it is named here
+ * because it is the thing that keeps the swap from moving the layout. Next
+ * emits a `Zen Dots Fallback` @font-face — `src: local(Arial)` with
+ * `size-adjust: 140.2%`, `ascent-override: 66.34%`,
+ * `descent-override: 19.26%` — so the face the visitor sees during the swap
+ * occupies the same box as Zen Dots itself and `display: 'swap'` costs no CLS.
+ *
+ * NO `fallback: [...]` HERE, deliberately, and this is not a style choice:
+ * passing one SUPPRESSES that generated face. With
+ * `fallback: ['system-ui', 'arial']` the build emitted
+ * `--font-iriz: "Zen Dots", system-ui, arial` and no `Zen Dots Fallback`
+ * @font-face at all — i.e. exactly the layout shift `adjustFontFallback` is
+ * there to prevent. Without it: `--font-iriz: "Zen Dots", "Zen Dots Fallback"`.
+ * Verified in the built CSS both ways. The plain-system end of the chain is
+ * appended in `.font-iriz` (app/globals.css) instead, where it costs nothing.
+ *
+ * Self-hosted at build time like Inter Tight above — the woff2 is emitted into
+ * the build output, so no visitor ever requests fonts.googleapis.com.
+ */
+const zenDots = Zen_Dots({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-iriz',
+  display: 'swap',
+  adjustFontFallback: true,
 });
 
 const TITLE = 'BluNeuron IRIZ — True 500 ANSI Lumens, Built-in Google TV';
@@ -57,7 +95,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`dark ${interTight.variable}`}>
+    <html lang="en" className={`dark ${interTight.variable} ${zenDots.variable}`}>
       <body className="bg-black font-sans text-white antialiased">
         <MotionConfig reducedMotion="user">
           <CartProvider>

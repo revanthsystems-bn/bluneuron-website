@@ -9,10 +9,16 @@ const LOOP = MEDIA.heroLoop;
 /**
  * The hero's full-bleed 4s loop — the white-studio shot, handheld.
  *
- * Nothing in here grades or masks the footage: the hero's white ground is
- * held down by the flat veil and the two scrims in components/Hero.jsx, and
- * deliberately not by a filter on this element, so the reduced-motion poster
- * below gets exactly the same treatment as the video.
+ * Nothing in here grades or masks the footage, and that is still the rule:
+ * the bright grade lives on the WRAPPER in components/Hero.jsx
+ * (`.hero-media`), one level up, precisely so the poster below and the video
+ * get exactly the same treatment. A filter on either element alone is how the
+ * two media states drift apart.
+ *
+ * `.hero-media-frame` is the one shared piece of framing: it owns
+ * `object-position` for the wide 16:9 crop, and it is on BOTH elements so
+ * the video and the still frame the product the same way. app/globals.css
+ * records which value was chosen for phones and why.
  *
  * Under reduced motion this renders NO <video> element at all — just the
  * poster. A paused video at 100svh is worse than useless: dropping
@@ -70,7 +76,7 @@ export default function HeroBackdrop() {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-center"
+        className="hero-media-frame object-cover"
       />
     );
   }
@@ -78,7 +84,7 @@ export default function HeroBackdrop() {
   return (
     <video
       ref={videoRef}
-      className="h-full w-full object-cover object-center"
+      className="hero-media-frame h-full w-full object-cover"
       poster={LOOP.poster}
       aria-label={LOOP.description}
       // muted + playsInline are both required or iOS refuses to autoplay.
