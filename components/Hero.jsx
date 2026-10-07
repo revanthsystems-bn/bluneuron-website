@@ -282,12 +282,31 @@ export default function Hero({ theme = 'dark' }) {
           </Reveal>
 
           <Reveal amount={0.2} delay={0.08}>
+            {/* TWO CHILDREN, one for each audience.
+
+                The name the machines read is a real text node ("IRIZ",
+                uppercase like every other IRIZ on the site) in an `sr-only`
+                span — not an `aria-label`. An aria-label would have worked for
+                the accessible name, but it OVERRIDES the contents rather than
+                supplementing them, which is how this element ended up
+                announcing "iriz" in the first place.
+
+                The glyphs the eye reads are the dotless U+0131 wordmark, in an
+                `aria-hidden` span so it is pruned from the accessibility tree
+                and cannot be announced as "ırız".
+
+                The styling stays on the <h1> and the visual span INHERITS it —
+                family, size, weight, tracking, leading, colour and the
+                `text-transform: none` all cascade down. Restating the classes
+                on the span would be a second place for them to drift, and the
+                rendered box is identical either way: verified pixel-for-pixel
+                against the previous build at 390 and 1440. */}
             <h1
               className={`type-display font-iriz relative mt-5 ${displayClass}`}
               style={{ textTransform: 'none' }}
-              aria-label="iriz"
             >
-              {wordmarkText}
+              <span className="sr-only">{HERO.display}</span>
+              <span aria-hidden="true">{wordmarkText}</span>
             </h1>
           </Reveal>
 
