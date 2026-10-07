@@ -11,10 +11,16 @@
  * It owns its own submission so the two call sites cannot drift apart on
  * validation order, phone normalisation, or what counts as success. The parent
  * is told via `onSuccess` and decides what to show.
+ *
+ * That ownership is also why the Meta Pixel `Lead` event is fired from here
+ * rather than from the two parents: there is exactly one place in the codebase
+ * where a signup is known to have succeeded, so both surfaces report a Lead by
+ * construction and a third surface added later cannot forget to.
  */
 
 import { useId, useRef, useState } from 'react';
 import { isValidEmail, isValidPhone, submitNotifySignup } from '@/lib/web3forms';
+import { trackMetaPixel } from '@/lib/metaPixel';
 
 export default function NotifyFields({
   source,
@@ -72,6 +78,15 @@ export default function NotifyFields({
       // Success is ONLY this branch — a resolved promise from
       // submitNotifySignup, which itself only resolves on `success: true`.
       setStatus('idle');
+
+      // A real, delivered signup — the one conversion this site has. No
+      // arguments: the standard `Lead` event carries no parameters, and the
+      // email and phone number the visitor just typed must never be sent to
+      // Meta. A missing `fbq` (ad blocker, or the pixel deliberately off
+      // locally) is a silent no-op inside trackMetaPixel, so this cannot throw
+      // and cost the visitor their confirmation.
+      trackMetaPixel('Lead');
+
       onSuccess?.(data);
     } catch (err) {
       // Keep everything typed. A failed send must not cost the visitor

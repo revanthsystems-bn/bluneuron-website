@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Inter_Tight, Zen_Dots } from 'next/font/google';
 import { MotionConfig } from 'framer-motion';
 import './globals.css';
@@ -7,6 +8,7 @@ import ConsentNotice from '@/components/ConsentNotice';
 import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import NotifyProvider from '@/components/notify/NotifyProvider';
+import MetaPixel from '@/components/MetaPixel';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -109,6 +111,15 @@ export default function RootLayout({ children }) {
           </CartProvider>
         </MotionConfig>
         <Analytics />
+        {/* Meta Pixel base code + PageView on every route change.
+            The Suspense boundary is required, not cosmetic: MetaPixel reads
+            `useSearchParams`, and a root-layout client component that does
+            that without a boundary pulls the entire page tree out of
+            prerendering. Wrapped, the pages stay static and only this
+            (render-nothing) component is client-rendered. */}
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
       </body>
     </html>
   );
