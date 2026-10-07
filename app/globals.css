@@ -1460,10 +1460,29 @@
    * same chain `.type-display` falls back to, so a failed font load
    * degrades to the old wordmark rather than to Times.
    * ================================================================ */
-  .font-iriz {
+  /* .font-iriz {
     font-family: var(--font-iriz), var(--font-display), var(--font-sans);
     font-weight: 400;
     letter-spacing: 0.02em;
     line-height: 1.05;
-  }
+  } */
+  /* Check for missing closing braces like this */
+  @layer utilities {
+    .font-iriz {
+      font-family: var(--font-iriz), system-ui, sans-serif;
+      font-weight: 400;
+      text-transform: none !important;
+      /* The wordmark alone is 1.3x `.type-display`'s ramp — every term of
+         that clamp scaled: 1.875->2.4rem, 5.75->7.5vw, 5.75->7.5rem. It is
+         set HERE and not on `.type-display` because this class dresses
+         exactly one element on the site (the hero h1), so the display ramp
+         that every other heading shares is untouched.
+
+         Leading and tracking are deliberately NOT restated: both are
+         relative (unitless 0.88 and -0.045em, inherited from
+         `.type-display`), so they scale with the font-size on their own and
+         stay proportional at every step of the clamp. */
+      font-size: clamp(2.4rem, 7.5vw, 7.5rem);
+    }
+  } /* <--- Check if this outer bracket or an inner one is missing */
 }
