@@ -5,6 +5,7 @@ import Reveal from './Reveal';
 import NotifyFields from './notify/NotifyFields';
 import NotifySuccess from './notify/NotifySuccess';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
+import { SHOW_PRIVACY } from '@/lib/iriz';
 
 /**
  * The inline signup at the bottom of the page — the same signup as the modal,
@@ -53,14 +54,20 @@ export default function Newsletter() {
                 onSuccess={() => setDone(true)}
               />
               <p className="mt-5 text-center text-[11px] leading-relaxed text-white/35">
-                No spam. Unsubscribe anytime. See our{' '}
-                <a
-                  href="/legal/privacy"
-                  className="underline underline-offset-2 transition-colors hover:text-white/60"
-                >
-                  Privacy Policy
-                </a>
-                .
+                No spam. Unsubscribe anytime.
+                {SHOW_PRIVACY && (
+                  <>
+                    {' '}
+                    See our{' '}
+                    <a
+                      href="/legal/privacy"
+                      className="underline underline-offset-2 transition-colors hover:text-white/60"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
+                  </>
+                )}
               </p>
             </>
           )}

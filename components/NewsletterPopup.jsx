@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import NotifyFields from './notify/NotifyFields';
 import NotifySuccess from './notify/NotifySuccess';
 import { startLenis, stopLenis } from '@/lib/lenis';
+import { SHOW_PRIVACY } from '@/lib/iriz';
 
 /**
  * The signup modal. Presentational and controlled — components/notify/
@@ -188,14 +189,20 @@ export default function NewsletterPopup({ open, source, onClose, onSubscribed })
                     <NotifyFields source={source} onSuccess={handleSuccess} emailRef={emailRef} />
 
                     <p className="mt-5 text-center text-[11px] leading-relaxed text-white/35">
-                      No spam. Unsubscribe anytime. See our{' '}
-                      <a
-                        href="/legal/privacy"
-                        className="underline underline-offset-2 transition-colors hover:text-white/60"
-                      >
-                        Privacy Policy
-                      </a>
-                      .
+                      No spam. Unsubscribe anytime.
+                      {SHOW_PRIVACY && (
+                        <>
+                          {' '}
+                          See our{' '}
+                          <a
+                            href="/legal/privacy"
+                            className="underline underline-offset-2 transition-colors hover:text-white/60"
+                          >
+                            Privacy Policy
+                          </a>
+                          .
+                        </>
+                      )}
                     </p>
 
                     <div className="mt-4 text-center">

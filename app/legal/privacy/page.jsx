@@ -1,8 +1,14 @@
 import LegalPage from '@/components/LegalPage';
+import { SHOW_PRIVACY } from '@/lib/iriz';
 
 export const metadata = {
   title: 'Privacy Policy (Draft) — BluNeuron',
   description: 'Draft privacy policy for BluNeuron — placeholder text, not reviewed by counsel.',
+  // While SHOW_PRIVACY is false the page is unlinked everywhere and out of the
+  // sitemap, so this is the last door left: a draft policy that nothing points
+  // at must not turn up in a search result either. The route itself is kept —
+  // see the flag's note in lib/iriz.js for why it is not deleted.
+  ...(SHOW_PRIVACY ? {} : { robots: { index: false, follow: false } }),
 };
 
 const sections = [

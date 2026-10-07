@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { SHOW_PRIVACY } from '@/lib/iriz';
 
 const STORAGE_KEY = 'bluneuron-consent-ack';
 
@@ -28,7 +29,20 @@ const STORAGE_KEY = 'bluneuron-consent-ack';
  */
 const LANDMARKS = ['#compare', '#buy', 'footer'];
 
+/**
+ * The privacy switch (SHOW_PRIVACY, lib/iriz.js) is read HERE rather than at
+ * the render site in app/layout.jsx, and this wrapper exists so that it can
+ * be: a conditional `return null` has to sit above every hook, and the bar's
+ * own hooks are in the component below. Off, that component never mounts, so
+ * no landmark query and no IntersectionObserver ever run — rather than
+ * mounting, observing, and then rendering nothing.
+ */
 export default function ConsentNotice() {
+  if (!SHOW_PRIVACY) return null;
+  return <ConsentNoticeBar />;
+}
+
+function ConsentNoticeBar() {
   const [acknowledged, setAcknowledged] = useState(true);
   const [pastTop, setPastTop] = useState(false);
 
