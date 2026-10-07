@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { REGION, SOCIAL_LINKS } from '@/lib/iriz';
+import { REGION, SHOW_PRIVACY, SOCIAL_LINKS } from '@/lib/iriz';
 
 /**
  * A deliberately minimal footer: wordmark, market, socials, copyright.
@@ -10,17 +10,15 @@ import { REGION, SOCIAL_LINKS } from '@/lib/iriz';
  * from the consent bar and the signup forms — they are simply not restated at
  * the bottom of every page.
  *
- * The Privacy Policy link that used to close the bottom row is gone too, so
- * that row is now just the copyright line. /legal/privacy still exists and is
- * still linked from all three places a visitor actually hands over an email or
- * phone number — components/ConsentNotice, components/Newsletter's inline
- * signup, and components/NewsletterPopup's "Notify Me" fine print. None of
- * those ever read this file; the privacy link lives next to the fields it
- * describes rather than at the bottom of every page.
+ * The Privacy Policy link is BACK in the bottom row, beside the copyright.
+ * It had been removed on the reasoning that the notice only has to be visible
+ * where the collection happens — which it still is, in components/ConsentNotice
+ * and in both signup forms' fine print. That reasoning covers consent; it does
+ * not cover someone who has already signed up and simply wants to re-read the
+ * policy, and the footer is the first place anyone looks for it. Both now.
  *
- * So: do not re-add it here on the theory that collecting email requires a
- * footer link. The requirement is that the notice be visible where the
- * collection happens, and it is.
+ * It is gated on SHOW_PRIVACY (lib/iriz.js) like every other privacy surface,
+ * so the four of them can be turned off together.
  *
  * NOT a client component any more. The only thing that ever needed state here
  * was the region <select>, and a static label needs none. Both consumers
@@ -133,13 +131,21 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* One line, so no row machinery: the `flex flex-col ... gap-2
-            sm:flex-row sm:items-center sm:gap-5` that laid the copyright out
-            beside the Privacy Policy link went with the link. A flex row
-            around a single child would reserve a gap next to nothing and
-            change where that child sits between breakpoints. */}
-        <div className="mt-8 border-t border-border-subtle pt-6 text-xs text-white/45">
+        {/* The row machinery is back with the link: stacked below sm so the
+            two never crowd on a phone, side by side above it. With
+            SHOW_PRIVACY off there is a single child again, and `gap` on a
+            one-child flex row reserves nothing — so this lays out identically
+            either way. */}
+        <div className="mt-8 flex flex-col gap-2 border-t border-border-subtle pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
           <p>© {new Date().getFullYear()} BluNeuron. All rights reserved.</p>
+          {SHOW_PRIVACY && (
+            <a
+              href="/legal/privacy"
+              className="underline underline-offset-2 transition-colors hover:text-white"
+            >
+              Privacy Policy
+            </a>
+          )}
         </div>
       </div>
     </footer>

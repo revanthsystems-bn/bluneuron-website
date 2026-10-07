@@ -53,12 +53,13 @@ export default function Newsletter() {
                 source={NOTIFY_SOURCES.inlineForm}
                 onSuccess={() => setDone(true)}
               />
+              {/* The consent line sits under the button, where the action is. With
+                  SHOW_PRIVACY off it falls back to the reassurance copy rather than to
+                  nothing, so the fine print never disappears entirely. */}
               <p className="mt-5 text-center text-[11px] leading-relaxed text-white/35">
-                No spam. Unsubscribe anytime.
-                {SHOW_PRIVACY && (
+                {SHOW_PRIVACY ? (
                   <>
-                    {' '}
-                    See our{' '}
+                    By signing up, you agree to our{' '}
                     <a
                       href="/legal/privacy"
                       className="underline underline-offset-2 transition-colors hover:text-white/60"
@@ -67,6 +68,8 @@ export default function Newsletter() {
                     </a>
                     .
                   </>
+                ) : (
+                  'No spam. Unsubscribe anytime.'
                 )}
               </p>
             </>

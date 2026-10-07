@@ -104,12 +104,12 @@ function ConsentNoticeBar() {
     >
       <div className="section-container flex flex-col items-start justify-between gap-4 py-5 sm:flex-row sm:items-center">
         <p className="max-w-2xl text-xs leading-relaxed text-white/60">
-          We use your email address only to send the updates you sign up for, and to respond if you contact
-          support — submissions are processed by our third-party form provider. See our{' '}
+          We use cookies and similar tools to measure visits and our ads, and we use your email only for launch
+          updates. See our{' '}
           <a href="/legal/privacy" className="underline underline-offset-2 hover:text-white">
             Privacy Policy
-          </a>{' '}
-          for details.
+          </a>
+          .
         </p>
         <button
           onClick={dismiss}
