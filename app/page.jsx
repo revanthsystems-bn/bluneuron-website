@@ -9,11 +9,9 @@ import Hero from '@/components/Hero';
 import Newsletter from '@/components/Newsletter';
 import Footer from '@/components/Footer';
 import StickyBuyBar from '@/components/StickyBuyBar';
-import { BRAND, MEDIA, PRICING, SPECS } from '@/lib/iriz';
 import { COMMERCE_ENABLED } from '@/lib/launch';
 import { resolveHeroTheme } from '@/lib/heroTheme';
-import { SITE_URL, absoluteUrl } from '@/lib/site';
-import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
+import { ORGANIZATION_JSON_LD, pageMetadata, productJsonLd } from '@/lib/seo';
 
 /**
  * Homepage title, at 65 characters.
@@ -22,8 +20,8 @@ import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
  * characters; past it the tail is truncated in the result, and the tail is where
  * the brand name sits. "Native" is the word that was cut to make room — the
  * distinction it draws (true 1080p DISPLAY vs. the H723's 4K DECODING, see
- * lib/iriz.js) still appears in the description, the og:title, the h1 and the
- * Product markup below, none of which are width-constrained.
+ * lib/iriz.js) still appears in the description, the og:title and the hero h1,
+ * none of which are width-constrained.
  */
 const TITLE = 'IRIZ Mini Projector for Home — 1080p, 500 ANSI Lumens | BluNeuron';
 
@@ -41,48 +39,15 @@ export const metadata = pageMetadata({
   ogTitle: 'BluNeuron IRIZ — Mini Projector for Home, Native 1080p, 500 ANSI Lumens',
 });
 
-const PRODUCT_JSON_LD = {
-  '@context': 'https://schema.org',
-  '@type': 'Product',
-  '@id': `${SITE_URL}/#product`,
-  name: `${BRAND.fullName} Mini Projector for Home`,
-  brand: { '@type': 'Brand', name: BRAND.name },
-  description:
-    'A mini projector for home cinema: true 500 ANSI lumens, native 1080p resolution, '
-    + 'Allwinner H723 chipset, and built-in Google TV with 10,000+ apps.',
-  // Absolute, fetchable URLs — Google rejects relative `image` values, and
-  // every entry here is a file that exists in public/.
-  image: [
-    absoluteUrl(MEDIA.product.heroClean),
-    absoluteUrl(MEDIA.product.retailBox),
-  ],
-  url: SITE_URL,
-  // No `aggregateRating` or `review`. The manufacturer supplied no ratings
-  // data with this unit (lib/iriz.js) and inventing one would be both a
-  // structured-data violation and a lie told in a search result.
-  additionalProperty: SPECS.map((spec) => ({
-    '@type': 'PropertyValue',
-    name: spec.label,
-    value: `${spec.value} (${spec.unit})`,
-  })),
-  // No `offers` block while commerce is off. Structured data is a public
-  // claim: an Offer with a price and `InStock` tells Google the IRIZ can be
-  // bought right now for ₹13,999, which would put a price and a buy prompt in
-  // search results for a product with no purchase path. Price-free product
-  // markup is still valid and still earns a rich result.
-  ...(COMMERCE_ENABLED
-    ? {
-        offers: {
-          '@type': 'Offer',
-          url: SITE_URL,
-          price: PRICING.offerPrice,
-          priceCurrency: PRICING.currency,
-          availability: 'https://schema.org/InStock',
-          itemCondition: 'https://schema.org/NewCondition',
-        },
-      }
-    : {}),
-};
+/**
+ * Product structured data, or `null` while there is no confirmed price.
+ *
+ * The whole decision lives in productJsonLd() (lib/seo.js) — including why a
+ * price-free Product is not emitted at all rather than emitted without
+ * `offers`. Resolved once at module scope: it depends only on constants, so
+ * there is nothing per-request about it.
+ */
+const PRODUCT_JSON_LD = productJsonLd();
 
 /**
  * `searchParams` is a Promise in Next 16 and is a request-time API, so reading
@@ -100,16 +65,23 @@ export default async function Home({ searchParams }) {
 
   return (
     <>
-      {/* Two separate <script> blocks rather than one @graph array. Both are
-          valid; separate blocks mean a syntax error in one can't invalidate
-          the other, and Google's Rich Results Test reports them independently.
-          Organization is emitted HERE and only here — it describes the site as
-          a whole, so a copy on every page would be duplicate markup. */}
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(PRODUCT_JSON_LD) }}
-      />
+      {/* Separate <script> blocks rather than one @graph array. Both spellings
+          are valid; separate blocks mean a syntax error in one can't
+          invalidate the other, and Google's Rich Results Test reports them
+          independently — which also lets Product drop out on its own below
+          without touching Organization.
+
+          Product renders only when it is VALID (a confirmed price, so it can
+          carry `offers`). Organization is emitted HERE and only here: it
+          describes the site as a whole, so a copy on every page would be
+          duplicate markup. */}
+      {PRODUCT_JSON_LD && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(PRODUCT_JSON_LD) }}
+        />
+      )}
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
