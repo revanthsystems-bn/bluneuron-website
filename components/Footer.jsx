@@ -1,29 +1,40 @@
 import Image from 'next/image';
 import { REGION, SHOW_PRIVACY, SOCIAL_LINKS } from '@/lib/iriz';
+import { FOOTER_COLUMNS, ROUTES } from '@/lib/routes';
+import { COMPANY, allKnown } from '@/lib/site-config';
 
 /**
- * A deliberately minimal footer: wordmark, market, socials, copyright.
+ * THE LINK COLUMNS ARE BACK — Product, Support, Policies, Company.
  *
- * The four link columns (Product / Support / Company / Legal) are GONE. Every
- * route they pointed at still exists and is still reachable — /specs and
- * /compare from the masthead nav, /support and /about by URL, the legal pages
- * from the consent bar and the signup forms — they are simply not restated at
- * the bottom of every page.
+ * They were removed once, on the reasoning that every route they pointed at
+ * was reachable some other way: /specs and /compare from the masthead,
+ * /support and /about by URL, the legal pages from the consent bar and the
+ * signup forms. That held while the site was a pre-launch teaser with four
+ * destinations.
  *
- * The Privacy Policy link is BACK in the bottom row, beside the copyright.
- * It had been removed on the reasoning that the notice only has to be visible
- * where the collection happens — which it still is, in components/ConsentNotice
- * and in both signup forms' fine print. That reasoning covers consent; it does
- * not cover someone who has already signed up and simply wants to re-read the
- * policy, and the footer is the first place anyone looks for it. Both now.
+ * It stops holding the moment the product sells on Amazon and Flipkart. A
+ * marketplace buyer does not arrive at the homepage and browse down — they
+ * arrive at a policy page from a search, or at this site from a link on an
+ * invoice, already owning the thing, looking for a warranty claim or a return
+ * window. The masthead nav is about choosing the product; it has nothing for
+ * someone who already has one. The footer is where that person looks, on every
+ * page, and sixteen routes cannot be reached from a masthead with four.
  *
- * It is gated on SHOW_PRIVACY (lib/iriz.js) like every other privacy surface,
- * so the four of them can be turned off together.
+ * Column content and order come from FOOTER_COLUMNS in lib/routes.js, which is
+ * also where the paths themselves are defined — so a footer link cannot point
+ * at a page that does not exist, and a renamed route updates here for free.
  *
- * NOT a client component any more. The only thing that ever needed state here
- * was the region <select>, and a static label needs none. Both consumers
- * (app/page.jsx, components/PageShell) are server components, so dropping
- * 'use client' keeps the footer out of every page's JS bundle.
+ * THE IDENTITY LINE at the bottom (legal name, GSTIN, registered address) is a
+ * disclosure, not decoration: India's Consumer Protection (E-Commerce) Rules
+ * expect a seller's legal identity and address to be discoverable, and the
+ * footer of every page is where that belongs. It renders only once all three
+ * are real — a footer reading "GSTIN: [TBD]" looks like a broken site rather
+ * than an unfinished one, and a half-filled disclosure is worse than none.
+ * See lib/site-config.js.
+ *
+ * Still NOT a client component. Nothing here has state — the region is a
+ * static label, and both consumers (app/page.jsx, components/PageShell) are
+ * server components, so the whole footer stays out of every page's JS bundle.
  */
 
 /**
@@ -64,19 +75,61 @@ export default function Footer() {
     ...ICONS[key],
   }));
 
+  const showIdentity = allKnown(COMPANY.legalName, COMPANY.gstin, COMPANY.registeredAddress);
+
   return (
     <footer className="border-t border-border-subtle bg-black">
       {/* `pb-28` below lg, not plain `py`: StickyBuyBar is `fixed bottom-0
-          lg:hidden`, so on a phone it sits over whatever the footer puts last —
-          which is now the copyright line. Same offset-for-the-bar precedent as
-          components/ConsentNotice. Pages without the buy bar just get a little
-          extra air under the footer, which costs nothing. */}
-      <div className="section-container pb-28 pt-10 sm:pt-12 lg:pb-12">
-        {/* One compact row. The columns that used to sit above this are gone,
-            so the old `mt-14 ... border-t pt-8` that separated them from it
-            went with them — kept, it would hold open the exact gap removing
-            them was meant to close. */}
-        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+          lg:hidden`, so on a phone it sits over whatever the footer puts last.
+          Same offset-for-the-bar precedent as components/ConsentNotice. Pages
+          without the buy bar just get a little extra air under the footer,
+          which costs nothing. */}
+      <div className="section-container pb-28 pt-14 sm:pt-16 lg:pb-12">
+        {/*
+          Two columns at 390px rather than four or one: four is unreadable at
+          that width, and one turns a 17-link footer into a very long scroll
+          past the end of the content.
+
+          CSS MULTI-COLUMN below lg, not a 2-up grid. In a grid every row is as
+          tall as its tallest cell, so "Product" (4 links) beside "Support" (6)
+          leaves two links' worth of dead space before the next row starts —
+          about 200px of empty black in the middle of the footer on a phone.
+          Multi-column flows the four blocks into two balanced columns instead
+          and packs them with no gaps. `break-inside-avoid` is what keeps a
+          column's own links from being split across the fold.
+
+          At lg it goes back to a real four-column grid, where each heading
+          gets its own column and the balancing multi-column does is not wanted.
+        */}
+        <nav
+          aria-label="Footer"
+          className="columns-2 gap-x-6 lg:grid lg:grid-cols-4 lg:gap-x-6 lg:[column-count:auto]"
+        >
+          {FOOTER_COLUMNS.map((column) => (
+            <div key={column.title} className="mb-10 break-inside-avoid lg:mb-0">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+                {column.title}
+              </h2>
+              <ul className="mt-4 space-y-2.5">
+                {column.links.map((link) => (
+                  <li key={`${column.title}-${link.href}-${link.label}`}>
+                    <a
+                      href={link.href}
+                      className="text-sm text-white/60 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        {/* `mt-4` not `mt-14`: each column block already carries `mb-10` for
+            the multi-column flow, so the gap below the last one is mostly
+            there already. */}
+        <div className="mt-4 flex flex-col items-start justify-between gap-6 border-t border-border-subtle pt-10 sm:flex-row sm:items-center lg:mt-14">
           <Image
             src="/brand/wordmark-white.png"
             alt="BluNeuron"
@@ -131,16 +184,30 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* The row machinery is back with the link: stacked below sm so the
-            two never crowd on a phone, side by side above it. With
-            SHOW_PRIVACY off there is a single child again, and `gap` on a
-            one-child flex row reserves nothing — so this lays out identically
-            either way. */}
-        <div className="mt-8 flex flex-col gap-2 border-t border-border-subtle pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+        {/* The legal identity line. Its own row above the copyright, because
+            an address is long enough that sharing a line with anything else
+            wraps badly at 390px. */}
+        {showIdentity && (
+          <div className="mt-8 border-t border-border-subtle pt-6 text-xs leading-relaxed text-white/40">
+            <p className="font-medium text-white/55">{COMPANY.legalName}</p>
+            <p className="mt-1">{COMPANY.registeredAddress}</p>
+            <p className="mt-1">GSTIN: {COMPANY.gstin}</p>
+          </div>
+        )}
+
+        {/* Stacked below sm so the two never crowd on a phone, side by side
+            above it. With SHOW_PRIVACY off there is a single child again, and
+            `gap` on a one-child flex row reserves nothing — so this lays out
+            identically either way. */}
+        <div
+          className={`flex flex-col gap-2 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between sm:gap-5 ${
+            showIdentity ? 'mt-6' : 'mt-8 border-t border-border-subtle pt-6'
+          }`}
+        >
           <p>© {new Date().getFullYear()} BluNeuron. All rights reserved.</p>
           {SHOW_PRIVACY && (
             <a
-              href="/legal/privacy"
+              href={ROUTES.privacy}
               className="underline underline-offset-2 transition-colors hover:text-white"
             >
               Privacy Policy

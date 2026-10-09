@@ -7,12 +7,14 @@ import ProductShowcase from '@/components/ProductShowcase';
 import ComparisonTable from '@/components/ComparisonTable';
 import Hero from '@/components/Hero';
 import Newsletter from '@/components/Newsletter';
+import BuySection from '@/components/BuySection';
 import Footer from '@/components/Footer';
 import StickyBuyBar from '@/components/StickyBuyBar';
 import { BRAND, MEDIA, PRICING, SPECS } from '@/lib/iriz';
 import { COMMERCE_ENABLED } from '@/lib/launch';
 import { resolveHeroTheme } from '@/lib/heroTheme';
 import { SITE_URL } from '@/lib/site';
+import { MARKETPLACE, SHOW_BUY, isTBD } from '@/lib/site-config';
 
 const PRODUCT_JSON_LD = {
   '@context': 'https://schema.org',
@@ -28,23 +30,44 @@ const PRODUCT_JSON_LD = {
     name: spec.label,
     value: `${spec.value} (${spec.unit})`,
   })),
-  // No `offers` block while commerce is off. Structured data is a public
-  // claim: an Offer with a price and `InStock` tells Google the IRIZ can be
-  // bought right now for ₹13,999, which would put a price and a buy prompt in
-  // search results for a product with no purchase path. Price-free product
-  // markup is still valid and still earns a rich result.
-  ...(COMMERCE_ENABLED
+  // No `offers` block unless the product can actually be bought AND we know
+  // the price. Structured data is a public claim: an Offer with a price and
+  // `InStock` tells Google the IRIZ can be bought right now for that amount,
+  // which would put a price and a buy prompt in search results for a product
+  // with no purchase path — or, worse, quote "[TBD]" as a price. Price-free
+  // product markup is still valid and still earns a rich result.
+  //
+  // Two ways to be buyable, and they carry different prices: marketplace
+  // selling (SHOW_BUY, the real path — the marketplace price) and the
+  // switched-off in-site cart (COMMERCE_ENABLED — PRICING in lib/iriz.js).
+  // SHOW_BUY is checked first for the same reason the masthead CTA checks it
+  // first: it is the path a buyer would actually take.
+  ...(SHOW_BUY && !isTBD(MARKETPLACE.priceInr)
     ? {
         offers: {
           '@type': 'Offer',
-          url: SITE_URL,
-          price: PRICING.offerPrice,
-          priceCurrency: PRICING.currency,
+          // The buy card, not a marketplace URL. This page is where both
+          // listings are offered, and naming one of them here would make the
+          // other invisible to a rich result.
+          url: new URL('/where-to-buy', SITE_URL).toString(),
+          price: MARKETPLACE.priceInr,
+          priceCurrency: 'INR',
           availability: 'https://schema.org/InStock',
           itemCondition: 'https://schema.org/NewCondition',
         },
       }
-    : {}),
+    : COMMERCE_ENABLED
+      ? {
+          offers: {
+            '@type': 'Offer',
+            url: SITE_URL,
+            price: PRICING.offerPrice,
+            priceCurrency: PRICING.currency,
+            availability: 'https://schema.org/InStock',
+            itemCondition: 'https://schema.org/NewCondition',
+          },
+        }
+      : {}),
 };
 
 /**
@@ -94,7 +117,14 @@ export default async function Home({ searchParams }) {
         <TechSpecs />
         <ProductShowcase />
         <ComparisonTable />
-        <Newsletter />
+        {/* The closing section is EITHER the marketplace buy card or the
+            launch-list signup — never both, and never neither. They share the
+            `#buy` id (BUY_ANCHOR in lib/routes.js), which is what the masthead
+            CTA, the mobile sticky bar and ConsentNotice's landmark list all
+            point at, so that anchor resolves in both states and none of those
+            three has to know which one is mounted.
+            See SHOW_BUY in lib/site-config.js. */}
+        {SHOW_BUY ? <BuySection /> : <Newsletter />}
       </main>
       <Footer />
     </>

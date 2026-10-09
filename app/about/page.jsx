@@ -1,10 +1,13 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import Reveal from '@/components/Reveal';
+import { ROUTES, routeRobots } from '@/lib/routes';
+import { COMPANY, allKnown } from '@/lib/site-config';
 
 export const metadata = {
   title: 'About — BluNeuron',
   description: 'Why BluNeuron exists, and why the IRIZ is built around honest brightness claims.',
+  robots: routeRobots(ROUTES.about),
 };
 
 const VALUES = [
@@ -67,13 +70,49 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/*
+        The registered entity, in prose rather than as the footer's compact
+        disclosure line. Both read COMPANY from lib/site-config.js and both
+        hide while it is unknown — a "who we are" page that answers the
+        question with "[TBD]" is worse than one that does not raise it. The
+        difference is only in the telling: the footer is the legally required
+        disclosure on every page, this is the paragraph someone looking into
+        the company actually wants to read.
+      */}
+      {allKnown(COMPANY.legalName, COMPANY.registeredAddress) && (
+        <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+          <div className="section-container">
+            <Reveal className="max-w-[680px]">
+              <h2 className="text-2xl font-bold tracking-tighter text-white">The company</h2>
+              <p className="mt-4 text-sm leading-relaxed text-white/60">
+                {COMPANY.brandName} is a brand of{' '}
+                <span className="font-semibold text-white/85">{COMPANY.legalName}</span>, registered
+                in India at {COMPANY.registeredAddress}
+                {allKnown(COMPANY.gstin) && <> under GSTIN {COMPANY.gstin}</>}.
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-white/60">
+                We sell through Amazon and Flipkart rather than running our own store, so every
+                order, payment and delivery is handled by them —{' '}
+                <a
+                  href={ROUTES.whereToBuy}
+                  className="underline underline-offset-2 transition-colors hover:text-white"
+                >
+                  where to buy
+                </a>{' '}
+                sets out who handles what after an order.
+              </p>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
       <section className="bg-black py-16 text-center sm:py-20">
         <div className="section-container">
           <Reveal>
             <p className="mx-auto max-w-md text-sm text-white/50">
-              Questions about the company or the product? We'd genuinely like to hear from you.
+              Questions about the company or the product? We&apos;d genuinely like to hear from you.
             </p>
-            <a href="/support#contact" className="btn-secondary mt-5 inline-flex">
+            <a href={ROUTES.contact} className="btn-secondary mt-5 inline-flex">
               Get in Touch →
             </a>
           </Reveal>

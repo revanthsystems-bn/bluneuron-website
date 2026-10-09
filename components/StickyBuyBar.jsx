@@ -8,6 +8,8 @@ import NotifyButton from './NotifyButton';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
 import { COMMERCE_ENABLED } from '@/lib/launch';
 import { BRAND } from '@/lib/iriz';
+import { BUY_HREF } from '@/lib/routes';
+import { MARKETPLACE, SHOW_BUY, formatInr } from '@/lib/site-config';
 
 // Mobile-only sticky bottom bar, shown once the user scrolls past the hero —
 // the same pattern most consumer-hardware product pages use. Desktop already
@@ -32,7 +34,28 @@ export default function StickyBuyBar() {
           transition={{ type: 'spring', stiffness: 340, damping: 32 }}
           className="fixed inset-x-0 bottom-0 z-50 border-t border-border-subtle bg-black/95 px-4 py-3 backdrop-blur-glass lg:hidden"
         >
-          {COMMERCE_ENABLED ? (
+          {SHOW_BUY ? (
+            /* Marketplace selling: the bar carries the price and ONE action,
+               which scrolls to the buy card. Not the two marketplace buttons
+               themselves — a 390px bar cannot hold a price plus two labelled
+               buttons without truncating all three, and choosing a marketplace
+               is a decision that needs the fulfilment note next to it. See
+               components/BuySection. */
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-white">
+                  {formatInr(MARKETPLACE.priceInr)}
+                </p>
+                <p className="truncate text-xs text-white/50">{MARKETPLACE.priceNote}</p>
+              </div>
+              <a
+                href={BUY_HREF}
+                className="btn-primary shrink-0 whitespace-nowrap px-5 py-2.5 text-xs"
+              >
+                Buy
+              </a>
+            </div>
+          ) : COMMERCE_ENABLED ? (
             <div className="flex items-center justify-between gap-3">
               <PriceTag size="sm" />
               <BuyButtons

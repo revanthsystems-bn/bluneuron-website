@@ -1,20 +1,21 @@
+import { SITEMAP } from '@/lib/routes';
 import { SITE_URL } from '@/lib/site';
 
-const ROUTES = [
-  { path: '/', priority: 1, changeFrequency: 'weekly' },
-  { path: '/specs', priority: 0.8, changeFrequency: 'monthly' },
-  { path: '/compare', priority: 0.8, changeFrequency: 'monthly' },
-  { path: '/support', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/about', priority: 0.5, changeFrequency: 'monthly' },
-  { path: '/legal/privacy', priority: 0.2, changeFrequency: 'yearly' },
-  { path: '/legal/terms', priority: 0.2, changeFrequency: 'yearly' },
-  { path: '/legal/shipping', priority: 0.2, changeFrequency: 'yearly' },
-  { path: '/legal/returns', priority: 0.2, changeFrequency: 'yearly' },
-];
-
+/**
+ * The route list used to live here. It now comes from lib/routes.js, which is
+ * also where the footer columns and the support tiles get their paths — so the
+ * sitemap cannot advertise a URL that no page serves, and a renamed route
+ * updates all three at once.
+ *
+ * SITEMAP is pre-filtered to the pages that are INDEXABLE: a page still
+ * showing [TBD] placeholders sends `noindex` (see routeRobots in
+ * lib/routes.js), and listing it here would ask a crawler to index a page that
+ * asks not to be. Those pages reappear on their own once their details are
+ * filled into lib/site-config.js.
+ */
 export default function sitemap() {
   const lastModified = new Date();
-  return ROUTES.map((route) => ({
+  return SITEMAP.map((route) => ({
     url: new URL(route.path, SITE_URL).toString(),
     lastModified,
     changeFrequency: route.changeFrequency,
