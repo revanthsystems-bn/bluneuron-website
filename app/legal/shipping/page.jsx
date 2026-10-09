@@ -1,9 +1,12 @@
 import LegalPage from '@/components/LegalPage';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Shipping Policy (Draft) — BluNeuron',
-  description: 'Draft shipping policy for BluNeuron — placeholder text, not reviewed by counsel.',
-};
+export const metadata = pageMetadata({
+  title: 'Shipping Policy — BluNeuron',
+  description:
+    'How BluNeuron dispatches and delivers the IRIZ mini projector across India, including timelines and tracking. Draft text, pending legal review.',
+  path: '/legal/shipping',
+});
 
 const sections = [
   {

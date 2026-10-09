@@ -1,9 +1,12 @@
 import LegalPage from '@/components/LegalPage';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Returns Policy (Draft) — BluNeuron',
-  description: 'Draft returns policy for BluNeuron — placeholder text, not reviewed by counsel.',
-};
+export const metadata = pageMetadata({
+  title: 'Returns & Refunds — BluNeuron',
+  description:
+    'How to return or exchange an IRIZ mini projector, the return window, and how refunds are issued. Draft text, pending legal review.',
+  path: '/legal/returns',
+});
 
 const sections = [
   {

@@ -2,6 +2,7 @@ import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import Reveal from '@/components/Reveal';
 import { FULL_SPEC_SHEET, BOX_CONTENTS, WARRANTY, SHOW_PENDING_SPECS } from '@/lib/iriz';
+import { pageMetadata } from '@/lib/seo';
 
 // The groups this page actually renders. Everything still lives in
 // FULL_SPEC_SHEET; the pending-detail groups are filtered out here rather than
@@ -24,15 +25,16 @@ const GROUP_SPANS = SHOW_PENDING_SPECS
   ? ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-7', 'lg:col-span-5', 'lg:col-span-12']
   : ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-7', 'lg:col-span-5'];
 
-export const metadata = {
-  title: 'Full Specs — BluNeuron IRIZ',
+export const metadata = pageMetadata({
+  title: 'IRIZ Full Specifications — 1080p, 500 ANSI Lumens | BluNeuron',
   // Describes what the page actually lists, which the flag decides. Promising
   // "dimensions, box contents, and warranty" while they are hidden would be a
   // description search engines show for content that is not there.
   description: SHOW_PENDING_SPECS
-    ? 'Complete technical specifications for the BluNeuron IRIZ projector: optics, connectivity, dimensions, box contents, and warranty.'
-    : 'Complete technical specifications for the BluNeuron IRIZ projector: optics and display, throw and screen size, platform, and connectivity.',
-};
+    ? 'Full specifications for the BluNeuron IRIZ mini projector: native 1080p optics, 500 ANSI lumens, connectivity, dimensions, box contents and warranty.'
+    : 'Full specifications for the BluNeuron IRIZ mini projector: native 1080p optics and display, throw and screen size, Google TV platform and connectivity.',
+  path: '/specs',
+});
 
 export default function SpecsPage() {
   return (

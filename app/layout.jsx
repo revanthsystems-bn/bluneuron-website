@@ -37,15 +37,30 @@ const zenDots = Zen_Dots({
   adjustFontFallback: true,
 });
 
-const TITLE = 'BluNeuron IRIZ — True 500 ANSI Lumens, Built-in Google TV';
+/**
+ * Site-wide metadata DEFAULTS. Every real route overrides title, description,
+ * canonical and Open Graph through `pageMetadata` (lib/seo.js) — these values
+ * are the fallback for a route that forgets to, not the homepage's copy. The
+ * homepage sets its own in app/page.jsx.
+ *
+ * NOTE: no `alternates` key here, and that is deliberate. Metadata merges
+ * shallowly from layout to page, so a canonical set in this file would be
+ * inherited by every page that didn't set its own — pointing all of them at a
+ * single URL. lib/seo.js has the full reasoning.
+ */
+const TITLE = 'BluNeuron IRIZ — Mini Projector for Home';
 const DESCRIPTION =
-  'The BluNeuron IRIZ projector: true 500 ANSI Lumens, native 1080P, Allwinner H723 chipset, and built-in Google TV with 10,000+ apps.';
-const OG_IMAGE = '/media/iriz/product/hero-clean.png';
+  'The BluNeuron IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, '
+  + 'and built-in Google TV with 10,000+ apps.';
 
 export const metadata = {
+  // Resolves every root-relative URL in this file and in `pageMetadata` —
+  // canonicals, og:url, og:image — to an absolute one. Relative URLs in
+  // metadata are a build error without it.
   metadataBase: new URL(SITE_URL),
   title: { default: TITLE, template: '%s' },
   description: DESCRIPTION,
+  applicationName: 'BluNeuron',
   icons: {
     icon: '/brand/logo-mark.png',
     shortcut: '/brand/logo-mark.png',
@@ -56,14 +71,22 @@ export const metadata = {
     description: DESCRIPTION,
     url: '/',
     siteName: 'BluNeuron',
-    images: [{ url: OG_IMAGE, width: 1600, height: 1600, alt: 'BluNeuron IRIZ projector' }],
+    images: [
+      {
+        url: '/media/iriz/product/hero-clean.png',
+        width: 1600,
+        height: 1600,
+        alt: 'The BluNeuron IRIZ mini projector for home, three-quarter view, lens forward',
+      },
+    ],
+    locale: 'en_IN',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
-    images: [OG_IMAGE],
+    images: ['/media/iriz/product/hero-clean.png'],
   },
 };
 

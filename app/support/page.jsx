@@ -4,15 +4,27 @@ import Reveal from '@/components/Reveal';
 import FaqAccordion from '@/components/FaqAccordion';
 import ContactForm from '@/components/ContactForm';
 import { SETUP_STEPS, FAQS, TROUBLESHOOTING } from '@/lib/iriz';
+import { faqJsonLd, pageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Support — BluNeuron IRIZ',
-  description: 'Setup guide, FAQs, troubleshooting, and contact support for the BluNeuron IRIZ projector.',
-};
+export const metadata = pageMetadata({
+  title: 'IRIZ Support — Setup, FAQs & Troubleshooting | BluNeuron',
+  description:
+    'Set up your IRIZ mini projector, read answers on brightness and throw distance, troubleshoot common issues, or contact BluNeuron support in India.',
+  path: '/support',
+});
+
+// FAQPage, derived from the same FAQS array the accordion renders below — see
+// faqJsonLd in lib/seo.js for why it is derived and not retyped.
+const FAQ_JSON_LD = faqJsonLd(FAQS);
 
 export default function SupportPage() {
   return (
     <PageShell>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+      />
       <PageHeading
         eyebrow="Support"
         title="We've got you covered."

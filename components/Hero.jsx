@@ -284,12 +284,18 @@ export default function Hero({ theme = 'dark' }) {
           <Reveal amount={0.2} delay={0.08}>
             {/* TWO CHILDREN, one for each audience.
 
-                The name the machines read is a real text node ("IRIZ",
-                uppercase like every other IRIZ on the site) in an `sr-only`
-                span — not an `aria-label`. An aria-label would have worked for
-                the accessible name, but it OVERRIDES the contents rather than
-                supplementing them, which is how this element ended up
-                announcing "iriz" in the first place.
+                The name the machines read is a real text node in an
+                `sr-only` span — not an `aria-label`. An aria-label would have
+                worked for the accessible name, but it OVERRIDES the contents
+                rather than supplementing them, which is how this element ended
+                up announcing "iriz" in the first place.
+
+                That text node is HERO.accessibleName ("IRIZ mini projector for
+                home"), not HERO.display. The h1 is the single strongest
+                on-page heading signal a crawler reads, and "IRIZ" alone names
+                the product without saying what it is. The visual span below
+                still draws HERO.display, so the two cannot drift: the sentence
+                is read, the four letters are seen.
 
                 The glyphs the eye reads are the dotless U+0131 wordmark, in an
                 `aria-hidden` span so it is pruned from the accessibility tree
@@ -305,7 +311,7 @@ export default function Hero({ theme = 'dark' }) {
               className={`type-display font-iriz relative mt-5 ${displayClass}`}
               style={{ textTransform: 'none' }}
             >
-              <span className="sr-only">{HERO.display}</span>
+              <span className="sr-only">{HERO.accessibleName}</span>
               <span aria-hidden="true">{wordmarkText}</span>
             </h1>
           </Reveal>

@@ -3,12 +3,14 @@ import PageHeading from '@/components/PageHeading';
 import ComparisonTable from '@/components/ComparisonTable';
 import Reveal from '@/components/Reveal';
 import { COMPARISON } from '@/lib/iriz';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'IRIZ vs. Others — BluNeuron IRIZ',
+export const metadata = pageMetadata({
+  title: 'IRIZ vs. Budget Projectors — Side-by-Side | BluNeuron',
   description:
-    'See how the BluNeuron IRIZ compares to typical budget projectors on brightness, resolution, smart OS, audio, and more.',
-};
+    'How the IRIZ mini projector compares to typical budget projectors in India on ANSI brightness, native 1080p resolution, smart OS, audio and connectivity.',
+  path: '/compare',
+});
 
 const EXTRA_ROWS = [
   { label: 'Voice Assistant', iriz: 'Built-in "Hey Google"', other: 'Not available' },

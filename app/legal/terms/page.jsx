@@ -1,9 +1,12 @@
 import LegalPage from '@/components/LegalPage';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Terms of Service (Draft) — BluNeuron',
-  description: 'Draft terms of service for BluNeuron — placeholder text, not reviewed by counsel.',
-};
+export const metadata = pageMetadata({
+  title: 'Terms of Service — BluNeuron',
+  description:
+    'The terms that govern use of the BluNeuron website and the purchase of the IRIZ mini projector. Draft text, pending legal review.',
+  path: '/legal/terms',
+});
 
 const sections = [
   {

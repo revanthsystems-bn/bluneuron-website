@@ -106,6 +106,12 @@ export default function Footer() {
               {REGION.label}
             </p>
 
+            {/* The whole row goes when there are no handles to show, not just
+                its contents: an empty <ul> still counts as a flex child, so the
+                parent's `gap-5` would hold open a gap to the right of the
+                region label with nothing in it. See SOCIAL_LINKS in
+                lib/iriz.js. */}
+            {socials.length > 0 && (
             <ul className="flex items-center gap-2">
               {socials.map((social) => (
                 <li key={social.key}>
@@ -128,6 +134,7 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+            )}
           </div>
         </div>
 
