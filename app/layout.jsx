@@ -9,6 +9,7 @@ import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import NotifyProvider from '@/components/notify/NotifyProvider';
 import MetaPixel from '@/components/MetaPixel';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -105,15 +106,29 @@ export default function RootLayout({ children }) {
             </NotifyProvider>
           </CartProvider>
         </MotionConfig>
-        <Analytics />
-        {/* Meta Pixel base code + PageView on every route change.
-            The Suspense boundary is required, not cosmetic: MetaPixel reads
-            `useSearchParams`, and a root-layout client component that does
-            that without a boundary pulls the entire page tree out of
-            prerendering. Wrapped, the pages stay static and only this
-            (render-nothing) component is client-rendered. */}
+        {/* VERCEL-ONLY. @vercel/analytics reports to the Vercel dashboard of
+            the deployment serving the page; there is no dashboard behind it
+            anywhere else, so on GoDaddy Node.js hosting it would load a
+            script that can never report. `VERCEL` is set by Vercel itself on
+            every build and runtime, and nowhere else — so this is read, not
+            configured, and needs no env var of our own.
+
+            Evaluated on the server at build time (this layout is static), so
+            the non-Vercel build does not ship the script at all rather than
+            loading it and having it no-op. Google Analytics below is the
+            host-independent replacement and runs in both places. */}
+        {process.env.VERCEL ? <Analytics /> : null}
+        {/* Meta Pixel base code + PageView on every route change, and the GA4
+            tag + page_view on every route change.
+            The Suspense boundary is required, not cosmetic: both components
+            read `useSearchParams`, and a root-layout client component that
+            does that without a boundary pulls the entire page tree out of
+            prerendering. Wrapped, the pages stay static and only these
+            (render-nothing) components are client-rendered. One boundary is
+            enough for both. */}
         <Suspense fallback={null}>
           <MetaPixel />
+          <GoogleAnalytics />
         </Suspense>
       </body>
     </html>

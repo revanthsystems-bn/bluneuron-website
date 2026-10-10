@@ -25,7 +25,7 @@ import { pageMetadata } from '@/lib/seo';
  */
 
 const CONTACT_EMAIL = 'systems@bluneuron.com';
-const LAST_UPDATED = '7 October 2026';
+const LAST_UPDATED = '10 October 2026';
 
 export const metadata = pageMetadata({
   title: 'Privacy Policy — BluNeuron',
@@ -94,7 +94,24 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong className="font-semibold text-white">Vercel Analytics:</strong> counts visits without
-                using cookies.
+                using cookies. Used only on the version of this site hosted by Vercel.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">Google Analytics 4:</strong> counts visits and
+                measures which pages people use. It uses cookies. We have switched off Google&rsquo;s
+                advertising and cross-device features for this site, so the data is not used to personalise ads
+                or linked to a Google account, and we never send your name, email address or phone number to
+                it. Google processes this data under its own privacy policy. You can opt out across all sites
+                with Google&rsquo;s browser add-on at{' '}
+                <a
+                  href="https://tools.google.com/dlpage/gaoptout"
+                  className="text-white underline underline-offset-2 transition-colors hover:text-white/70"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  tools.google.com/dlpage/gaoptout
+                </a>
+                .
               </li>
               <li>
                 <strong className="font-semibold text-white">Meta Pixel (Facebook/Instagram):</strong> uses
