@@ -10,65 +10,48 @@ import Newsletter from '@/components/Newsletter';
 import BuySection from '@/components/BuySection';
 import Footer from '@/components/Footer';
 import StickyBuyBar from '@/components/StickyBuyBar';
-import { BRAND, MEDIA, PRICING, SPECS } from '@/lib/iriz';
 import { COMMERCE_ENABLED } from '@/lib/launch';
 import { resolveHeroTheme } from '@/lib/heroTheme';
-import { SITE_URL } from '@/lib/site';
-import { MARKETPLACE, SHOW_BUY, isTBD } from '@/lib/site-config';
+import { ROUTES } from '@/lib/routes';
+import { SHOW_BUY } from '@/lib/site-config';
+import { ORGANIZATION_JSON_LD, pageMetadata, productJsonLd } from '@/lib/seo';
 
-const PRODUCT_JSON_LD = {
-  '@context': 'https://schema.org',
-  '@type': 'Product',
-  name: BRAND.fullName,
-  brand: { '@type': 'Brand', name: BRAND.name },
-  description:
-    'True 500 ANSI Lumens, native 1080P, Allwinner H723 chipset, and built-in Google TV with 10,000+ apps.',
-  image: [new URL(MEDIA.product.heroClean, SITE_URL).toString()],
-  url: SITE_URL,
-  additionalProperty: SPECS.map((spec) => ({
-    '@type': 'PropertyValue',
-    name: spec.label,
-    value: `${spec.value} (${spec.unit})`,
-  })),
-  // No `offers` block unless the product can actually be bought AND we know
-  // the price. Structured data is a public claim: an Offer with a price and
-  // `InStock` tells Google the IRIZ can be bought right now for that amount,
-  // which would put a price and a buy prompt in search results for a product
-  // with no purchase path — or, worse, quote "[TBD]" as a price. Price-free
-  // product markup is still valid and still earns a rich result.
-  //
-  // Two ways to be buyable, and they carry different prices: marketplace
-  // selling (SHOW_BUY, the real path — the marketplace price) and the
-  // switched-off in-site cart (COMMERCE_ENABLED — PRICING in lib/iriz.js).
-  // SHOW_BUY is checked first for the same reason the masthead CTA checks it
-  // first: it is the path a buyer would actually take.
-  ...(SHOW_BUY && !isTBD(MARKETPLACE.priceInr)
-    ? {
-        offers: {
-          '@type': 'Offer',
-          // The buy card, not a marketplace URL. This page is where both
-          // listings are offered, and naming one of them here would make the
-          // other invisible to a rich result.
-          url: new URL('/where-to-buy', SITE_URL).toString(),
-          price: MARKETPLACE.priceInr,
-          priceCurrency: 'INR',
-          availability: 'https://schema.org/InStock',
-          itemCondition: 'https://schema.org/NewCondition',
-        },
-      }
-    : COMMERCE_ENABLED
-      ? {
-          offers: {
-            '@type': 'Offer',
-            url: SITE_URL,
-            price: PRICING.offerPrice,
-            priceCurrency: PRICING.currency,
-            availability: 'https://schema.org/InStock',
-            itemCondition: 'https://schema.org/NewCondition',
-          },
-        }
-      : {}),
-};
+/**
+ * Homepage title, at 65 characters.
+ *
+ * The budget is Google's ~580px of rendered title width, which is roughly 60-65
+ * characters; past it the tail is truncated in the result, and the tail is where
+ * the brand name sits. "Native" is the word that was cut to make room — the
+ * distinction it draws (true 1080p DISPLAY vs. the H723's 4K DECODING, see
+ * lib/iriz.js) still appears in the description, the og:title and the hero h1,
+ * none of which are width-constrained.
+ */
+const TITLE = 'IRIZ Mini Projector for Home — 1080p, 500 ANSI Lumens | BluNeuron';
+
+// 147 characters. Under the ~155 Google renders, and carries the three terms
+// this page is meant to rank for: "mini projector for home", "1080p", "India".
+const DESCRIPTION =
+  'The IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, and built-in '
+  + 'Google TV with 10,000+ apps. Designed and supported in India.';
+
+export const metadata = pageMetadata({
+  title: TITLE,
+  description: DESCRIPTION,
+  path: ROUTES.home,
+  // No width budget on an OG card, so the fuller claim goes here.
+  ogTitle: 'BluNeuron IRIZ — Mini Projector for Home, Native 1080p, 500 ANSI Lumens',
+});
+
+/**
+ * Product structured data, or `null` while there is no confirmed price.
+ *
+ * The whole decision lives in productJsonLd() (lib/seo.js) — including why a
+ * price-free Product is not emitted at all rather than emitted without
+ * `offers`, and why MARKETPLACE.priceInr in lib/site-config.js is the one
+ * price it is allowed to read. Resolved once at module scope: it depends only
+ * on constants, so there is nothing per-request about it.
+ */
+const PRODUCT_JSON_LD = productJsonLd();
 
 /**
  * `searchParams` is a Promise in Next 16 and is a request-time API, so reading
@@ -86,10 +69,27 @@ export default async function Home({ searchParams }) {
 
   return (
     <>
+      {/* Separate <script> blocks rather than one @graph array. Both spellings
+          are valid; separate blocks mean a syntax error in one can't
+          invalidate the other, and Google's Rich Results Test reports them
+          independently — which also lets Product drop out on its own below
+          without touching Organization.
+
+          Product renders only when it is VALID (a confirmed price, so it can
+          carry `offers`). Organization is emitted HERE and only here: it
+          describes the site as a whole, so a copy on every page would be
+          duplicate markup. */}
+      {PRODUCT_JSON_LD && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(PRODUCT_JSON_LD) }}
+        />
+      )}
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(PRODUCT_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
       />
       {/* No AnnouncementBar here: the cinematic hero has to be the first
           visible thing on the page, and its eyebrow + tagline already carry

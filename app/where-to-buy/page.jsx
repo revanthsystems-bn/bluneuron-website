@@ -6,12 +6,16 @@ import MarketplaceButtons from '@/components/MarketplaceButtons';
 import Reveal from '@/components/Reveal';
 import { BRAND, HERO, MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { MARKETPLACE, SHOW_BUY, formatInr } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'Where to Buy — BluNeuron IRIZ',
-  description:
-    'The BluNeuron IRIZ is sold on Amazon and Flipkart. Price, what each marketplace handles, and what we handle directly.',
+  ...pageMetadata({
+    title: 'Where to Buy — BluNeuron IRIZ',
+    description:
+      'The BluNeuron IRIZ is sold on Amazon and Flipkart. Price, what each marketplace handles, and what we handle directly.',
+    path: ROUTES.whereToBuy,
+  }),
   robots: routeRobots(ROUTES.whereToBuy),
 };
 

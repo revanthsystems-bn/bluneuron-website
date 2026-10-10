@@ -2,11 +2,16 @@ import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import Reveal from '@/components/Reveal';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { COMPANY, allKnown } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'About — BluNeuron',
-  description: 'Why BluNeuron exists, and why the IRIZ is built around honest brightness claims.',
+  ...pageMetadata({
+    title: 'About BluNeuron — Honest Projector Specs',
+    description:
+      'Why BluNeuron exists, and why the IRIZ mini projector for home is built on honest ANSI brightness claims and real native 1080p, not marketing numbers.',
+    path: ROUTES.about,
+  }),
   robots: routeRobots(ROUTES.about),
 };
 

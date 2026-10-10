@@ -1,6 +1,7 @@
 import LegalPage from '@/components/LegalPage';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { SUPPORT, TBD, WARRANTY } from '@/lib/site-config';
 
 /**
@@ -60,9 +61,12 @@ const SECTIONS = [
 ];
 
 export const metadata = {
-  title: 'Warranty Policy — BluNeuron IRIZ',
-  description:
-    'The BluNeuron IRIZ manufacturer warranty: cover period, what is covered, exclusions, and how to make a claim.',
+  ...pageMetadata({
+    title: 'Warranty Policy — BluNeuron IRIZ',
+    description:
+      'The BluNeuron IRIZ manufacturer warranty: cover period, what is covered, exclusions, and how to make a claim.',
+    path: ROUTES.warranty,
+  }),
   robots: routeRobots(ROUTES.warranty),
 };
 

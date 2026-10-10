@@ -1,5 +1,6 @@
 import LegalPage from '@/components/LegalPage';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { COMPANY, GRIEVANCE_OFFICER, SUPPORT, TBD } from '@/lib/site-config';
 
 /**
@@ -65,9 +66,12 @@ const SECTIONS = [
 ];
 
 export const metadata = {
-  title: 'Grievance Redressal — BluNeuron',
-  description:
-    'How to escalate a complaint to BluNeuron: our grievance officer, what to include, and the timelines for acknowledgement and resolution.',
+  ...pageMetadata({
+    title: 'Grievance Redressal — BluNeuron',
+    description:
+      'How to escalate a complaint to BluNeuron: our grievance officer, what to include, and the timelines for acknowledgement and resolution.',
+    path: ROUTES.grievance,
+  }),
   robots: routeRobots(ROUTES.grievance),
 };
 

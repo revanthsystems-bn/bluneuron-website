@@ -5,12 +5,16 @@ import ContactForm from '@/components/ContactForm';
 import Reveal from '@/components/Reveal';
 import { Clock, Mail, Phone } from 'lucide-react';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { GRIEVANCE_OFFICER, SUPPORT, isTBD } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'Contact Support — BluNeuron',
-  description:
-    'Email, phone and support hours for BluNeuron — plus our grievance officer and the form that reaches our team directly.',
+  ...pageMetadata({
+    title: 'Contact Support — BluNeuron',
+    description:
+      'Email, phone and support hours for BluNeuron — plus our grievance officer and the form that reaches our team directly.',
+    path: ROUTES.contact,
+  }),
   robots: routeRobots(ROUTES.contact),
 };
 

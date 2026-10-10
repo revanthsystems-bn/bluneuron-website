@@ -1,6 +1,7 @@
 import LegalPage from '@/components/LegalPage';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { COMPANY, SUPPORT, TBD } from '@/lib/site-config';
 
 /**
@@ -67,9 +68,12 @@ const SECTIONS = [
 ];
 
 export const metadata = {
-  title: 'Terms of Service — BluNeuron',
-  description:
-    'Terms governing use of the BluNeuron website. The IRIZ is sold on Amazon and Flipkart under their terms.',
+  ...pageMetadata({
+    title: 'Terms of Service — BluNeuron',
+    description:
+      'Terms governing use of the BluNeuron website. The IRIZ is sold on Amazon and Flipkart under their terms.',
+    path: ROUTES.terms,
+  }),
   robots: routeRobots(ROUTES.terms),
 };
 

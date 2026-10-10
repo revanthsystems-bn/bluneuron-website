@@ -4,13 +4,24 @@ import FaqAccordion from '@/components/FaqAccordion';
 import Reveal from '@/components/Reveal';
 import { FAQS, TROUBLESHOOTING } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { faqJsonLd, pageMetadata } from '@/lib/seo';
 
 export const metadata = {
-  title: 'FAQ & Troubleshooting — BluNeuron IRIZ',
-  description:
-    'Answers about brightness, throw distance, Wi-Fi, input lag and connectivity — plus fixes for blurry images, keystone, sound and the remote.',
+  ...pageMetadata({
+    title: 'FAQ & Troubleshooting — BluNeuron IRIZ',
+    description:
+      'Answers about brightness, throw distance, Wi-Fi, input lag and connectivity — plus fixes for blurry images, keystone, sound and the remote.',
+    path: ROUTES.faq,
+  }),
   robots: routeRobots(ROUTES.faq),
 };
+
+// FAQPage, derived from the same FAQS array the accordion renders below — see
+// faqJsonLd in lib/seo.js for why it is derived and never retyped. It lives
+// here rather than on /support because Google requires the markup to match the
+// questions VISIBLE on the page, and /support is now a hub of tiles with no
+// questions on it at all.
+const FAQ_JSON_LD = faqJsonLd(FAQS);
 
 /**
  * FAQ and troubleshooting, on one page.
@@ -30,6 +41,11 @@ export const metadata = {
 export default function FaqPage() {
   return (
     <PageShell>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+      />
       <PageHeading
         eyebrow="Support"
         title="FAQ & troubleshooting"

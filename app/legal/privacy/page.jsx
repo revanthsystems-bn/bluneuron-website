@@ -1,6 +1,7 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import Reveal from '@/components/Reveal';
+import { pageMetadata } from '@/lib/seo';
 
 /**
  * The privacy policy — a real document, and the only legal page that does not
@@ -26,11 +27,12 @@ import Reveal from '@/components/Reveal';
 const CONTACT_EMAIL = 'systems@bluneuron.com';
 const LAST_UPDATED = '7 October 2026';
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: 'Privacy Policy — BluNeuron',
   description:
-    'How BluNeuron collects and uses information on bluneuron.com — launch-update signups, site analytics, and the services we use.',
-};
+    'How BluNeuron collects and uses information on bluneuron.com — launch-update signups, site analytics, and the third-party services we rely on.',
+  path: '/legal/privacy',
+});
 
 /** Section heading. One level below the PageHeading h1. */
 function H2({ children }) {

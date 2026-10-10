@@ -4,12 +4,16 @@ import DraftBanner from '@/components/DraftBanner';
 import SupportForm from '@/components/SupportForm';
 import Reveal from '@/components/Reveal';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { WARRANTY } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'Warranty Claim — BluNeuron IRIZ',
-  description:
-    'Make a warranty claim on your BluNeuron IRIZ: order ID, serial number, purchase date and what is going wrong.',
+  ...pageMetadata({
+    title: 'Warranty Claim — BluNeuron IRIZ',
+    description:
+      'Make a warranty claim on your BluNeuron IRIZ: order ID, serial number, purchase date and what is going wrong.',
+    path: ROUTES.warrantyClaim,
+  }),
   robots: routeRobots(ROUTES.warrantyClaim),
 };
 

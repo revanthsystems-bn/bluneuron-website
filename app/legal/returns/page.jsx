@@ -1,5 +1,6 @@
 import LegalPage from '@/components/LegalPage';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { RETURNS, SUPPORT, TBD } from '@/lib/site-config';
 
 /**
@@ -65,9 +66,12 @@ const SECTIONS = [
 ];
 
 export const metadata = {
-  title: 'Returns & Refunds — BluNeuron',
-  description:
-    'How returns and refunds work for the BluNeuron IRIZ, which is sold on Amazon and Flipkart.',
+  ...pageMetadata({
+    title: 'Returns & Refunds — BluNeuron',
+    description:
+      'How returns and refunds work for the BluNeuron IRIZ, which is sold on Amazon and Flipkart.',
+    path: ROUTES.returns,
+  }),
   robots: routeRobots(ROUTES.returns),
 };
 

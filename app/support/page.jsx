@@ -4,11 +4,15 @@ import SupportTiles from '@/components/SupportTiles';
 import Reveal from '@/components/Reveal';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 
 export const metadata = {
-  title: 'Support — BluNeuron IRIZ',
-  description:
-    'Register a warranty, make a claim, read the FAQ and troubleshooting, download manuals, or contact BluNeuron support.',
+  ...pageMetadata({
+    title: 'IRIZ Support — Warranty, FAQs & Downloads | BluNeuron',
+    description:
+      'Register a warranty, make a claim, read the FAQ and troubleshooting, download manuals, or contact BluNeuron support in India.',
+    path: ROUTES.support,
+  }),
   robots: routeRobots(ROUTES.support),
 };
 

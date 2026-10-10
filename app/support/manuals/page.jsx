@@ -5,12 +5,16 @@ import Reveal from '@/components/Reveal';
 import { Download, FileText } from 'lucide-react';
 import { SETUP_STEPS } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { MANUALS, TBD, isTBD } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'Manuals & Downloads — BluNeuron IRIZ',
-  description:
-    'The IRIZ quick-start guide, full user manual and warranty card — plus the five-step setup walkthrough.',
+  ...pageMetadata({
+    title: 'Manuals & Downloads — BluNeuron IRIZ',
+    description:
+      'The IRIZ quick-start guide, full user manual and warranty card — plus the five-step setup walkthrough.',
+    path: ROUTES.manuals,
+  }),
   robots: routeRobots(ROUTES.manuals),
 };
 

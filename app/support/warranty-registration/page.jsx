@@ -5,12 +5,16 @@ import SupportForm from '@/components/SupportForm';
 import Reveal from '@/components/Reveal';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { WARRANTY } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'Warranty Registration — BluNeuron IRIZ',
-  description:
-    'Register your BluNeuron IRIZ with your marketplace order ID and serial number so a future warranty claim is quick.',
+  ...pageMetadata({
+    title: 'Warranty Registration — BluNeuron IRIZ',
+    description:
+      'Register your BluNeuron IRIZ with your marketplace order ID and serial number so a future warranty claim is quick.',
+    path: ROUTES.warrantyRegistration,
+  }),
   robots: routeRobots(ROUTES.warrantyRegistration),
 };
 

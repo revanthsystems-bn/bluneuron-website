@@ -1,5 +1,6 @@
 import LegalPage from '@/components/LegalPage';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
 import { SHIPPING, SUPPORT, TBD } from '@/lib/site-config';
 
 /**
@@ -50,9 +51,12 @@ const SECTIONS = [
 ];
 
 export const metadata = {
-  title: 'Shipping — BluNeuron',
-  description:
-    'How shipping works for the BluNeuron IRIZ: orders are fulfilled and delivered by Amazon or Flipkart.',
+  ...pageMetadata({
+    title: 'Shipping — BluNeuron',
+    description:
+      'How shipping works for the BluNeuron IRIZ: orders are fulfilled and delivered by Amazon or Flipkart.',
+    path: ROUTES.shipping,
+  }),
   robots: routeRobots(ROUTES.shipping),
 };
 

@@ -159,28 +159,35 @@ export default function Footer() {
               {REGION.label}
             </p>
 
-            <ul className="flex items-center gap-2">
-              {socials.map((social) => (
-                <li key={social.key}>
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`BluNeuron on ${social.label}`}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle text-white/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-[15px] w-[15px]"
-                      fill="currentColor"
-                      aria-hidden="true"
+            {/* The whole row goes when there are no handles to show, not just
+                its contents: an empty <ul> still counts as a flex child, so the
+                parent's `gap-5` would hold open a gap to the right of the
+                region label with nothing in it. See SOCIAL_LINKS in
+                lib/iriz.js. */}
+            {socials.length > 0 && (
+              <ul className="flex items-center gap-2">
+                {socials.map((social) => (
+                  <li key={social.key}>
+                    <a
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`BluNeuron on ${social.label}`}
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle text-white/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     >
-                      <path d={social.path} />
-                    </svg>
-                  </a>
-                </li>
-              ))}
-            </ul>
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-[15px] w-[15px]"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d={social.path} />
+                      </svg>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
