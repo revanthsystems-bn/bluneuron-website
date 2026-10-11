@@ -16,6 +16,14 @@ dist/
 .env.development
 .env.production
 
+# EXCEPTION, godaddy branch only: .env.production is committed here so the
+# GoDaddy build carries its own NEXT_PUBLIC_* values instead of depending on
+# when the host injects them (see CLAUDE.md > Build-time environment
+# variables). Everything in it is inlined into the browser bundle by
+# `next build` and is public already. A real secret must never be added to
+# it; .env.local stays ignored above, on every branch.
+!.env.production
+
 # Logs and local test output
 *.log
 npm-debug.log*
