@@ -135,3 +135,238 @@ set** — a variable Vercel sets itself, read and never configured. Google
 Analytics 4 (`components/GoogleAnalytics`) is the host-independent
 replacement and runs in both places. Keep both: dropping the Vercel one would
 blind the live site, and dropping GA would blind the GoDaddy one.
+
+# Hosting: Cloudflare Workers (`cloudflare` branch)
+
+The live site runs on **Vercel from `main`**. `godaddy` is the GoDaddy Node.js
+build; **`cloudflare` is the Cloudflare Workers build**, via the official
+OpenNext adapter (`@opennextjs/cloudflare`). The site must keep working on
+**all three** — nothing here may be a Cloudflare-only hack that breaks the
+Vercel deploy or the GoDaddy one. `npm run build` and `npm start` remain the
+Vercel/Node entry points and are untouched by this section.
+
+Cloudflare Workers is not a Node host. There is no long-lived process and no
+filesystem, so `npm start` means nothing here: OpenNext compiles the Next
+server into a single Worker script plus a directory of static assets, and
+`main` in `wrangler.jsonc` points at build output, never at source.
+
+## The files, and what each one is for
+
+- **`wrangler.jsonc`** — the Worker's own config: name, entry point,
+  compatibility date and flags, bindings. Every field carries a comment
+  saying why it is there; read it before changing any of them.
+- **`open-next.config.ts`** — the adapter's config. The filename is fixed by
+  the CLI, which compiles it with esbuild, so it is TypeScript in a project
+  with no `typescript` dependency. Next's TypeScript detection only scans
+  `app/`, `pages/` and `src/`, so a root-level `.ts` file does **not** flip
+  `next build` into TypeScript mode. Verified; re-verify if it ever moves.
+- **`.env.production`** — committed, as on `godaddy`, for the same reason.
+  See **Build-time environment variables** above.
+
+`.open-next/` and `.wrangler/` are build output and local state. Both are
+gitignored and neither is ever committed or uploaded by hand.
+
+`npm run cf-typegen` writes `cloudflare-env.d.ts` — the binding types, and
+~625 KB of generated workerd runtime types with them. It is **gitignored**,
+not committed: nothing here consumes it (no TypeScript, no tsconfig), and
+committed it would only re-churn on every wrangler bump. Run the script when
+you want the types; delete the file when you don't.
+
+## `nodejs_compat` is not optional
+
+```jsonc
+"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"]
+```
+
+Next's server reaches for `node:stream`, `node:buffer`, `node:async_hooks`
+and `node:crypto` on every render. Without `nodejs_compat` the Worker throws
+at **import** time — before it serves a single request — so the symptom is
+every route failing at once, not one slow page. The compatibility date must
+also be `2024-09-23` or later, for the same reason. Do not "tidy" either
+field.
+
+## Build-time environment variables, again
+
+Same rule as GoDaddy, same reason: `NEXT_PUBLIC_*` values are **inlined by
+`next build`**, so they must exist when Cloudflare runs the build, not when
+the Worker starts. `scripts/assert-build-env.js` runs inside the OpenNext
+build — it calls `next build` internally, at `PHASE_PRODUCTION_BUILD` — and
+still refuses a build missing `NEXT_PUBLIC_META_PIXEL_ID` or
+`NEXT_PUBLIC_WEB3FORMS_KEY`.
+
+The committed `.env.production` is what satisfies it, so a Workers build
+needs **no environment variables configured in the Cloudflare dashboard at
+all**. Setting them there too is harmless and makes them visible in the UI,
+but a dashboard value is not a substitute: the file is the thing that cannot
+be forgotten.
+
+Workers **runtime** variables (`vars`, secrets) are useless for these three.
+Nothing reads them at runtime; they are already baked into the bundle.
+
+## Worker size: 64 MiB, not 3 MiB
+
+**Since 2026-09-04 Cloudflare checks only the UNCOMPRESSED bundle size, and
+the limit is 64 MiB on both the Free and Paid plans.** The old limits — 3 MiB
+gzipped on Free, 10 MiB on Paid — are gone. Any guide or prior instruction
+citing 3 MiB is out of date. Wrangler still prints a `gzip:` figure; it is
+informational and no longer a limit.
+
+Measured on this site:
+
+```
+Total Upload: 5342.68 KiB / gzip: 1119.17 KiB
+```
+
+That is ~5.2 MiB against a 64 MiB ceiling — about 8% — and also well under
+the retired 3 MiB gzip rule. **The Free plan is sufficient; the $5 Workers
+Paid plan buys nothing we need for size.** Nearly all of the 5.2 MiB is
+Next's own compiled server runtime and React's server renderers.
+`three`, `framer-motion`, `lucide-react` and `sharp` contribute nothing
+measurable: they are client-side, or unused on this host.
+
+Re-measure rather than guess:
+
+```bash
+npx opennextjs-cloudflare build
+npx wrangler deploy --dry-run --outdir .wrangler/dry-run
+```
+
+## Large media must stay a static asset
+
+`public/` is ~12 MB, most of it product photography and the hero video in
+`public/media/iriz/video/`. OpenNext copies all of it, plus Next's
+`/_next/static/**`, into `.open-next/assets/`, which is uploaded **beside**
+the Worker and served from the edge:
+
+- Those bytes do **not** count toward the Worker size limit.
+- Requests that hit an asset do **not** invoke the Worker. On both plans they
+  are free and unmetered, with no egress charge.
+
+So large media belongs in `public/`, exactly as it does today. It must never
+be imported into a server component as data or inlined as a `data:` URI —
+that moves it into the Worker bundle and bills every request for it.
+Verified: no image or video bytes appear in the Worker bundle, and the files
+served by the Workers runtime are byte-identical to the originals. The
+per-file asset limit is 25 MiB, which the 723 KB video is nowhere near.
+
+## next/image, and what it costs
+
+`next/image` works unchanged — no loader file, no component edits. The
+adapter implements Next's `/_next/image` endpoint on top of the Cloudflare
+**Images binding** declared in `wrangler.jsonc`, which is the approach
+OpenNext recommends. Verified in the Workers runtime: a 799 KB source PNG
+comes back as 5.8 KB / 10.6 KB / 17.3 KB AVIF at widths 640 / 1080 / 1920,
+honouring the `formats` and `qualities` already set in `next.config.js`.
+
+**It is not unconditionally free.** Cloudflare bills *unique*
+transformations: 5,000 per month free, then an Images Paid plan at $0.50 per
+1,000. A unique transformation is one (source image x width x format x
+quality) combination, cached for 30 days — it is **not** per request, so
+traffic volume does not move the number. This site has roughly 20 optimised
+images, which at Next's widths and the two configured formats is a few
+hundred combinations a month: comfortably inside the free allowance.
+
+What would break that is adding many images at once, or ever accepting
+user-supplied image URLs. **If the allowance is exceeded, the free fallback
+is to pre-generate the variants at build time** — `sharp` is already a
+dependency — and serve them from `public/` via a custom loader. The crude
+version is `images.unoptimized = true`, which ships the originals; several
+detail PNGs are over 1 MB, so that is a last resort, not a plan. Do not
+switch to `/cdn-cgi/image` as a "free" workaround: same product, same bill.
+
+Unsupported by the Images binding, and unused here: `images.minimumCacheTTL`
+and `dangerouslyAllowLocalIP`.
+
+## Range requests: the hero video on iOS
+
+Workers Static Assets answered a `Range:` request in the local Workers
+runtime with **`200` and the whole file**, not `206 Partial Content`, and set
+no `Accept-Ranges` header. Chrome and Firefox tolerate that and play the
+video; **iOS Safari requires `206` and can show a blank player instead.**
+
+This was NOT verified against a real deployment — only the local runtime —
+and Cloudflare has been closing issues in this area, so check it once the
+Worker is live rather than trusting either answer:
+
+```bash
+curl -s -o /dev/null -D - -H "Range: bytes=0-1023" \
+  https://<the deployed host>/media/iriz/video/iriz-loop.webm | head -3
+```
+
+`206 Partial Content` means there is nothing to do. If it is `200`, the hero
+degrades to its poster frame on iPhones — `components/HeroBackdrop` already
+treats poster-only as a supported state, so it fails gracefully rather than
+breaking. The fix, if it matters, is to serve that one file through the
+Worker with a range handler reading the `ASSETS` binding, guarded so the
+Vercel and GoDaddy builds never take that path.
+
+## No ISR, deliberately
+
+`open-next.config.ts` uses `staticAssetsIncrementalCache` — the free,
+read-only cache that reads prerendered pages out of the uploaded assets. It
+needs no R2 bucket, no KV namespace, no queue and no `WORKER_SELF_REFERENCE`
+service binding.
+
+The cost of that choice: **`revalidate`, `revalidatePath` and on-demand
+revalidation do not work.** Every route is prerendered at build time except
+`/`, which reads `searchParams` for the `?hero=` override and is plain SSR,
+so nothing today needs them. If ISR is ever added it will fail *silently* —
+the page will serve its build-time copy forever. Switch to
+`r2IncrementalCache`, add the bucket and the queue, and read
+https://opennext.js.org/cloudflare/caching first.
+
+## Wrangler needs Node 22
+
+`wrangler` declares `node >= 22` and refuses to start on Node 20 with
+`Wrangler requires at least Node.js v22.0.0`. `package.json` still allows
+`>=20.9 <23` because the Next build itself is fine on 20 — so `npm run build`
+works on Node 20 while `npm run preview` and `npm run deploy` do not. Use
+Node 22 locally for anything that touches wrangler.
+
+**`.node-version` pins the hosted build to Node 22**, and it is there because
+the two ends disagree: Cloudflare's build image defaults to **Node 24**,
+which is outside this project's declared `engines` range (`>=20.9 <23`),
+while wrangler's floor is 22. Twenty-two is the only version that satisfies
+both, and the Workers build image preinstalls it, so the pin costs no build
+time. Without the file the build still runs — `.npmrc` sets no
+`engine-strict`, so a version outside `engines` is a warning, not an error —
+but it would run on a Node this project does not claim to support. Vercel
+reads the same file; GoDaddy ignores it and picks its Node in the panel.
+
+## What this costs the GoDaddy install
+
+`@opennextjs/cloudflare` is a `dependency`, per the rule above: anything a
+build needs must survive `npm install --omit=dev`. `wrangler` is a
+`devDependency` — but it lands in the production install anyway, because it
+is a **peer dependency of `@opennextjs/cloudflare`** and npm installs peers
+by default. Measured on this branch, `npm install --omit=dev` goes from
+**170 packages to 465**.
+
+That is noise, not a problem, and specifically it does NOT touch the 100 MB
+upload rule: `node_modules/` is never uploaded, the host installs it. Proven
+on this branch, in a clean tree with no `.env.local`:
+
+```bash
+npm install --omit=dev   # 465 packages
+npm run build            # passes; all 15 routes
+```
+
+If that install ever needs to be lean again, moving
+`@opennextjs/cloudflare` to `devDependencies` is safe **for Cloudflare**,
+which installs dev dependencies during a build — but it would then be
+missing on any host that does not, so do not make that change without
+re-reading **dependencies vs devDependencies** above.
+
+## Connecting the branch (Workers Builds)
+
+Workers & Pages -> Create -> Workers -> Import a repository, pick this repo,
+and set:
+
+- **Git branch**: `cloudflare`
+- **Build command**: `npx opennextjs-cloudflare build`
+- **Deploy command**: `npx wrangler deploy`
+- **Build variables**: none required; `.env.production` is committed.
+
+Never point Workers Builds at `main` or `godaddy`. Neither has
+`wrangler.jsonc`, and the deploy step would fail — or worse, deploy
+something that was never built for this runtime.

@@ -8,6 +8,25 @@ build/
 dist/
 .vercel/
 
+# Cloudflare Workers (OpenNext) build output and local state.
+# `.open-next/` is written by `opennextjs-cloudflare build` — the Worker
+# bundle plus the static assets it uploads. `.wrangler/` is wrangler's local
+# cache and the local-mode storage used by `npm run preview`. Both are
+# regenerated on every build; neither is ever uploaded.
+.open-next/
+.wrangler/
+
+# `npm run cf-typegen` output: ~625 KB of generated workerd runtime types.
+# Nothing in this project consumes them — there is no TypeScript here and no
+# tsconfig — so it is regenerated on demand rather than committed and
+# re-churned on every wrangler bump.
+cloudflare-env.d.ts
+
+# Local Cloudflare dev variables — same rule as .env.local: may hold a real
+# secret, so it is never committed.
+.dev.vars
+.dev.vars.*
+
 # Environment — only .env.example is committed, and it holds variable NAMES only.
 # Never commit a file with a real key in it.
 .env
@@ -16,12 +35,13 @@ dist/
 .env.development
 .env.production
 
-# EXCEPTION, godaddy branch only: .env.production is committed here so the
-# GoDaddy build carries its own NEXT_PUBLIC_* values instead of depending on
-# when the host injects them (see CLAUDE.md > Build-time environment
-# variables). Everything in it is inlined into the browser bundle by
-# `next build` and is public already. A real secret must never be added to
-# it; .env.local stays ignored above, on every branch.
+# EXCEPTION, deployment branches only (godaddy, cloudflare): .env.production
+# is committed there so the build carries its own NEXT_PUBLIC_* values instead
+# of depending on when the host injects them (see CLAUDE.md > Build-time
+# environment variables, and > Hosting: Cloudflare). Everything in it is
+# inlined into the browser bundle by `next build` and is public already. A
+# real secret must never be added to it; .env.local stays ignored above, on
+# every branch.
 !.env.production
 
 # Logs and local test output

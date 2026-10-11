@@ -1,0 +1,57 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // The Worker's name, and therefore its default hostname:
+  // bluneuron-website.<account subdomain>.workers.dev. Renaming it creates a
+  // SECOND Worker rather than renaming this one, so leave it alone once the
+  // branch is connected in the dashboard.
+  "name": "bluneuron-website",
+
+  // Written by `opennextjs-cloudflare build`, not by hand, and gitignored.
+  // Everything under .open-next/ is build output.
+  "main": ".open-next/worker.js",
+
+  // Pins the Workers runtime's behaviour to a date, so a future runtime
+  // change cannot alter how this Worker behaves without a deliberate bump
+  // here. OpenNext requires 2024-09-23 or later; this is current.
+  "compatibility_date": "2026-10-01",
+
+  "compatibility_flags": [
+    // REQUIRED by OpenNext. Next's server reaches for node:* builtins
+    // (stream, buffer, async_hooks, crypto) on every render; without this
+    // flag the Worker fails at import time, before any request is served.
+    "nodejs_compat",
+
+    // Makes `fetch()` to this Worker's own public hostname go out to the
+    // edge and come back, instead of short-circuiting inside the isolate.
+    // OpenNext's get-started config sets it, and it is what makes a
+    // same-origin fetch from a server component behave like a real request.
+    "global_fetch_strictly_public"
+  ],
+
+  // Static assets: everything in public/ plus Next's build output
+  // (/_next/static/**), uploaded alongside the Worker and served directly
+  // from Cloudflare's edge. Requests that hit an asset NEVER invoke the
+  // Worker — they are free and unmetered, and the bytes do not count toward
+  // the Worker size limit. This is what keeps the 12 MB of product imagery
+  // and the hero video out of the bundle.
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  // next/image. The adapter implements Next's image optimisation endpoint on
+  // top of this binding, so /_next/image keeps working with no loader file
+  // and no change to any component. Free for the first 5,000 unique
+  // transformations a month; see CLAUDE.md for the arithmetic and the
+  // fallback if that is ever exceeded.
+  "images": {
+    "binding": "IMAGES"
+  },
+
+  // Request logs and invocation metrics in the dashboard. Included on the
+  // free plan; the only reason to turn it off is noise.
+  "observability": {
+    "enabled": true
+  }
+}
