@@ -7,9 +7,13 @@
   // branch is connected in the dashboard.
   "name": "bluneuron-website",
 
-  // Written by `opennextjs-cloudflare build`, not by hand, and gitignored.
-  // Everything under .open-next/ is build output.
-  "main": ".open-next/worker.js",
+  // The entry point. NOT the adapter's generated worker directly — this is a
+  // committed wrapper that imports `.open-next/worker.js` (which IS generated
+  // by `opennextjs-cloudflare build`, and gitignored, along with everything
+  // else under .open-next/) and delegates every request to it except the
+  // range-served video files. See custom-worker.js for why that exists, and
+  // `assets.run_worker_first` below for how those requests reach it.
+  "main": "custom-worker.js",
 
   // Pins the Workers runtime's behaviour to a date, so a future runtime
   // change cannot alter how this Worker behaves without a deliberate bump
@@ -31,13 +35,28 @@
 
   // Static assets: everything in public/ plus Next's build output
   // (/_next/static/**), uploaded alongside the Worker and served directly
-  // from Cloudflare's edge. Requests that hit an asset NEVER invoke the
+  // from Cloudflare's edge. Requests that hit an asset do not invoke the
   // Worker — they are free and unmetered, and the bytes do not count toward
   // the Worker size limit. This is what keeps the 12 MB of product imagery
-  // and the hero video out of the bundle.
+  // and the hero video out of the bundle. The sole exception is
+  // `run_worker_first` below, which is two video files and nothing else.
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+
+    // The ONE exception to "asset requests never invoke the Worker": the
+    // video files. The asset worker answers a `Range:` request with 200 and
+    // the whole file and sends no `Accept-Ranges`, which iOS Safari treats as
+    // "this cannot be streamed" and refuses to play. These two rules send
+    // just those paths to the Worker first, where custom-worker.js reads the
+    // bytes back out of the ASSETS binding and answers a real 206.
+    //
+    // Keep this list as narrow as it is. Every path matched here becomes a
+    // billed Worker invocation instead of a free asset hit, so it is worth
+    // two files and would not be worth all of public/. The wildcard matches
+    // deep paths (/media/iriz/video/iriz-loop.mp4); rules must start with "/"
+    // and "!" prefixes exclude. Max 100 rules.
+    "run_worker_first": ["/media/*.mp4", "/media/*.webm"]
   },
 
   // next/image. The adapter implements Next's image optimisation endpoint on

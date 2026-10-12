@@ -147,14 +147,23 @@ Vercel/Node entry points and are untouched by this section.
 
 Cloudflare Workers is not a Node host. There is no long-lived process and no
 filesystem, so `npm start` means nothing here: OpenNext compiles the Next
-server into a single Worker script plus a directory of static assets, and
-`main` in `wrangler.jsonc` points at build output, never at source.
+server into a single Worker script plus a directory of static assets.
+
+`main` in `wrangler.jsonc` points at `custom-worker.js` — a committed
+wrapper that imports the generated `.open-next/worker.js` and delegates
+everything to it except the range-served video files. Nothing else is source:
+the generated worker, the server bundle and the assets are all build output.
 
 ## The files, and what each one is for
 
 - **`wrangler.jsonc`** — the Worker's own config: name, entry point,
   compatibility date and flags, bindings. Every field carries a comment
   saying why it is there; read it before changing any of them.
+- **`custom-worker.js`** — the Worker entry point, and the only hand-written
+  runtime code on this branch. It exists for one reason: answering `Range:`
+  requests for the hero video with a real `206`. See **Range requests** below.
+  It is invisible to the other two hosts — only `wrangler.jsonc` references
+  it, and `wrangler.jsonc` exists only here.
 - **`open-next.config.ts`** — the adapter's config. The filename is fixed by
   the CLI, which compiles it with esbuild, so it is TypeScript in a project
   with no `typescript` dependency. Next's TypeScript detection only scans
@@ -240,7 +249,10 @@ the Worker and served from the edge:
 
 - Those bytes do **not** count toward the Worker size limit.
 - Requests that hit an asset do **not** invoke the Worker. On both plans they
-  are free and unmetered, with no egress charge.
+  are free and unmetered, with no egress charge. The one exception is the two
+  video files, deliberately routed through the Worker for byte ranges — see
+  **Range requests** below. Their *bytes* still live in the assets, so the
+  size rule above is unaffected.
 
 So large media belongs in `public/`, exactly as it does today. It must never
 be imported into a server component as data or inlined as a `data:` URI —
@@ -279,26 +291,55 @@ and `dangerouslyAllowLocalIP`.
 
 ## Range requests: the hero video on iOS
 
-Workers Static Assets answered a `Range:` request in the local Workers
-runtime with **`200` and the whole file**, not `206 Partial Content`, and set
-no `Accept-Ranges` header. Chrome and Firefox tolerate that and play the
-video; **iOS Safari requires `206` and can show a blank player instead.**
+**Confirmed on the live deployment, and fixed.** Workers Static Assets
+answers a `Range:` request with **`200` and the whole file**, not `206
+Partial Content`, and sends no `Accept-Ranges` header. It did this on
+www.bluneuron.com for both `iriz-loop.mp4` and `iriz-loop.webm` — a 2-byte
+range came back as all 739,869 bytes — so the earlier "only seen in the local
+runtime, re-verify once live" note is settled: the local runtime was right.
 
-This was NOT verified against a real deployment — only the local runtime —
-and Cloudflare has been closing issues in this area, so check it once the
-Worker is live rather than trusting either answer:
+Chrome and Firefox tolerate it and play the video. **iOS Safari requires
+`206` for `<video>`** and shows the poster or a blank player instead.
+
+The fix is `custom-worker.js`, reached through two `run_worker_first` rules in
+`wrangler.jsonc`:
+
+- `"run_worker_first": ["/media/*.mp4", "/media/*.webm"]` sends **only** those
+  paths to the Worker ahead of the asset worker. The wildcard matches deep
+  paths, so `/media/iriz/video/iriz-loop.mp4` is covered.
+- The Worker reads the bytes back out of the `ASSETS` binding and slices
+  them, so the videos are still ordinary static assets — uploaded beside the
+  Worker, out of the Worker size budget, never inlined into the bundle.
+- It answers `206` with `Content-Range`, `Accept-Ranges: bytes`, an explicit
+  `Content-Type`, a 30-day `Cache-Control`, and the asset's own `ETag`
+  passed through; `416` for an unsatisfiable range; and a plain `200` for a
+  request with no `Range`, a multi-range header, or a non-matching
+  `If-Range`.
+
+Verified live, both files, cold and repeated:
 
 ```bash
-curl -s -o /dev/null -D - -H "Range: bytes=0-1023" \
-  https://<the deployed host>/media/iriz/video/iriz-loop.webm | head -3
+curl -s -o /dev/null -D - -H "Range: bytes=0-1" \
+  https://www.bluneuron.com/media/iriz/video/iriz-loop.mp4 | head -5
+# HTTP/1.1 206 Partial Content
+# Content-Range: bytes 0-1/739869
+# Accept-Ranges: bytes
 ```
 
-`206 Partial Content` means there is nothing to do. If it is `200`, the hero
-degrades to its poster frame on iPhones — `components/HeroBackdrop` already
-treats poster-only as a supported state, so it fails gracefully rather than
-breaking. The fix, if it matters, is to serve that one file through the
-Worker with a range handler reading the `ASSETS` binding, guarded so the
-Vercel and GoDaddy builds never take that path.
+Two consequences worth knowing before touching any of it:
+
+- **Those two paths are now billed Worker invocations**, not free asset
+  hits, and `CF-Cache-Status` disappears from their responses — the Worker
+  runs ahead of the cache. That is a fine trade for two files and would not
+  be fine for all of `public/`, so **keep the `run_worker_first` list
+  narrow**. Everything else under `/media/` (the poster frame, the product
+  photography) still comes straight off the edge, free and `HIT`.
+- The Worker buffers the whole file to slice it. Bounded by Cloudflare's
+  25 MiB per-asset limit, and these are 723 KB and 651 KB. A genuinely large
+  video would need streaming instead.
+
+`components/HeroBackdrop` still treats poster-only as a supported state, so
+the page degrades rather than breaks if this ever regresses.
 
 ## No ISR, deliberately
 
