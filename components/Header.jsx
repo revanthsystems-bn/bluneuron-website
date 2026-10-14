@@ -10,6 +10,8 @@ import NotifyButton from './NotifyButton';
 import { useCart } from './cart/CartContext';
 import { runBuyNow } from '@/lib/commerce';
 import { COMMERCE_ENABLED } from '@/lib/launch';
+import { BUY_HREF } from '@/lib/routes';
+import { SHOW_BUY } from '@/lib/site-config';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
 
 const NAV_ITEMS = [
@@ -114,6 +116,70 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
   // it; past either hero, the normal black glass.
   const transparent = ink;
 
+  /**
+   * THE MASTHEAD CTA — one function, two call sites (the bar and the open
+   * mobile panel), so the two can never offer different actions.
+   *
+   * Three states, in priority order:
+   *
+   *   SHOW_BUY          "Buy", an anchor to the homepage buy card. The product
+   *                     sells on Amazon and Flipkart, so the masthead's job is
+   *                     to get you to the two marketplace buttons — not to
+   *                     pick a marketplace for you from up here, which is a
+   *                     decision the buy card makes properly with the price
+   *                     and the fulfilment note beside it.
+   *   COMMERCE_ENABLED  the old in-site "Buy Now". Dead today (that flag is
+   *                     false, see lib/launch.js) and kept intact rather than
+   *                     deleted, so the in-site cart path still works if it is
+   *                     ever switched back on.
+   *   neither           "Notify Me", the launch-list modal. The pre-launch
+   *                     state, unchanged.
+   *
+   * SHOW_BUY wins over COMMERCE_ENABLED deliberately: marketplace selling is
+   * the real purchase path now, so if both were ever on, the masthead must
+   * send people to the marketplaces rather than to the dummy checkout.
+   *
+   * An `<a>` for the buy state, not a button: it navigates to a URL, so it
+   * must be middle-clickable, copyable and keyboard-activatable like any link.
+   * `/#buy` rather than a bare `#buy` so it also works from /specs, /support
+   * and every other page the masthead appears on.
+   */
+  const renderCta = (className, { onNavigate, strength = 0.15 } = {}) => {
+    if (SHOW_BUY) {
+      return (
+        <Magnetic as="a" href={BUY_HREF} className={className} strength={strength} onClick={onNavigate}>
+          Buy
+        </Magnetic>
+      );
+    }
+
+    if (COMMERCE_ENABLED) {
+      return (
+        <Magnetic
+          as="button"
+          type="button"
+          onClick={() => {
+            onNavigate?.();
+            handleBuyNow();
+          }}
+          className={className}
+          strength={strength}
+        >
+          Buy Now
+        </Magnetic>
+      );
+    }
+
+    return (
+      <NotifyButton
+        source={onNavigate ? NOTIFY_SOURCES.mobileMenu : NOTIFY_SOURCES.masthead}
+        className={className}
+        strength={strength}
+        onClick={onNavigate}
+      />
+    );
+  };
+
   return (
     <header
       className={[
@@ -201,21 +267,8 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
 
         <div className="flex items-center gap-3">
           <CartButton ink={ink} />
-          {COMMERCE_ENABLED ? (
-            <Magnetic
-              as="button"
-              type="button"
-              onClick={handleBuyNow}
-              className={`hidden px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`}
-              strength={0.15}
-            >
-              Buy Now
-            </Magnetic>
-          ) : (
-            <NotifyButton
-              source={NOTIFY_SOURCES.masthead}
-              className={`hidden px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`}
-            />
+          {renderCta(
+            `hidden px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
           )}
           <button
             aria-label="Toggle menu"
@@ -266,25 +319,13 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
                 {item.label}
               </a>
             ))}
-            {COMMERCE_ENABLED ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileOpen(false);
-                  handleBuyNow();
-                }}
-                className={`mt-2 justify-center ${ink ? 'btn-primary-ink' : 'btn-primary'}`}
-              >
-                Buy Now
-              </button>
-            ) : (
-              <NotifyButton
-                source={NOTIFY_SOURCES.mobileMenu}
-                className={`mt-2 justify-center ${ink ? 'btn-primary-ink' : 'btn-primary'}`}
-                strength={0}
-                onClick={() => setMobileOpen(false)}
-              />
-            )}
+            {renderCta(`mt-2 justify-center ${ink ? 'btn-primary-ink' : 'btn-primary'}`, {
+              // Closing the panel is the shared part: tapping the CTA inside
+              // an open mobile menu must dismiss it, whichever of the three
+              // actions the CTA currently is.
+              onNavigate: () => setMobileOpen(false),
+              strength: 0,
+            })}
           </nav>
         </div>
       )}

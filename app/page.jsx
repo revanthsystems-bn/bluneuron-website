@@ -7,10 +7,13 @@ import ProductShowcase from '@/components/ProductShowcase';
 import ComparisonTable from '@/components/ComparisonTable';
 import Hero from '@/components/Hero';
 import Newsletter from '@/components/Newsletter';
+import BuySection from '@/components/BuySection';
 import Footer from '@/components/Footer';
 import StickyBuyBar from '@/components/StickyBuyBar';
 import { COMMERCE_ENABLED } from '@/lib/launch';
 import { resolveHeroTheme } from '@/lib/heroTheme';
+import { ROUTES } from '@/lib/routes';
+import { SHOW_BUY } from '@/lib/site-config';
 import { ORGANIZATION_JSON_LD, pageMetadata, productJsonLd } from '@/lib/seo';
 
 /**
@@ -34,7 +37,7 @@ const DESCRIPTION =
 export const metadata = pageMetadata({
   title: TITLE,
   description: DESCRIPTION,
-  path: '/',
+  path: ROUTES.home,
   // No width budget on an OG card, so the fuller claim goes here.
   ogTitle: 'BluNeuron IRIZ — Mini Projector for Home, Native 1080p, 500 ANSI Lumens',
 });
@@ -44,8 +47,9 @@ export const metadata = pageMetadata({
  *
  * The whole decision lives in productJsonLd() (lib/seo.js) — including why a
  * price-free Product is not emitted at all rather than emitted without
- * `offers`. Resolved once at module scope: it depends only on constants, so
- * there is nothing per-request about it.
+ * `offers`, and why MARKETPLACE.priceInr in lib/site-config.js is the one
+ * price it is allowed to read. Resolved once at module scope: it depends only
+ * on constants, so there is nothing per-request about it.
  */
 const PRODUCT_JSON_LD = productJsonLd();
 
@@ -113,7 +117,14 @@ export default async function Home({ searchParams }) {
         <TechSpecs />
         <ProductShowcase />
         <ComparisonTable />
-        <Newsletter />
+        {/* The closing section is EITHER the marketplace buy card or the
+            launch-list signup — never both, and never neither. They share the
+            `#buy` id (BUY_ANCHOR in lib/routes.js), which is what the masthead
+            CTA, the mobile sticky bar and ConsentNotice's landmark list all
+            point at, so that anchor resolves in both states and none of those
+            three has to know which one is mounted.
+            See SHOW_BUY in lib/site-config.js. */}
+        {SHOW_BUY ? <BuySection /> : <Newsletter />}
       </main>
       <Footer />
     </>

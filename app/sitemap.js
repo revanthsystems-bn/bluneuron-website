@@ -1,33 +1,30 @@
+import { SITEMAP } from '@/lib/routes';
 import { absoluteUrl } from '@/lib/site';
-import { SHOW_PRIVACY } from '@/lib/iriz';
 
 /**
- * Every indexable route, and only those.
+ * The route list used to live here. It now comes from lib/routes.js, which is
+ * also where the footer columns and the support tiles get their paths — so the
+ * sitemap cannot advertise a URL that no page serves, and a renamed route
+ * updates all three at once.
  *
- * /checkout and /order-confirmation are deliberately absent — both are
- * `noindex` (see their layouts) and listing a noindex URL in a sitemap is a
- * contradiction Search Console reports as an error.
+ * SITEMAP is pre-filtered to the pages that are INDEXABLE, on two counts:
  *
- * `priority` is relative within this file only; search engines treat it as a
- * hint at best. The ordering that matters is the homepage first.
+ *   - a page still showing [TBD] placeholders sends `noindex` (routeRobots in
+ *     lib/routes.js), and listing it here would ask a crawler to index a page
+ *     that asks not to be. Those reappear on their own once their details are
+ *     filled into lib/site-config.js.
+ *   - /checkout and /order-confirmation are absent because they are not in the
+ *     registry's candidate list at all. Both are `noindex` in their own layouts
+ *     and both are disallowed in robots.txt (app/robots.js), and a sitemap
+ *     entry for either is a contradiction Search Console reports as an error.
+ *
+ * URLs go through absoluteUrl() rather than `new URL(path, SITE_URL)` so the
+ * homepage is listed as the bare origin — the same string the homepage's own
+ * canonical resolves to, and one spelling of every absolute URL site-wide.
  */
-const ROUTES = [
-  { path: '/', priority: 1, changeFrequency: 'weekly' },
-  { path: '/specs', priority: 0.8, changeFrequency: 'monthly' },
-  { path: '/compare', priority: 0.8, changeFrequency: 'monthly' },
-  { path: '/support', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/about', priority: 0.5, changeFrequency: 'monthly' },
-  // Gated on the same flag the footer link uses. A sitemap entry for a page
-  // the site refuses to link is a crawl invitation to an orphan.
-  ...(SHOW_PRIVACY ? [{ path: '/legal/privacy', priority: 0.2, changeFrequency: 'yearly' }] : []),
-  { path: '/legal/terms', priority: 0.2, changeFrequency: 'yearly' },
-  { path: '/legal/shipping', priority: 0.2, changeFrequency: 'yearly' },
-  { path: '/legal/returns', priority: 0.2, changeFrequency: 'yearly' },
-];
-
 export default function sitemap() {
   const lastModified = new Date();
-  return ROUTES.map((route) => ({
+  return SITEMAP.map((route) => ({
     url: absoluteUrl(route.path),
     lastModified,
     changeFrequency: route.changeFrequency,
