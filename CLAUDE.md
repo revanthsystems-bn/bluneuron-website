@@ -1,10 +1,51 @@
 @AGENTS.md
 
+# What is live, and where
+
+**`https://www.bluneuron.com` is served by Cloudflare Workers, deployed with
+wrangler from the `cloudflare` branch.** That is the production site. Read
+this before believing any sentence elsewhere in this file that says the live
+site runs on Vercel — several do, they describe how it used to be, and they
+are being corrected section by section rather than all at once.
+
+- **Vercel no longer serves the domain.** A Vercel deployment may still
+  exist and still build, but nothing a visitor sees comes from it.
+- **`main` and `iriz-launch` are not live.** Neither branch is deployed
+  anywhere a customer can reach. Merging into `main` ships nothing.
+- **Workers Builds is not connected to the repo.** Pushing to `cloudflare`
+  does **not** redeploy. Every deployment is a manual `wrangler deploy` from
+  a developer's machine, which means a `wrangler deploy` run here changes
+  the live site immediately — treat it as shipping, and confirm before
+  running it. `npx wrangler deployments list` shows what is actually out
+  there.
+
+## Building locally on this machine
+
+Two things differ from a clean checkout, and both look like project bugs:
+
+- **Node 22 for anything touching wrangler.** The system Node is 20, and
+  wrangler refuses to start below 22. A portable Node 22 lives at
+  `C:\Users\MEENA\AppData\Local\node22\` — prepend it to `PATH`. `next build`
+  itself is fine on Node 20.
+- **`.env.local` overrides `.env.production`.** Next loads `.env.local` at
+  higher priority, and the local one sets `NEXT_PUBLIC_META_PIXEL_ID` and
+  `NEXT_PUBLIC_WEB3FORMS_KEY` to EMPTY — so `scripts/assert-build-env.js`
+  aborts a build that would otherwise pass. **Never edit `.env.local`.**
+  Source the committed public values for the build instead:
+
+  ```bash
+  set -a; . ./.env.production; set +a
+  ```
+
 # Working rules
 
 - **Work on feature branches.** Never commit directly to `main`.
-- **Never push to `main` without an explicit "ship to main".** Merging into
-  `main` deploys to the live site via Vercel; that is a decision, not a step.
+- **Never push to `main`**, and never merge into it, without an explicit
+  "ship to main". `main` is not the live branch any more, but it is still
+  the repository's trunk and still not somewhere to push unasked.
+- **Never deploy to production without being asked.** `wrangler deploy` on
+  the `cloudflare` branch IS production. Use `wrangler versions upload` for
+  a preview URL instead.
 - **Never force-push.** Any branch, any time.
 - **Never commit `.env.local`**, or any file holding a real secret.
   `.env.example` is committed and holds variable NAMES only.
@@ -16,7 +57,8 @@
 
 # Hosting: GoDaddy Node.js (`godaddy` branch)
 
-The live site runs on **Vercel from `main`**. The `godaddy` branch is the
+The live site runs on **Cloudflare Workers from `cloudflare`** — see *What is
+live, and where* at the top of this file. The `godaddy` branch is the
 GoDaddy Node.js Hosting build, and everything in this section exists because
 GoDaddy's deployment model differs from Vercel's in ways that fail silently
 rather than loudly. The site must keep working on **both** — nothing here may
@@ -133,13 +175,14 @@ then, pass the values in the environment at build time:
 `app/layout.jsx` renders `<Analytics />` **only when `process.env.VERCEL` is
 set** — a variable Vercel sets itself, read and never configured. Google
 Analytics 4 (`components/GoogleAnalytics`) is the host-independent
-replacement and runs in both places. Keep both: dropping the Vercel one would
-blind the live site, and dropping GA would blind the GoDaddy one.
+replacement and runs in **every** place. Keep both — but note which one
+carries the live site now: GA4 is the only analytics on Cloudflare Workers,
+so **dropping GA would blind production**. The Vercel one reports only from
+a Vercel deployment, which no longer serves the domain.
 
 # Hosting: Cloudflare Workers (`cloudflare` branch)
 
-The live site runs on **Vercel from `main`**. `godaddy` is the GoDaddy Node.js
-build; **`cloudflare` is the Cloudflare Workers build**, via the official
+**`cloudflare` is the branch that serves the live site**, via the official
 OpenNext adapter (`@opennextjs/cloudflare`). The site must keep working on
 **all three** — nothing here may be a Cloudflare-only hack that breaks the
 Vercel deploy or the GoDaddy one. `npm run build` and `npm start` remain the

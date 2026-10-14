@@ -3,16 +3,16 @@ import PageHeading from '@/components/PageHeading';
 import DraftBanner from '@/components/DraftBanner';
 import ContactForm from '@/components/ContactForm';
 import Reveal from '@/components/Reveal';
-import { Clock, Mail, Phone } from 'lucide-react';
+import { Briefcase, Clock, Mail, Phone } from 'lucide-react';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { GRIEVANCE_OFFICER, SUPPORT, isTBD } from '@/lib/site-config';
+import { GRIEVANCE_OFFICER, SUPPORT, allKnown, isTBD } from '@/lib/site-config';
 
 export const metadata = {
   ...pageMetadata({
     title: 'Contact Support — BluNeuron',
     description:
-      'Email, phone and support hours for BluNeuron — plus our grievance officer and the form that reaches our team directly.',
+      'Support and sales email, support hours, and the form that reaches the BluNeuron team directly.',
     path: ROUTES.contact,
   }),
   robots: routeRobots(ROUTES.contact),
@@ -51,6 +51,13 @@ const CHANNELS = [
     note: 'Best for setup help you want talked through.',
   },
   {
+    icon: Briefcase,
+    label: 'Sales',
+    value: SUPPORT.salesEmail,
+    href: isTBD(SUPPORT.salesEmail) ? null : `mailto:${SUPPORT.salesEmail}`,
+    note: 'Bulk orders, retail and distribution enquiries, partnerships.',
+  },
+  {
     icon: Clock,
     label: 'Hours',
     value: SUPPORT.hours,
@@ -58,6 +65,35 @@ const CHANNELS = [
     note: 'Messages outside these hours are answered the next working day.',
   },
 ];
+
+/**
+ * A channel we do not have yet is REMOVED, not rendered with its placeholder.
+ *
+ * This page used to show every channel including the unknown ones, on the
+ * reasoning that a contact page quietly showing two of three looks finished
+ * when it is not — and while that was true of a page whose email, phone and
+ * hours were ALL unknown, it is the wrong trade now that only the helpline
+ * is. There is no phone number, and a "Phone: [TBD]" tile on a live, indexed
+ * support page is not an honest placeholder to a visitor with a dead unit:
+ * it reads as a number being withheld, and it is the tile they will try
+ * first. The page is complete without it, and the moment SUPPORT.phone in
+ * lib/site-config.js holds a real number the tile reappears here with no
+ * other edit.
+ */
+const VISIBLE_CHANNELS = CHANNELS.filter((channel) => !isTBD(channel.value));
+
+/** Is there a named officer to escalate to? See GRIEVANCE_OFFICER. */
+const HAS_GRIEVANCE_OFFICER = allKnown(GRIEVANCE_OFFICER.name, GRIEVANCE_OFFICER.email);
+
+/**
+ * The tile width, derived from how many tiles there actually are, because
+ * the number is no longer fixed at three. `bento-grid` is a 12-column board:
+ * three tiles take four columns each and fill one row, four take six each
+ * and fill two. Hardcoding `lg:col-span-4` left a four-tile layout as 3 + 1,
+ * with one tile stranded on its own row at a third of the width — which is
+ * exactly what happens the day the helpline lands.
+ */
+const TILE_SPAN = VISIBLE_CHANNELS.length === 4 ? 'lg:col-span-6' : 'lg:col-span-4';
 
 export default function ContactPage() {
   return (
@@ -73,7 +109,7 @@ export default function ContactPage() {
           <DraftBanner path={ROUTES.contact} className="mb-10 max-w-[680px]" />
 
           <div className="bento-grid">
-            {CHANNELS.map((channel, i) => {
+            {VISIBLE_CHANNELS.map((channel, i) => {
               const Icon = channel.icon;
 
               return (
@@ -81,7 +117,7 @@ export default function ContactPage() {
                   key={channel.label}
                   delay={Math.min(i, 3) * 0.05}
                   y={20}
-                  className="bento-tile p-6 lg:col-span-4"
+                  className={`bento-tile p-6 ${TILE_SPAN}`}
                 >
                   <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft">
                     <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -145,7 +181,16 @@ export default function ContactPage() {
       {/* Its own section, not a line in the footer of the page. A grievance is
           an escalation — someone using this has already tried the channels
           above and been let down by them — and burying the route to it under
-          the contact form is how a required disclosure becomes a formality. */}
+          the contact form is how a required disclosure becomes a formality.
+
+          HIDDEN ENTIRELY while no officer is appointed, rather than rendered
+          with "[TBD]" where the name goes. The disclosure's whole purpose is
+          to give an unhappy customer a person to reach; a panel that names
+          nobody and links to a draft policy does not do that, and printing
+          the gap on a live page makes the site look abandoned rather than
+          unfinished. Fill in GRIEVANCE_OFFICER (lib/site-config.js) and the
+          panel and the /legal/grievance link return together. */}
+      {HAS_GRIEVANCE_OFFICER && (
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container">
           <Reveal className="glass-panel max-w-[680px] p-8 sm:p-10">
@@ -185,6 +230,7 @@ export default function ContactPage() {
           </Reveal>
         </div>
       </section>
+      )}
     </PageShell>
   );
 }

@@ -7,18 +7,22 @@ import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { useCart } from './CartContext';
 import { formatPrice, PRICING } from '@/lib/iriz';
 import { COMMERCE_ENABLED } from '@/lib/launch';
+import { BUY_HREF } from '@/lib/routes';
 
 export default function CartDrawer() {
   const { isOpen, closeCart, product, qty, subtotal, setItemQty, removeItem } = useCart();
   const router = useRouter();
 
+  // /checkout is deleted (see lib/commerce.js), so the drawer's CTA goes to
+  // the homepage buy card — the site's real purchase path — rather than to a
+  // form that no longer exists.
   const goToCheckout = () => {
     closeCart();
-    router.push('/checkout');
+    router.push(BUY_HREF);
   };
 
-  // Pre-launch this drawer is the site's only route to /checkout, so it does
-  // not mount at all. The cart state behind it is untouched. See lib/launch.js.
+  // Pre-launch this drawer does not mount at all. The cart state behind it is
+  // untouched. See lib/launch.js.
   if (!COMMERCE_ENABLED) return null;
 
   return (

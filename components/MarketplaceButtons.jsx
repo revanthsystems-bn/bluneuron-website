@@ -2,6 +2,7 @@
 
 import { track } from '@vercel/analytics';
 import Magnetic from './Magnetic';
+import { trackGaEvent } from '@/lib/googleAnalytics';
 import { trackMetaPixelCustom } from '@/lib/metaPixel';
 import { MARKETPLACE, MARKETPLACES, isTBD } from '@/lib/site-config';
 
@@ -21,12 +22,22 @@ import { MARKETPLACE, MARKETPLACES, isTBD } from '@/lib/site-config';
  * lib/site-config.js.
  *
  * WHAT HAPPENS ON CLICK, and what deliberately does not: the marketplace name
- * goes to Vercel Analytics as `buy_click` and to the Meta Pixel as the custom
- * `ClickToBuy`. Nothing else. No email, no phone number, no click id, no
- * referrer games — the card collects nothing, so there is nothing personal to
- * leak, and that must stay true. Both calls are no-ops when their script is
- * absent (ad blocker, consent tooling, localhost), and neither is awaited, so
- * analytics can never delay or block the navigation to Amazon.
+ * goes to Google Analytics 4 and Vercel Analytics as `buy_click`, and to the
+ * Meta Pixel as the custom `ClickToBuy`. Nothing else. No email, no phone
+ * number, no click id, no referrer games — the card collects nothing, so
+ * there is nothing personal to leak, and that must stay true. All three calls
+ * are no-ops when their script is absent (ad blocker, consent tooling,
+ * localhost), and none is awaited, so analytics can never delay or block the
+ * navigation to Amazon.
+ *
+ * GA4 IS THE ONE THAT ACTUALLY REPORTS HERE. @vercel/analytics only reaches
+ * the dashboard of a Vercel deployment, and this site is served from
+ * Cloudflare Workers — app/layout.jsx does not even render <Analytics /> off
+ * Vercel, so `track()` has nothing to send to and silently does nothing. It
+ * is kept because the Vercel deploy still exists and still reports from it;
+ * GA4 (lib/googleAnalytics.js) is the host-independent one, and without this
+ * call the single most valuable event on the site — a click through to a
+ * marketplace listing — was invisible on the host that serves the domain.
  */
 
 /** Opens-in-a-new-tab glyph. Drawn, aria-hidden, inherits the label's colour. */
@@ -94,6 +105,7 @@ export default function MarketplaceButtons({
               className={`${tone} ${buttonClassName}`}
               strength={strength}
               onClick={() => {
+                trackGaEvent('buy_click', { marketplace: marketplace.name });
                 track('buy_click', { marketplace: marketplace.name });
                 trackMetaPixelCustom('ClickToBuy', { marketplace: marketplace.name });
               }}

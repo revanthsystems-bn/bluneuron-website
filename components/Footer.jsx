@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { REGION, SHOW_PRIVACY, SOCIAL_LINKS } from '@/lib/iriz';
-import { FOOTER_COLUMNS, ROUTES } from '@/lib/routes';
+import { FOOTER_COLUMNS, ROUTES, isDraftRoute } from '@/lib/routes';
 import { COMPANY, allKnown } from '@/lib/site-config';
 
 /**
@@ -75,7 +75,32 @@ export default function Footer() {
     ...ICONS[key],
   }));
 
-  const showIdentity = allKnown(COMPANY.legalName, COMPANY.gstin, COMPANY.registeredAddress);
+  /**
+   * A DRAFT page is not linked from the footer of every page on the site.
+   *
+   * The three things draft state already drives — the banner, the `noindex`
+   * and the sitemap — all keep a crawler and a reader from treating an
+   * unfinished page as finished. A sitewide footer link is the fourth, and
+   * the most prominent of them: it puts "Grievance redressal" in front of
+   * every visitor and lands the ones who need it most on a page that cannot
+   * yet name its officer. The link returns on its own the moment the page
+   * stops being a draft, from the same table (lib/routes.js) the other three
+   * read. Columns that empty out entirely are dropped with it, so no heading
+   * is left standing over nothing.
+   */
+  const columns = FOOTER_COLUMNS.map((column) => ({
+    ...column,
+    links: column.links.filter((link) => !isDraftRoute(link.href)),
+  })).filter((column) => column.links.length > 0);
+
+  // GSTIN is NOT part of this test. The disclosure that matters under the
+  // Consumer Protection (E-Commerce) Rules is who the seller is and where
+  // they are; the GSTIN is an extra line that renders when we have one and
+  // is simply absent when we do not (COMPANY.gstin is '' — see the note on
+  // it in lib/site-config.js). Requiring all three meant one unset field
+  // suppressed the legal name and the address as well, which is the opposite
+  // of what the test is for.
+  const showIdentity = allKnown(COMPANY.legalName, COMPANY.registeredAddress);
 
   return (
     <footer className="border-t border-border-subtle bg-black">
@@ -105,7 +130,7 @@ export default function Footer() {
           aria-label="Footer"
           className="columns-2 gap-x-6 lg:grid lg:grid-cols-4 lg:gap-x-6 lg:[column-count:auto]"
         >
-          {FOOTER_COLUMNS.map((column) => (
+          {columns.map((column) => (
             <div key={column.title} className="mb-10 break-inside-avoid lg:mb-0">
               <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
                 {column.title}
@@ -198,7 +223,7 @@ export default function Footer() {
           <div className="mt-8 border-t border-border-subtle pt-6 text-xs leading-relaxed text-white/40">
             <p className="font-medium text-white/55">{COMPANY.legalName}</p>
             <p className="mt-1">{COMPANY.registeredAddress}</p>
-            <p className="mt-1">GSTIN: {COMPANY.gstin}</p>
+            {allKnown(COMPANY.gstin) && <p className="mt-1">GSTIN: {COMPANY.gstin}</p>}
           </div>
         )}
 

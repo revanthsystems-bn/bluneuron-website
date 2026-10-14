@@ -28,13 +28,22 @@ const SECTIONS = [
     ],
   },
   {
+    // TODO(launch): appoint the officer, fill GRIEVANCE_OFFICER in
+    // lib/site-config.js, and this page stops being a draft on its own —
+    // banner off, `noindex` off, back in the sitemap, back in the footer.
+    // It is the last [TBD] holding the page, along with the two timelines
+    // below.
     heading: 'Grievance officer',
     body: [
       `Name: ${GRIEVANCE_OFFICER.name}`,
       `Email: ${GRIEVANCE_OFFICER.email}`,
       `Entity: ${COMPANY.legalName}`,
       `Address: ${COMPANY.registeredAddress}`,
-      `Phone and calling hours: ${SUPPORT.phone} — ${SUPPORT.hours}`,
+      // NO phone line. There is no helpline yet, and the row is omitted
+      // rather than printed as "[TBD] — Monday–Saturday…", which reads as a
+      // number we are withholding rather than one that does not exist.
+      // SUPPORT.phone in lib/site-config.js is the single switch.
+      `Written to at: ${SUPPORT.email}, ${SUPPORT.hours}`,
     ],
   },
   {

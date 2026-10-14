@@ -5,6 +5,7 @@ import ThrowRange from '@/components/ThrowRange';
 import TechSpecs from '@/components/TechSpecs';
 import ProductShowcase from '@/components/ProductShowcase';
 import ComparisonTable from '@/components/ComparisonTable';
+import WhyIriz from '@/components/WhyIriz';
 import Hero from '@/components/Hero';
 import Newsletter from '@/components/Newsletter';
 import BuySection from '@/components/BuySection';
@@ -117,6 +118,13 @@ export default async function Home({ searchParams }) {
         <TechSpecs />
         <ProductShowcase />
         <ComparisonTable />
+        {/* The long-form read, last before the ask. It is deliberately the
+            only prose section on the page and deliberately at the bottom:
+            everything above states the product in fragments, and this is
+            where the fragments are joined up for the reader who is still
+            deciding — and for a crawler, which cannot read the photography
+            the rest of the page argues with. See components/WhyIriz. */}
+        <WhyIriz />
         {/* The closing section is EITHER the marketplace buy card or the
             launch-list signup — never both, and never neither. They share the
             `#buy` id (BUY_ANCHOR in lib/routes.js), which is what the masthead

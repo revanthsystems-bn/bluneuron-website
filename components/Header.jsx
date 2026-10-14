@@ -10,15 +10,29 @@ import NotifyButton from './NotifyButton';
 import { useCart } from './cart/CartContext';
 import { runBuyNow } from '@/lib/commerce';
 import { COMMERCE_ENABLED } from '@/lib/launch';
-import { BUY_HREF } from '@/lib/routes';
+import { BUY_HREF, ROUTES } from '@/lib/routes';
 import { SHOW_BUY } from '@/lib/site-config';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
 
+/**
+ * The masthead nav.
+ *
+ * "Support" is here and the four product links are not enough without it.
+ * Everything else in this list is for someone deciding whether to buy; the
+ * moment the product is on Amazon and Flipkart, a second kind of visitor
+ * arrives — one who already owns a unit and wants a warranty claim or a
+ * manual. They were reaching that through the footer alone, which on a phone
+ * is a full page-length scroll away from wherever they landed. It is the
+ * last item rather than the first because it is the smaller audience, and
+ * `/support` is a hub (lib/routes.js) that fans out to the six things they
+ * might actually want.
+ */
 const NAV_ITEMS = [
   { label: 'Overview', href: '/#showcase' },
   { label: 'Highlights', href: '/#highlights' },
   { label: 'Specs', href: '/specs' },
   { label: 'Compare', href: '/compare' },
+  { label: 'Support', href: ROUTES.support },
 ];
 
 /**

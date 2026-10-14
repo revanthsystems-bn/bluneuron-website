@@ -1,75 +1,109 @@
 import LegalPage from '@/components/LegalPage';
+import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { RETURNS, SUPPORT, TBD } from '@/lib/site-config';
+import { POLICY_LAST_UPDATED, RETURNS, SUPPORT, WARRANTY } from '@/lib/site-config';
 
 /**
- * Returns and refunds — rewritten for marketplace selling.
+ * Returns, refunds and cancellations — sections 3, 4 and 5 of the supplied
+ * Warranty, Return, Refund and Cancellation document. (Sections 1 and 2, the
+ * warranty itself and the service process, are at /legal/warranty.)
  *
- * The previous version of this page described returning a unit to US: a return
- * authorisation, a 30-day window, a refund to the original payment method.
- * None of that exists. There is no checkout on this site, so there is no
- * payment method to refund and no order of ours to authorise a return against.
- * Every return runs through Amazon or Flipkart, and the only honest thing this
- * page can do is say so first and then state where our own terms go further.
+ * WHAT IS KEPT, deliberately and in the source's own terms: the replacement
+ * windows and the exact difference between them — 7 days for a unit that is
+ * defective or non-functioning on arrival, 24 hours for physical or transit
+ * damage and for a specification mismatch; the non-replacement conditions,
+ * including the one that matters most commercially, that dissatisfaction
+ * with a DEFECT-FREE product's appearance, audio/visual characteristics or
+ * room-brightness performance is not a replacement; the requirement that a
+ * returned unit be unused and complete; and repair-or-replace as the remedy
+ * for a manufacturing defect.
  *
- * The 30-day figure went with it. It came from the homepage's "30-Day
- * Risk-Free Trial" trust badge, which does not render while commerce is off
- * (see COMMERCE_ENABLED in lib/launch.js) and was never a commitment anyone
- * had signed off. RETURNS.windowDays in lib/site-config.js is the one place a
- * real number will go.
+ * THE ONE SUBSTANTIVE CHANGE. The source says "No monetary refunds will be
+ * issued under any circumstances" and "Bluneuron maintains a strict No Refund
+ * Policy". That sentence is not enforceable in India as written: the
+ * Consumer Protection Act, 2019 gives a buyer rights a seller's policy cannot
+ * contract away, and a marketplace order additionally carries Amazon's or
+ * Flipkart's own refund policy, which we have agreed to as a seller on their
+ * platform. A blanket exclusion is also the kind of clause that gets a whole
+ * policy read down rather than just the offending line.
+ *
+ * So the substance is kept and the absolute is dropped: we do not refund for
+ * change of mind, and we do not refund a defect-free unit because of its
+ * appearance or brightness — which is what the no-refund rule is actually
+ * for — while the savings clause states plainly that statutory and
+ * marketplace rights are unaffected. That is the same commercial position,
+ * stated in a way that survives being tested.
+ *
+ * The cancellation section is rewritten for marketplace selling: we do not
+ * accept orders on this domain, so there is nothing here to cancel, and
+ * cancellation runs on the marketplace's rules.
  */
 const SECTIONS = [
   {
-    heading: 'Returns run through the marketplace',
-    body: 'The BluNeuron IRIZ is sold on Amazon and Flipkart. Your order, your payment and your return are all with the marketplace you bought from, so a return or a refund is started in your orders list there — not here. Their return window, their process and their refund timelines apply to the purchase.',
-    note: 'We cannot start, authorise or refund a marketplace return on your behalf. We also cannot see your order unless you tell us the order ID.',
+    heading: 'Where a return starts',
+    body: `The ${BRAND.fullName} is sold on Amazon and Flipkart. Your order, your payment and your invoice are with the marketplace you bought from, so a return, a replacement or a refund is started in your orders list there — not here. Their window, their process and their refund timelines apply to the purchase, and they are usually wider than ours.`,
+    note: 'We cannot start, authorise or refund a marketplace return on your behalf, and we cannot see your order unless you give us the order ID.',
   },
   {
-    heading: 'How to start a return',
+    heading: 'How to start a marketplace return',
     body: [
       'Open your orders on Amazon or Flipkart and choose the return or replacement option on the IRIZ order.',
-      'Follow their instructions for pickup or drop-off. Keep all original accessories and packaging with the unit.',
-      `If the marketplace window has closed and the unit has a fault, use the warranty claim form at ${ROUTES.warrantyClaim} instead.`,
+      'Follow their instructions for pickup or drop-off. Send the unit back with all original accessories and packaging.',
+      `If the marketplace window has closed and the unit has a fault, use the warranty claim form at ${ROUTES.warrantyClaim} instead — the warranty runs for ${WARRANTY.label} and is separate from any return window.`,
     ],
   },
   {
-    heading: 'Our own return window',
-    body: `Where we offer a return beyond the marketplace's own window, it is ${RETURNS.windowDays} days from delivery. Which purchases this applies to, and how it is claimed: ${TBD}.`,
-    note: 'If we are not offering anything beyond the marketplace window, this section must say so plainly rather than be deleted — a missing section reads as an unstated promise.',
+    heading: 'Our replacement windows, and the clock on each',
+    body: [
+      `Defective or non-functioning on arrival: tell us within ${RETURNS.replacementDays} days of delivery to receive a fresh replacement unit.`,
+      `Physical damage or transit damage: report within ${RETURNS.damageReportHours} hours of delivery. A claim made after that is treated as out-of-warranty mishandling.`,
+      `Wrong item or a specification mismatch — the unit delivered is not what was ordered: report within ${RETURNS.damageReportHours} hours of delivery.`,
+    ],
+    note: 'The two clocks differ because the questions differ. Whether a unit works is answerable in a week; whether it arrived damaged stops being answerable almost immediately. Photograph the outer packaging and the unit before anything else.',
   },
   {
     heading: 'Condition of a returned unit',
-    body: `A returned unit is expected in its original condition with all included accessories and its original packaging. What counts as a deduction or a refusal, and who bears return shipping: ${TBD}.`,
+    body: 'For a replacement to be processed, the product must be unused and in its original brand packaging, with all manuals, accessories, warranty card and the purchase invoice, free of marks, scratches or alterations.',
   },
   {
-    heading: 'Refund timelines',
-    body: `Marketplace refunds follow Amazon's or Flipkart's own timelines and are credited by them. Where we refund directly, it is within ${RETURNS.refundDays} days of receiving and inspecting the returned unit.`,
+    heading: 'When a replacement is not given',
+    body: [
+      "Dissatisfaction with a defect-free product's appearance, audio or visual characteristics, or its brightness in your room. A projector's picture depends on ambient light, surface and throw distance; a unit performing to specification is not a defective one.",
+      `Physical damage reported more than ${RETURNS.damageReportHours} hours after delivery.`,
+      'Damage caused by power surges, improper operation or negligence.',
+    ],
+    note: `Every IRIZ is inspected and tested by our quality control team before it ships, which is why these cases are narrow rather than routine. If you think a unit is genuinely faulty, raise it at ${ROUTES.warrantyClaim} and we will look at it.`,
   },
   {
-    heading: 'Non-returnable situations',
-    body: [TBD],
-    note: 'The final list must be exhaustive and must not restate a right the Consumer Protection Act gives the buyer regardless.',
+    heading: 'Refunds',
+    body: `We do not refund for change of mind, and we do not refund a defect-free unit on the basis of its appearance or its brightness performance. Where a unit has a manufacturing defect, the remedy under our warranty is repair or replacement — see ${ROUTES.warranty}. A refund on a marketplace order, where one is due, is issued by Amazon or Flipkart under their policy and on their timeline, since they took the payment.`,
+    note: 'Nothing in this policy limits your rights under the Consumer Protection Act, 2019 or the return and refund policy of the marketplace you purchased from.',
+  },
+  {
+    heading: 'If a unit cannot be repaired',
+    body: `Where a product cannot be repaired and no direct replacement is available, ${BRAND.name} may offer an equivalent model, or issue a credit note for the invoice value. All original accessories must be returned; where they are not, a reasonable deduction is made. The full terms are in the warranty policy at ${ROUTES.warranty}.`,
+  },
+  {
+    heading: 'Cancellations',
+    body: 'An order placed on Amazon or Flipkart is cancelled through that marketplace, under their rules — generally before the order is dispatched, and not at all once it has shipped. Same-day delivery orders and orders placed during limited-time promotional or holiday sales are often non-cancellable on their side; their listing says which.',
+    note: 'There is no checkout on this website, so there is no order of ours for you to cancel. If we begin selling directly in future, cancellation terms for direct orders will be published here.',
   },
   {
     heading: 'Returns and the warranty are not the same thing',
-    body: `A return gives your money back and ends the sale. The warranty repairs or replaces a faulty unit and keeps it. They have different windows and different processes — see the warranty policy at ${ROUTES.warranty}.`,
-  },
-  {
-    heading: 'Damaged or wrong item on arrival',
-    body: 'Raise this with the marketplace immediately — they handle delivery, and a damaged-in-transit or wrong-item claim is theirs to resolve. Photograph the packaging and the unit before you do anything else.',
+    body: `A return ends the sale and is the marketplace's to process. The warranty keeps the unit and repairs or replaces it, runs for a year from the invoice date, and is ours. They have different windows and different processes — see ${ROUTES.warranty}.`,
   },
   {
     heading: 'Questions',
-    body: `Email ${SUPPORT.email}, or use the form at ${ROUTES.contact}.`,
+    body: `Email ${SUPPORT.email} within support hours (${SUPPORT.hours}), or use the form at ${ROUTES.contact}.`,
   },
 ];
 
 export const metadata = {
   ...pageMetadata({
-    title: 'Returns & Refunds — BluNeuron',
+    title: 'Returns, Refunds & Cancellations — BluNeuron',
     description:
-      'How returns and refunds work for the BluNeuron IRIZ, which is sold on Amazon and Flipkart.',
+      'Replacement windows, refunds and cancellations for the BluNeuron IRIZ, which is sold on Amazon and Flipkart.',
     path: ROUTES.returns,
   }),
   robots: routeRobots(ROUTES.returns),
@@ -78,10 +112,11 @@ export const metadata = {
 export default function ReturnsPage() {
   return (
     <LegalPage
-      title="Returns & Refunds"
+      title="Returns, Refunds & Cancellations"
       path={ROUTES.returns}
-      intro="The IRIZ is sold on Amazon and Flipkart, so returns start there. Here is what that means, and where our own terms go further."
+      intro="The IRIZ is sold on Amazon and Flipkart, so returns start there. Here is what that means, and where our own replacement terms apply."
       sections={SECTIONS}
+      lastUpdated={POLICY_LAST_UPDATED}
     />
   );
 }

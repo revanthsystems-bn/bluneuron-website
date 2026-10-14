@@ -1,51 +1,81 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import Reveal from '@/components/Reveal';
+import { ROUTES } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
+import { COMPANY, POLICY_LAST_UPDATED, SUPPORT } from '@/lib/site-config';
 
 /**
- * The privacy policy — a real document, and the only legal page that does not
- * go through components/LegalPage.
+ * The privacy policy — the only legal page that does not go through
+ * components/LegalPage.
  *
- * That is deliberate. LegalPage hard-codes the amber "DRAFT — placeholder
- * legal text" banner and the "Draft prepared <date>" line, which are still
- * true of /legal/terms, /legal/shipping and /legal/returns and must stay
- * there. This page is no longer a draft, so it cannot use that shell, and
- * stripping the banner from the shell would quietly un-draft the other three.
+ * LegalPage takes `sections` of plain strings and lists. This page needs
+ * markup that shape cannot express: bold lead-ins inside list items,
+ * paragraphs that follow a list inside one section, and mailto and external
+ * links. So the prose is written out here, in the same chrome (PageShell +
+ * PageHeading) and the same tokens as every other page.
  *
- * It also needs markup LegalPage's `sections` prop cannot express: bold
- * lead-ins inside list items, a paragraph that follows a list inside the same
- * section, and mailto links. So the prose is written out here, in the same
- * chrome (PageShell + PageHeading) and the same tokens as the rest of the
- * site.
+ * (It was also, once, the only policy page that was NOT a draft, which is the
+ * original reason it was split out. That is no longer the distinction — the
+ * other pages are finished now and LegalPage's banner is driven from
+ * lib/routes.js rather than hardcoded — but the markup reason stands on its
+ * own.)
  *
- * Measure is capped at 680px rather than the `max-w-3xl` (768px) the draft
- * pages use — a policy is read, not skimmed, and 680px at 16px keeps lines
- * near the 65-75 character range that is comfortable for continuous text.
+ * WHAT CHANGED when the support hub landed: this policy described a site
+ * whose only form was a launch-list signup asking for an email and an
+ * optional phone number. There are now three more forms — warranty
+ * registration, warranty claim and contact — collecting a name, a mobile
+ * number, a marketplace, an order ID, a purchase date and a serial number.
+ * A privacy policy that does not mention the data the site's main forms
+ * collect is not a disclosure, so the "What we collect" section is written
+ * per form, naming the fields.
+ *
+ * The contact details are no longer a bare brand name and an inbox: the
+ * registered entity and its address come from lib/site-config.js, the same
+ * values the footer discloses.
+ *
+ * Measure is capped at 680px — a policy is read, not skimmed, and 680px at
+ * 16px keeps lines near the 65-75 characters comfortable for continuous text.
  */
 
-const CONTACT_EMAIL = 'systems@bluneuron.com';
-const LAST_UPDATED = '10 October 2026';
+const CONTACT_EMAIL = SUPPORT.email;
 
 export const metadata = pageMetadata({
   title: 'Privacy Policy — BluNeuron',
   description:
-    'How BluNeuron collects and uses information on bluneuron.com — launch-update signups, site analytics, and the third-party services we rely on.',
-  path: '/legal/privacy',
+    'What BluNeuron collects on bluneuron.com — launch signups, warranty and support forms, and the analytics services we use — and how to have it deleted.',
+  path: ROUTES.privacy,
 });
 
 /** Section heading. One level below the PageHeading h1. */
 function H2({ children }) {
-  return <h2 className="mb-3 mt-10 text-xl font-semibold tracking-tight text-white first:mt-0">{children}</h2>;
+  return (
+    <h2 className="mb-3 mt-10 text-xl font-semibold tracking-tight text-white first:mt-0">
+      {children}
+    </h2>
+  );
 }
 
-function Mail() {
+function Mail({ address = CONTACT_EMAIL }) {
   return (
     <a
-      href={`mailto:${CONTACT_EMAIL}`}
+      href={`mailto:${address}`}
       className="text-white underline underline-offset-2 transition-colors hover:text-white/70"
     >
-      {CONTACT_EMAIL}
+      {address}
+    </a>
+  );
+}
+
+function Ext({ href, children }) {
+  return (
+    <a
+      href={href}
+      className="text-white underline underline-offset-2 transition-colors hover:text-white/70"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      {children}
     </a>
   );
 }
@@ -53,7 +83,11 @@ function Mail() {
 export default function PrivacyPage() {
   return (
     <PageShell>
-      <PageHeading eyebrow="Legal" title="Privacy Policy" subtitle={`Last updated: ${LAST_UPDATED}`} />
+      <PageHeading
+        eyebrow="Legal"
+        title="Privacy Policy"
+        subtitle={`Last updated: ${POLICY_LAST_UPDATED}`}
+      />
 
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container">
@@ -61,26 +95,57 @@ export default function PrivacyPage() {
               page keeps the same left gutter as every other section. */}
           <Reveal className="max-w-[680px] text-base leading-relaxed text-white/70">
             <p>
-              BluNeuron (&ldquo;we&rdquo;, &ldquo;us&rdquo;) makes the IRIZ projector. This policy explains what
-              information we collect on bluneuron.com and how we use it.
+              {COMPANY.brandName} (&ldquo;we&rdquo;, &ldquo;us&rdquo;) is a brand of{' '}
+              {COMPANY.legalName}, which makes the IRIZ projector. This policy explains what
+              information we collect on bluneuron.com, what we do with it, and how to have it
+              removed.
+            </p>
+            <p className="mt-4">
+              We do not sell on this website. Buying an IRIZ happens on Amazon or Flipkart, and the
+              personal data in that transaction — your address, your payment details, your invoice
+              — is collected and held by the marketplace under their privacy policy, not ours. We
+              never see your card details, and we are not given your delivery address.
             </p>
 
             <H2>What we collect</H2>
             <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
               <li>
-                <strong className="font-semibold text-white">When you sign up for launch updates:</strong> your
-                email address, and your mobile number if you choose to give it.
+                <strong className="font-semibold text-white">Launch-list signup:</strong> your email
+                address, your name if you give it, and your mobile number if you choose to add one.
               </li>
               <li>
-                <strong className="font-semibold text-white">When you visit the site:</strong> basic information
-                about your visit, such as pages viewed, device and browser type, approximate location (country or
-                city), and how you arrived (for example, from an ad).
+                <strong className="font-semibold text-white">
+                  Warranty registration and warranty claims:
+                </strong>{' '}
+                your name, email address and mobile number, which marketplace you bought from, your
+                order ID, the purchase date, the unit&rsquo;s serial number, and — on a claim — your
+                description of what is going wrong.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">Contact form:</strong> your name, your
+                email address, and your message.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">When you visit the site:</strong> basic
+                information about the visit, such as pages viewed, device and browser type,
+                approximate location (country or city), and how you arrived — for example, from an
+                ad.
               </li>
             </ul>
+            <p className="mt-4">
+              Give us only what a form asks for. A warranty claim needs the serial number and the
+              order ID to be assessed; it does not need your address, and the form does not ask for
+              one.
+            </p>
 
             <H2>How we use it</H2>
             <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
-              <li>To tell you when IRIZ launches and share launch-related updates.</li>
+              <li>To answer your message, and to reply to you about a support request.</li>
+              <li>
+                To register a unit&rsquo;s warranty, to assess a claim against it, and to arrange
+                the repair or replacement that follows.
+              </li>
+              <li>To tell you when IRIZ launches, if you asked us to.</li>
               <li>To understand how people use the site and improve it.</li>
               <li>To measure and improve our advertising on Facebook and Instagram.</li>
             </ul>
@@ -89,59 +154,87 @@ export default function PrivacyPage() {
             <H2>Services we use</H2>
             <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
               <li>
-                <strong className="font-semibold text-white">Web3Forms:</strong> delivers your signup details to
-                us.
+                <strong className="font-semibold text-white">Web3Forms:</strong> delivers every form
+                on this site — the signup, the warranty forms and the contact form — to our inbox.
+                The details you type go to them in transit and to us; the site itself has no
+                database and stores nothing.
               </li>
               <li>
-                <strong className="font-semibold text-white">Vercel Analytics:</strong> counts visits without
-                using cookies. Used only on the version of this site hosted by Vercel.
-              </li>
-              <li>
-                <strong className="font-semibold text-white">Google Analytics 4:</strong> counts visits and
-                measures which pages people use. It uses cookies. We have switched off Google&rsquo;s
-                advertising and cross-device features for this site, so the data is not used to personalise ads
-                or linked to a Google account, and we never send your name, email address or phone number to
-                it. Google processes this data under its own privacy policy. You can opt out across all sites
-                with Google&rsquo;s browser add-on at{' '}
-                <a
-                  href="https://tools.google.com/dlpage/gaoptout"
-                  className="text-white underline underline-offset-2 transition-colors hover:text-white/70"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
+                <strong className="font-semibold text-white">Google Analytics 4:</strong> counts
+                visits and measures which pages people use. It uses cookies. Google&rsquo;s
+                advertising and cross-device features are switched off for this site, so the data is
+                not used to personalise ads or linked to a Google account, and we never send your
+                name, email address, phone number, order ID or serial number to it. Google processes
+                this data under its own privacy policy. You can opt out across all sites with
+                Google&rsquo;s browser add-on at{' '}
+                <Ext href="https://tools.google.com/dlpage/gaoptout">
                   tools.google.com/dlpage/gaoptout
-                </a>
+                </Ext>
                 .
               </li>
               <li>
-                <strong className="font-semibold text-white">Meta Pixel (Facebook/Instagram):</strong> uses
-                cookies to measure visits and signups from our ads. Meta processes this data under its own
-                privacy policy. You can limit ad tracking in your browser settings or your Facebook/Instagram ad
-                settings.
+                <strong className="font-semibold text-white">Meta Pixel (Facebook/Instagram):</strong>{' '}
+                uses cookies to measure visits, signups and clicks through to a marketplace listing
+                from our ads. It is sent the fact that one of those happened and nothing about you:
+                no name, no email address, no phone number, no order details. Meta processes this
+                data under its own privacy policy. You can limit ad tracking in your browser
+                settings or in your Facebook/Instagram ad settings.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">Vercel Analytics:</strong> counts visits
+                without using cookies. It runs only on a copy of this site hosted by Vercel — the
+                live site at www.bluneuron.com does not load it.
+              </li>
+            </ul>
+            <p className="mt-4">
+              Amazon and Flipkart set their own cookies on their own sites. Clicking through to a
+              listing takes you to them, and from that point their privacy policy applies.
+            </p>
+
+            <H2>How long we keep it</H2>
+            <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
+              <li>
+                <strong className="font-semibold text-white">Warranty and claim records:</strong> for
+                the length of the warranty and a reasonable period after it, because a later claim
+                is assessed against them.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">Support and contact messages:</strong>{' '}
+                for as long as needed to resolve the matter and handle any follow-up.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">Launch-list signups:</strong> until
+                launch and for a reasonable period after, or until you ask us to delete them.
               </li>
             </ul>
 
-            <H2>How long we keep it</H2>
-            <p>
-              We keep your signup details until IRIZ launches and for a reasonable period after, or until you ask
-              us to delete them.
-            </p>
-
             <H2>Your choices</H2>
             <p>
-              You can ask us to see, correct or delete your information, or stop receiving updates at any time,
-              by emailing <Mail />. Every update email also lets you unsubscribe.
+              You can ask us to show you, correct or delete the information we hold about you, or
+              stop sending you updates, at any time by emailing <Mail />. Every update email also
+              carries an unsubscribe link. Deleting a warranty registration is your decision to make
+              and your record to lose — we cannot assess a later claim from a record that is gone,
+              so we will say so before acting on the request.
             </p>
 
             <H2>Children</H2>
             <p>This site is not intended for anyone under 18.</p>
 
             <H2>Changes</H2>
-            <p>We may update this policy. The date at the top shows the latest version.</p>
+            <p>
+              We may update this policy. The date at the top of this page shows the version you are
+              reading.
+            </p>
 
             <H2>Contact</H2>
             <p>
-              BluNeuron, India. Email: <Mail />
+              {COMPANY.legalName}
+              <br />
+              {COMPANY.registeredAddress}
+              <br />
+              Email: <Mail />
+              <br />
+              Support hours: {SUPPORT.hours}
             </p>
           </Reveal>
         </div>

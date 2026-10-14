@@ -13,10 +13,10 @@ import { absoluteUrl } from '@/lib/site';
  *     lib/routes.js), and listing it here would ask a crawler to index a page
  *     that asks not to be. Those reappear on their own once their details are
  *     filled into lib/site-config.js.
- *   - /checkout and /order-confirmation are absent because they are not in the
- *     registry's candidate list at all. Both are `noindex` in their own layouts
- *     and both are disallowed in robots.txt (app/robots.js), and a sitemap
- *     entry for either is a contradiction Search Console reports as an error.
+ *   - /checkout and /order-confirmation used to be called out here as
+ *     deliberately absent. Both routes are now deleted — the IRIZ sells on
+ *     Amazon and Flipkart, and the in-site dummy checkout they implemented
+ *     had no future — so there is nothing left to exclude.
  *
  * URLs go through absoluteUrl() rather than `new URL(path, SITE_URL)` so the
  * homepage is listed as the bare origin — the same string the homepage's own
