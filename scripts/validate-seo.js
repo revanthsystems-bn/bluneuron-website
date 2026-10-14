@@ -32,6 +32,7 @@
 
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
+const net = require('node:net');
 const path = require('node:path');
 
 /* ------------------------------------------------------------------ *
@@ -150,6 +151,18 @@ function siteUrl() {
   return m[1];
 }
 
+/** Ask the OS for a port nothing is using, then release it for `next start`. */
+function freePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      const { port } = server.address();
+      server.close(() => resolve(String(port)));
+    });
+  });
+}
+
 async function waitForServer(base, timeoutMs = 120000) {
   const deadline = Date.now() + timeoutMs;
   for (;;) {
@@ -167,7 +180,19 @@ async function waitForServer(base, timeoutMs = 120000) {
 async function main() {
   const SITE_URL = siteUrl();
   const provided = process.env.BASE_URL;
-  const port = process.env.PORT || '3100';
+
+  /**
+   * A FREE port, found rather than assumed.
+   *
+   * This used to default to 3100. If anything was already listening there —
+   * a `next start` left running from an earlier check, which is exactly what
+   * happens during a screenshot session — `waitForServer` connected to THAT
+   * server, the newly spawned one failed to bind, and the validator happily
+   * reported a pass against a stale build. A validator that can silently
+   * check the wrong thing is worse than no validator, so the port is bound
+   * by the OS and handed over.
+   */
+  const port = process.env.PORT || (await freePort());
   const base = provided || `http://127.0.0.1:${port}`;
 
   let server = null;

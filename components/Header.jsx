@@ -2,38 +2,29 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Magnetic from './Magnetic';
+import AccountButton from './account/AccountButton';
 import CartButton from './cart/CartButton';
 import NotifyButton from './NotifyButton';
 import { useCart } from './cart/CartContext';
 import { runBuyNow } from '@/lib/commerce';
 import { COMMERCE_ENABLED } from '@/lib/launch';
-import { BUY_HREF, ROUTES } from '@/lib/routes';
+import { BUY_HREF, NAV_ITEMS, ROUTES } from '@/lib/routes';
 import { SHOW_BUY } from '@/lib/site-config';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
 
 /**
- * The masthead nav.
+ * NAV_ITEMS now comes from lib/routes.js rather than being declared here.
  *
- * "Support" is here and the four product links are not enough without it.
- * Everything else in this list is for someone deciding whether to buy; the
- * moment the product is on Amazon and Flipkart, a second kind of visitor
- * arrives — one who already owns a unit and wants a warranty claim or a
- * manual. They were reaching that through the footer alone, which on a phone
- * is a full page-length scroll away from wherever they landed. It is the
- * last item rather than the first because it is the smaller audience, and
- * `/support` is a hub (lib/routes.js) that fans out to the six things they
- * might actually want.
+ * It used to be four on-page anchors plus /specs — a masthead for a one-page
+ * teaser, where "Overview" and "Highlights" were scroll targets on the
+ * homepage and did nothing from anywhere else. With a shop, a product page
+ * and an account area, the masthead has to navigate the SITE, so the list
+ * lives in the registry beside the paths it points at and cannot name a
+ * route that does not exist.
  */
-const NAV_ITEMS = [
-  { label: 'Overview', href: '/#showcase' },
-  { label: 'Highlights', href: '/#highlights' },
-  { label: 'Specs', href: '/specs' },
-  { label: 'Compare', href: '/compare' },
-  { label: 'Support', href: ROUTES.support },
-];
 
 /**
  * `overlay` is for the homepage, where the cinematic hero runs full-bleed to
@@ -91,7 +82,19 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
   const [pastHero, setPastHero] = useState(!overlay);
   const { addItem } = useCart();
   const router = useRouter();
+  const pathname = usePathname();
   const handleBuyNow = () => runBuyNow({ addItem, router });
+
+  /**
+   * Which nav item is the page you are on.
+   *
+   * `exact` for /shop, because /shop/iriz is its own entry: without it both
+   * would light up on the product page and the highlight would stop meaning
+   * "you are here". Everything else matches on prefix so a future
+   * /support/faq still marks "Support".
+   */
+  const isCurrent = (item) =>
+    item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 300, damping: 40 });
@@ -262,27 +265,45 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
         </motion.a>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors duration-500 ${
-                ink
-                  ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
-                  : frosted
-                    ? 'text-white hover:bg-white/10'
-                    : 'text-white/80 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const current = isCurrent(item);
+            return (
+              <a
+                key={item.label}
+                href={item.href}
+                // `aria-current="page"` is the half of the active state that
+                // is not a colour. The tint below is invisible to a screen
+                // reader and, at this contrast, easy to miss at a glance;
+                // this is what actually announces "you are here".
+                aria-current={current ? 'page' : undefined}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors duration-500 ${
+                  ink
+                    ? current
+                      ? 'bg-black/[0.06] text-black-obsidian'
+                      : 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
+                    : current
+                      ? 'bg-white/10 text-white'
+                      : frosted
+                        ? 'text-white hover:bg-white/10'
+                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* THE ICON CLUSTER, in the order a shopper reaches for it: identity,
+            then basket, then the CTA. `gap-1` between the two icon buttons
+            rather than `gap-3` — they are both 40px hit targets with their
+            own padding, and a wider gap reads as two unrelated controls
+            instead of one account/cart pair. */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          <AccountButton ink={ink} />
           <CartButton ink={ink} />
           {renderCta(
-            `hidden px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
+            `ml-1 hidden px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
           )}
           <button
             aria-label="Toggle menu"
@@ -319,20 +340,45 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
           }`}
         >
           <nav className="section-container flex flex-col gap-1 py-4">
-            {NAV_ITEMS.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className={`rounded-lg px-3 py-3 text-sm font-medium ${
-                  ink
-                    ? 'text-black-obsidian/80 hover:bg-black/5 hover:text-black-obsidian'
-                    : 'text-white/80 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                {item.label}
-              </a>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const current = isCurrent(item);
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  aria-current={current ? 'page' : undefined}
+                  // `py-3` on a full-width row is a ~44px target, which is
+                  // the floor for a thumb. Do not tighten it to match the
+                  // desktop nav's `py-2`.
+                  className={`rounded-lg px-3 py-3 text-sm font-medium ${
+                    ink
+                      ? current
+                        ? 'bg-black/[0.06] text-black-obsidian'
+                        : 'text-black-obsidian/80 hover:bg-black/5 hover:text-black-obsidian'
+                      : current
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
+            {/* The account link is an ICON in the bar and a named row here.
+                An icon alone is ambiguous at the best of times, and in an
+                open menu there is room to say the word. */}
+            <a
+              href={ROUTES.account}
+              onClick={() => setMobileOpen(false)}
+              className={`rounded-lg px-3 py-3 text-sm font-medium ${
+                ink
+                  ? 'text-black-obsidian/80 hover:bg-black/5 hover:text-black-obsidian'
+                  : 'text-white/80 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              Account
+            </a>
             {renderCta(`mt-2 justify-center ${ink ? 'btn-primary-ink' : 'btn-primary'}`, {
               // Closing the panel is the shared part: tapping the CTA inside
               // an open mobile menu must dismiss it, whichever of the three

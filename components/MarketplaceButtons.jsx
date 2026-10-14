@@ -64,6 +64,15 @@ export default function MarketplaceButtons({
   className = 'flex flex-col gap-3 sm:flex-row sm:flex-wrap',
   buttonClassName = 'w-full justify-center sm:w-auto',
   strength = 0.12,
+  /**
+   * "Buy" on a product surface, "Checkout" from the basket. One component
+   * for both rather than a near-copy, so the inert state, the `rel` hygiene
+   * and the three analytics calls cannot diverge between them — which is
+   * precisely what a second copy would eventually do.
+   */
+  verb = 'Buy',
+  /** Replaces the fulfilment line. The basket says more than a product card needs to. */
+  note = MARKETPLACE.fulfilmentNote,
 }) {
   // A listing URL we do not have yet. Rendering the button as a dead link, or
   // pointing it at a marketplace search page, both end with a visitor on
@@ -76,7 +85,7 @@ export default function MarketplaceButtons({
     <div>
       <div className={className}>
         {MARKETPLACES.map((marketplace, i) => {
-          const label = `Buy on ${marketplace.name}`;
+          const label = `${verb} on ${marketplace.name}`;
           const tone = i === 0 ? 'btn-primary' : 'btn-secondary';
 
           if (isTBD(marketplace.url)) {
@@ -129,7 +138,7 @@ export default function MarketplaceButtons({
         </p>
       )}
 
-      <p className="mt-4 text-xs leading-relaxed text-white/45">{MARKETPLACE.fulfilmentNote}</p>
+      <p className="mt-4 text-xs leading-relaxed text-white/45">{note}</p>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { PRODUCT, PRICING } from '@/lib/iriz';
+import { PRODUCT } from '@/lib/iriz';
+import { confirmedPriceInr } from '@/lib/site-config';
 
 const CartContext = createContext(null);
 const STORAGE_KEY = 'bluneuron-cart-v1';
@@ -58,16 +59,36 @@ export function CartProvider({ children }) {
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
-  const subtotal = qty * PRICING.offerPrice;
-  const mrpSubtotal = qty * PRICING.mrp;
+  /**
+   * THE PRICE COMES FROM lib/site-config.js, not from PRICING in lib/iriz.js.
+   *
+   * The two happen to hold the same number today, and that is exactly why
+   * this has to be explicit. PRICING is the price this site INTENDED to sell
+   * at through the in-site cart that no longer exists; MARKETPLACE.priceInr
+   * is what a live listing actually charges, and it is the one figure the
+   * buy card, /where-to-buy and the Product structured data all quote. A
+   * basket that totalled a different number from the product page would be
+   * the single worst place for those two to drift apart.
+   *
+   * `confirmedPriceInr()` returns null rather than a placeholder when no
+   * real price is set, so the subtotal is null and every consumer has to
+   * decide what to show instead of quietly rendering "₹NaN".
+   *
+   * NO MRP, AND NO "YOU SAVE". The old basket showed a struck-through
+   * ₹39,999 beside the total. We do not set the price Amazon and Flipkart
+   * charge, so we are in no position to state what a buyer is saving
+   * against — that is a discount claim about someone else's listing.
+   */
+  const unitPrice = confirmedPriceInr();
+  const subtotal = unitPrice === null ? null : qty * unitPrice;
 
   const value = useMemo(
     () => ({
       product: PRODUCT,
       qty,
       itemCount: qty,
+      unitPrice,
       subtotal,
-      mrpSubtotal,
       isOpen,
       hydrated,
       addItem,
@@ -77,7 +98,7 @@ export function CartProvider({ children }) {
       openCart,
       closeCart,
     }),
-    [qty, subtotal, mrpSubtotal, isOpen, hydrated, addItem, setItemQty, removeItem, clear, openCart, closeCart]
+    [qty, unitPrice, subtotal, isOpen, hydrated, addItem, setItemQty, removeItem, clear, openCart, closeCart]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

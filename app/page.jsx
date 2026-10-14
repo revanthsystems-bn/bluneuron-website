@@ -15,7 +15,7 @@ import { COMMERCE_ENABLED } from '@/lib/launch';
 import { resolveHeroTheme } from '@/lib/heroTheme';
 import { ROUTES } from '@/lib/routes';
 import { SHOW_BUY } from '@/lib/site-config';
-import { ORGANIZATION_JSON_LD, pageMetadata, productJsonLd } from '@/lib/seo';
+import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
 
 /**
  * Homepage title, at 65 characters.
@@ -43,16 +43,20 @@ export const metadata = pageMetadata({
   ogTitle: 'BluNeuron IRIZ — Mini Projector for Home, Native 1080p, 500 ANSI Lumens',
 });
 
-/**
- * Product structured data, or `null` while there is no confirmed price.
+/*
+ * PRODUCT STRUCTURED DATA HAS MOVED to app/shop/iriz/page.jsx.
  *
- * The whole decision lives in productJsonLd() (lib/seo.js) — including why a
- * price-free Product is not emitted at all rather than emitted without
- * `offers`, and why MARKETPLACE.priceInr in lib/site-config.js is the one
- * price it is allowed to read. Resolved once at module scope: it depends only
- * on constants, so there is nothing per-request about it.
+ * It was emitted here because this page was the only one describing the
+ * product. Now that there is a real product page, a Product block on the
+ * homepage describes something this page is not primarily about, and its
+ * `url` resolved to the origin — so a rich result would have led to the
+ * marketing page rather than to the offer. The decision about WHETHER to
+ * emit it at all (only with a confirmed price) is unchanged and still lives
+ * in productJsonLd(), lib/seo.js.
+ *
+ * ORGANIZATION stays here, and only here: it describes the site as a whole,
+ * so a copy on every page would be duplicate markup.
  */
-const PRODUCT_JSON_LD = productJsonLd();
 
 /**
  * `searchParams` is a Promise in Next 16 and is a request-time API, so reading
@@ -70,23 +74,9 @@ export default async function Home({ searchParams }) {
 
   return (
     <>
-      {/* Separate <script> blocks rather than one @graph array. Both spellings
-          are valid; separate blocks mean a syntax error in one can't
-          invalidate the other, and Google's Rich Results Test reports them
-          independently — which also lets Product drop out on its own below
-          without touching Organization.
-
-          Product renders only when it is VALID (a confirmed price, so it can
-          carry `offers`). Organization is emitted HERE and only here: it
-          describes the site as a whole, so a copy on every page would be
-          duplicate markup. */}
-      {PRODUCT_JSON_LD && (
-        <script
-          type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(PRODUCT_JSON_LD) }}
-        />
-      )}
+      {/* Organization, and only Organization: it describes the site as a
+          whole, so a copy on every page would be duplicate markup. Product
+          lives on the product page now — see the note above. */}
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger

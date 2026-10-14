@@ -5,6 +5,7 @@ import './globals.css';
 import SmoothScroll from '@/components/SmoothScroll';
 import PageIntro from '@/components/PageIntro';
 import ConsentNotice from '@/components/ConsentNotice';
+import { AccountProvider } from '@/components/account/AccountContext';
 import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import NotifyProvider from '@/components/notify/NotifyProvider';
@@ -96,15 +97,20 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`dark ${interTight.variable} ${zenDots.variable}`}>
       <body className="bg-black font-sans text-white antialiased">
         <MotionConfig reducedMotion="user">
-          <CartProvider>
-            <NotifyProvider>
-              <SmoothScroll />
-              <PageIntro />
-              {children}
-              <ConsentNotice />
-              <CartDrawer />
-            </NotifyProvider>
-          </CartProvider>
+          {/* AccountProvider wraps CartProvider, not the other way round:
+              Phase 2 syncs the basket to the signed-in account, so the cart
+              needs to be able to read the session and never the reverse. */}
+          <AccountProvider>
+            <CartProvider>
+              <NotifyProvider>
+                <SmoothScroll />
+                <PageIntro />
+                {children}
+                <ConsentNotice />
+                <CartDrawer />
+              </NotifyProvider>
+            </CartProvider>
+          </AccountProvider>
         </MotionConfig>
         {/* VERCEL-ONLY. @vercel/analytics reports to the Vercel dashboard of
             the deployment serving the page; there is no dashboard behind it

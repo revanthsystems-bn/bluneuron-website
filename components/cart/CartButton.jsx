@@ -2,33 +2,46 @@
 
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from './CartContext';
-import { COMMERCE_ENABLED } from '@/lib/launch';
 
-// `ink` is the light-hero test (lib/heroTheme.js): while the masthead floats
-// over the white hero the icon has to be dark. Inert while COMMERCE_ENABLED is
-// false, since this renders nothing at all pre-launch.
+/**
+ * The masthead's basket.
+ *
+ * NO LONGER GATED ON COMMERCE_ENABLED, and the reason is that the basket
+ * means something different now. That flag says "the in-site checkout
+ * works", and while it was false there was genuinely nothing a cart could
+ * lead to — so the icon was hidden entirely. The cart now ends at Amazon or
+ * Flipkart (components/cart/CartDrawer), which is a path that exists whether
+ * or not this site ever takes a payment. Hiding the basket would hide the
+ * only place the quantity a visitor chose is remembered.
+ *
+ * `ink` is the light-hero test (lib/heroTheme.js): while the masthead floats
+ * over the white hero the icon has to be dark.
+ *
+ * The count is rendered only once `hydrated` is true. The server has no
+ * access to localStorage, so it always renders zero; painting a count before
+ * the stored cart is read is a hydration mismatch, and the badge would pop
+ * in anyway. Suppressing it until then costs nothing — the badge is
+ * absolutely positioned and reserves no layout.
+ */
 export default function CartButton({ className = '', ink = false }) {
-  const { itemCount, openCart } = useCart();
-
-  // Pre-launch there is nothing to put in a cart, so the masthead shows no
-  // cart icon at all. See lib/launch.js.
-  if (!COMMERCE_ENABLED) return null;
+  const { itemCount, openCart, hydrated } = useCart();
+  const count = hydrated ? itemCount : 0;
 
   return (
     <button
       type="button"
       onClick={openCart}
-      aria-label={itemCount > 0 ? `Open cart, ${itemCount} item${itemCount > 1 ? 's' : ''}` : 'Open cart'}
-      className={`relative rounded-full p-2 transition-colors duration-500 ${
+      aria-label={count > 0 ? `Open cart, ${count} item${count > 1 ? 's' : ''}` : 'Open cart'}
+      className={`relative flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
         ink
           ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
           : 'text-white/80 hover:bg-white/5 hover:text-white'
       } ${className}`}
     >
       <ShoppingCart size={20} aria-hidden="true" />
-      {itemCount > 0 && (
-        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white">
-          {itemCount}
+      {count > 0 && (
+        <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white">
+          {count}
         </span>
       )}
     </button>
