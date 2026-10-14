@@ -27,9 +27,8 @@ import { BRAND, THROW_RANGE } from '@/lib/iriz';
  *     in a short viewport would eat the reading area.
  *   - Each point is an h3 and two short paragraphs, never more. A reader who
  *     only reads the seven headings still gets the argument in order.
- *   - The prose column is capped at 640px. The site's policy pages use 680px
- *     for continuous text; this is slightly tighter because it sits beside a
- *     rail rather than alone on the page.
+ *   - The prose column is capped at 680px, the same measure the policy pages
+ *     use for continuous text.
  *   - Numbers come from THROW_RANGE in lib/iriz.js rather than being typed
  *     into the sentence, so the dial above and the prose here cannot ever
  *     quote different distances.
@@ -66,7 +65,11 @@ const POINTS = [
   {
     heading: 'Screen size is just a question of where you put it',
     body: [
-      `A 1:1 throw ratio means the picture is as wide as the distance you stand back. At ${THROW_RANGE.min.distance} m you get roughly ${THROW_RANGE.min.size} inches; at ${THROW_RANGE.max.distance} m you get up to ${THROW_RANGE.max.size}. ${THROW_RANGE.line}`,
+      // THROW_RANGE.line leads, and the sentence before it is NOT a
+      // restatement of it: that line already says "a 1:1 throw ratio", so an
+      // opening sentence explaining the ratio put the same fact on the page
+      // twice in forty words.
+      `${THROW_RANGE.line} At ${THROW_RANGE.min.distance} m that is roughly ${THROW_RANGE.min.size} inches of picture; at ${THROW_RANGE.max.distance} m, up to ${THROW_RANGE.max.size} inches.`,
       'In practice that makes the room the control. Pull the unit back along a coffee table for a bigger picture, push it forward for a brighter, tighter one — no lens swap, no settings, no calculator.',
     ],
   },
@@ -100,7 +103,14 @@ export default function WhyIriz() {
       className="scroll-mt-20 border-b border-border-subtle bg-black-soft py-20"
     >
       <div className="section-container">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-16">
+        {/* Column widths are chosen to USE the container rather than to look
+            tidy in isolation. A 22rem rail beside a 640px measure left about
+            250px of empty black against the right edge at 1440 — which reads
+            as a layout that failed to fill, not as whitespace. A wider rail
+            (26rem), a wider gap and the site's own 680px prose measure close
+            that to an ordinary margin, and all three still collapse to one
+            column below lg. */}
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-24">
           {/* THE RAIL. `self-start` is what makes `sticky` work inside a grid
               — a stretched grid item is already as tall as the row, so it has
               no room to stick within. Sticky only above lg: in a phone
@@ -119,10 +129,11 @@ export default function WhyIriz() {
             </p>
           </Reveal>
 
-          {/* THE PROSE. `max-w-[640px]` for a 65-75 character measure, and
+          {/* THE PROSE. `max-w-[680px]` is the measure the policy pages use
+              for continuous text — 65-75 characters at this size — and
               `gap-10` between points so each heading has air above it and
               reads as an entry point rather than a paragraph break. */}
-          <div className="flex max-w-[640px] flex-col gap-10">
+          <div className="flex max-w-[680px] flex-col gap-10">
             {POINTS.map((point, i) => (
               <Reveal
                 key={point.heading}

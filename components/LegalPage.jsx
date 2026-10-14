@@ -2,6 +2,61 @@ import PageShell from './PageShell';
 import PageHeading from './PageHeading';
 import DraftBanner from './DraftBanner';
 import Reveal from './Reveal';
+import { ROUTES } from '@/lib/routes';
+
+/**
+ * Turn the route paths written inside a policy sentence into real links.
+ *
+ * These pages cross-reference each other constantly — "see /legal/warranty",
+ * "use the claim form at /support/warranty-claim" — and the `sections` shape
+ * is plain strings, so every one of those used to render as literal grey
+ * text. On pages that were drafts nobody was meant to read, that was
+ * tolerable. On published, indexed policy pages it is not: the reader most
+ * likely to need the cross-reference is on a phone, and a path they have to
+ * retype is a path they do not follow.
+ *
+ * It matches ONLY paths that are in the ROUTES registry (lib/routes.js),
+ * longest first so /support/warranty-claim wins over /support. That is the
+ * whole safety property: a sentence cannot accidentally produce a link to a
+ * page that does not exist, and a typo'd path stays visibly plain text
+ * instead of becoming a dead link — which is the failure mode of the obvious
+ * implementation, a regex for anything that looks like a path.
+ *
+ * The lookbehind-free construction matters: the pattern is built from
+ * escaped literals and anchored with a boundary check on the following
+ * character, so /specs inside /specs-and-more would not match.
+ */
+const ROUTE_PATHS = [...new Set(Object.values(ROUTES))]
+  .filter((p) => p !== '/')
+  .sort((a, b) => b.length - a.length);
+
+const ROUTE_PATTERN = new RegExp(
+  `(${ROUTE_PATHS.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(?![\\w/-])`,
+  'g'
+);
+
+function linkify(text) {
+  if (typeof text !== 'string') return text;
+  const parts = text.split(ROUTE_PATTERN);
+  if (parts.length === 1) return text;
+
+  return parts.map((part, i) =>
+    ROUTE_PATHS.includes(part) ? (
+      <a
+        // The index is stable here: `parts` comes from one deterministic
+        // split of one constant string, and nothing reorders or filters it.
+        // eslint-disable-next-line react/no-array-index-key
+        key={`${part}-${i}`}
+        href={part}
+        className="text-white/85 underline underline-offset-2 transition-colors hover:text-white"
+      >
+        {part}
+      </a>
+    ) : (
+      part
+    )
+  );
+}
 
 /**
  * The shell every policy page but one renders through: /legal/warranty,
@@ -59,15 +114,17 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
                 {Array.isArray(section.body) ? (
                   <ul className="list-disc space-y-1.5 pl-5">
                     {section.body.map((line) => (
-                      <li key={line}>{line}</li>
+                      <li key={line}>{linkify(line)}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p>{section.body}</p>
+                  <p>{linkify(section.body)}</p>
                 )}
 
                 {section.note && (
-                  <p className="mt-2.5 text-xs leading-relaxed text-white/40">{section.note}</p>
+                  <p className="mt-2.5 text-xs leading-relaxed text-white/40">
+                    {linkify(section.note)}
+                  </p>
                 )}
               </div>
             ))}
