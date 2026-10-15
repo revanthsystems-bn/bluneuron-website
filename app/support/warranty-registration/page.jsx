@@ -13,7 +13,7 @@ export const metadata = {
   ...pageMetadata({
     title: 'Warranty Registration — BluNeuron IRIZ',
     description:
-      'Register your BluNeuron IRIZ with your marketplace order ID and serial number so a future warranty claim is quick.',
+      'Register your BluNeuron IRIZ with your purchase details so a future warranty claim is quick.',
     path: ROUTES.warrantyRegistration,
   }),
   robots: routeRobots(ROUTES.warrantyRegistration),
@@ -23,10 +23,8 @@ export const metadata = {
  * Registration is OPTIONAL and the page says so in the first line.
  *
  * Statutory warranty in India runs from the date of purchase whether or not
- * anything was registered, and a page that implies otherwise is pressuring
- * someone into handing over a serial number for a right they already have.
- * What registration actually buys is speed: the details are on file before
- * anything goes wrong, so a claim does not start with hunting for an invoice.
+ * anything was registered. Registration records the purchase details so a
+ * claim does not start with hunting for an invoice.
  */
 export default function WarrantyRegistrationPage() {
   return (
@@ -51,8 +49,8 @@ export default function WarrantyRegistrationPage() {
                   className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
                   aria-hidden="true"
                 />
-                Your Amazon or Flipkart <strong className="font-semibold text-white/85">order
-                ID</strong>, from the invoice in your orders list.
+                Your <strong className="font-semibold text-white/85">order ID</strong> from your
+                invoice or purchase confirmation.
               </li>
               <li className="flex gap-2.5">
                 <span
