@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Magnetic from './Magnetic';
 import { isValidEmail, normalizePhone, submitSupportRequest } from '@/lib/web3forms';
 import { MARKETPLACES } from '@/lib/site-config';
@@ -113,6 +114,22 @@ function todayIso() {
 }
 
 export default function SupportForm({ kind = 'registration' }) {
+  /**
+   * PRE-FILL FROM THE ACCOUNT, via the URL.
+   *
+   * "Raise a claim" on a registered unit (components/account/ProductList)
+   * links here with the unit's details as query parameters, so a customer
+   * does not retype the serial number and order ID the account page was just
+   * showing them — which is the whole reason registering a unit is worth
+   * doing. Query parameters rather than client state so the link survives
+   * being opened in a new tab, copied, or followed after a sign-in.
+   *
+   * The values are still EDITABLE and still validated. Nothing here trusts
+   * them: they arrive from a URL anyone can type, they are only ever used to
+   * fill in a form the person then submits, and the claim is checked against
+   * our records on the other end.
+   */
+  const searchParams = useSearchParams();
   const mode = MODES[kind] ?? MODES.registration;
   const isClaim = kind === 'claim';
 
@@ -120,16 +137,16 @@ export default function SupportForm({ kind = 'registration' }) {
   const id = (name) => `${uid}-${name}`;
   const errorId = (name) => `${uid}-${name}-error`;
 
-  const [fields, setFields] = useState({
+  const [fields, setFields] = useState(() => ({
     name: '',
     email: '',
     phone: '',
-    marketplace: '',
-    orderId: '',
-    purchaseDate: '',
-    serialNumber: '',
+    marketplace: searchParams.get('marketplace') ?? '',
+    orderId: searchParams.get('order') ?? '',
+    purchaseDate: searchParams.get('purchased') ?? '',
+    serialNumber: searchParams.get('serial') ?? '',
     issue: '',
-  });
+  }));
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [formError, setFormError] = useState('');

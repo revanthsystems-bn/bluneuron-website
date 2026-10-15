@@ -126,6 +126,13 @@ export default function PrivacyPage() {
                 email address, and your message.
               </li>
               <li>
+                <strong className="font-semibold text-white">If you create an account:</strong> your
+                email address (which is also how you sign in), and your name and mobile number if
+                you add them. If you save an address for a service pickup, we hold that too. Units
+                you register are kept with their marketplace, order ID, purchase date and serial
+                number, along with any warranty claim you raise and its status.
+              </li>
+              <li>
                 <strong className="font-semibold text-white">When you visit the site:</strong> basic
                 information about the visit, such as pages viewed, device and browser type,
                 approximate location (country or city), and how you arrived — for example, from an
@@ -137,6 +144,12 @@ export default function PrivacyPage() {
               order ID to be assessed; it does not need your address, and the form does not ask for
               one.
             </p>
+            <p className="mt-4">
+              We never ask for a password. Signing in sends a six-digit code to your email address
+              and that is the whole of it — there is no password for us to store or for anyone to
+              steal. We do not collect payment details at any point: the purchase happens on Amazon
+              or Flipkart, and we are not given your card, your UPI ID or your delivery address.
+            </p>
 
             <H2>How we use it</H2>
             <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
@@ -146,6 +159,11 @@ export default function PrivacyPage() {
                 the repair or replacement that follows.
               </li>
               <li>To tell you when IRIZ launches, if you asked us to.</li>
+              <li>
+                To keep your account: to sign you in, to show you the units you have registered and
+                when their warranty ends, and to pre-fill a claim so you do not retype what we
+                already hold.
+              </li>
               <li>To understand how people use the site and improve it.</li>
               <li>To measure and improve our advertising on Facebook and Instagram.</li>
             </ul>
@@ -185,6 +203,20 @@ export default function PrivacyPage() {
                 without using cookies. It runs only on a copy of this site hosted by Vercel — the
                 live site at www.bluneuron.com does not load it.
               </li>
+              <li>
+                <strong className="font-semibold text-white">Supabase:</strong> stores your account —
+                your sign-in, your profile, your saved addresses, your registered units and your
+                claims — and sends the six-digit sign-in code. They process this on our behalf and
+                do not use it for anything of their own. The database is hosted in their Mumbai
+                (ap-south-1) region, so your account data stays in India. Access is enforced
+                row-by-row in the database itself: a signed-in person can read and change their own
+                rows and nobody else&rsquo;s.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">Google Workspace:</strong> delivers the
+                sign-in code from support@bluneuron.com. That email contains the code and nothing
+                else.
+              </li>
             </ul>
             <p className="mt-4">
               Amazon and Flipkart set their own cookies on their own sites. Clicking through to a
@@ -206,6 +238,11 @@ export default function PrivacyPage() {
                 <strong className="font-semibold text-white">Launch-list signups:</strong> until
                 launch and for a reasonable period after, or until you ask us to delete them.
               </li>
+              <li>
+                <strong className="font-semibold text-white">Account data:</strong> for as long as
+                you keep the account. Delete it from your account settings and your profile,
+                addresses, registered units and claim history are removed immediately.
+              </li>
             </ul>
 
             <H2>Your choices</H2>
@@ -215,6 +252,20 @@ export default function PrivacyPage() {
               carries an unsubscribe link. Deleting a warranty registration is your decision to make
               and your record to lose — we cannot assess a later claim from a record that is gone,
               so we will say so before acting on the request.
+            </p>
+            <p className="mt-4">
+              If you have an account you can do most of this yourself, without asking: edit your
+              profile, add and remove addresses, and use{' '}
+              <strong className="font-semibold text-white">Delete my account and data</strong> in
+              your account settings to erase your profile, addresses, registered units and claims.
+              Your sign-in record — your email address, nothing else — is removed by us when you
+              email <Mail /> from that address, because deleting it needs a level of access this
+              website deliberately does not have.
+            </p>
+            <p className="mt-4">
+              Deleting your account does not cancel a warranty. Cover runs from the invoice date and
+              belongs to the unit, not to the account — but you would need your invoice and serial
+              number again to make a claim.
             </p>
 
             <H2>Children</H2>

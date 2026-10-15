@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import QuantityStepper from '../shop/QuantityStepper';
@@ -7,6 +8,7 @@ import MarketplaceButtons from '../MarketplaceButtons';
 import { useCart } from './CartContext';
 import { BRAND, PRODUCT } from '@/lib/iriz';
 import { ROUTES } from '@/lib/routes';
+import { trackViewCart } from '@/lib/shop-analytics';
 import { MARKETPLACE, WARRANTY, formatInr } from '@/lib/site-config';
 
 /**
@@ -31,6 +33,26 @@ import { MARKETPLACE, WARRANTY, formatInr } from '@/lib/site-config';
  */
 export default function CartPanel() {
   const { qty, unitPrice, subtotal, setItemQty, removeItem, hydrated } = useCart();
+  const reported = useRef(false);
+
+  /**
+   * `view_cart`, once per visit to this page and only with something in the
+   * basket.
+   *
+   * The ref guard matters: this component re-renders on every quantity
+   * change, and an unguarded effect would report a cart view each time
+   * someone pressed "+". That turns one visit into five in the funnel and
+   * makes the cart look like the most-viewed page on the site.
+   *
+   * It waits for `hydrated` because before that the quantity is always 0 —
+   * reporting then would either send nothing or send a view of an empty
+   * basket for a visitor who has one.
+   */
+  useEffect(() => {
+    if (!hydrated || reported.current || qty === 0) return;
+    reported.current = true;
+    trackViewCart({ unitPrice, quantity: qty });
+  }, [hydrated, qty, unitPrice]);
 
   // Before hydration localStorage has not been read, so the honest state is
   // "we do not know yet" — not "empty", which would flash an empty-cart
@@ -154,6 +176,12 @@ export default function CartPanel() {
             verb="Checkout"
             className="flex flex-col gap-3"
             buttonClassName="w-full justify-center"
+            // The basket is the only surface that reports `begin_checkout`,
+            // and the only one that hands a quantity to Amazon's cart
+            // endpoint. See lib/shop-analytics.js and amazonCartUrl().
+            isCheckout
+            quantity={qty}
+            unitPrice={unitPrice}
             note="Payment and delivery are handled securely by the marketplace. Your card details never touch this site — we are not given them."
           />
         </div>

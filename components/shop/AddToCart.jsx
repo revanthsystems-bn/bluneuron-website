@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Check } from 'lucide-react';
 import QuantityStepper from './QuantityStepper';
 import { useCart } from '@/components/cart/CartContext';
+import { trackAddToCart } from '@/lib/shop-analytics';
 
 /**
  * Quantity + "Add to cart", as one unit.
@@ -31,15 +32,17 @@ export default function AddToCart({
   buttonClassName = 'btn-primary w-full justify-center',
   idPrefix = 'pdp',
 }) {
-  const { addItem, openCart } = useCart();
+  const { addItem, openCart, unitPrice } = useCart();
   const [qty, setQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
   const handleAdd = () => {
     addItem(qty);
     setJustAdded(true);
-    // Phase 2 fires GA4 `add_to_cart` and the Pixel's `AddToCart` here —
-    // value and currency only, never anything about the person.
+    // GA4 `add_to_cart` and the Pixel's `AddToCart`: value, currency and
+    // quantity only, never anything about the person. See
+    // lib/shop-analytics.js for why that restriction is absolute.
+    trackAddToCart({ unitPrice, quantity: qty });
     if (openDrawer) openCart();
     window.setTimeout(() => setJustAdded(false), 1800);
   };

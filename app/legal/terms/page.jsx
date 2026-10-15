@@ -78,13 +78,28 @@ const SECTIONS = [
     body: `All content on bluneuron.com — including trademarks, logos, product design aesthetics, software code, graphic elements, user interfaces, text, audio clips and media downloads — is the exclusive intellectual property of ${COMPANY.legalName} and is protected by Indian and international copyright and trademark law. You may not reproduce, duplicate, copy, sell or exploit any portion of this website or our brand assets without our explicit written permission.`,
   },
   {
+    heading: 'Your account',
+    body: [
+      'An account is optional. You can browse the site, read every policy and contact support without one; it exists so a warranty registration, the units you own and any claim you raise are kept in one place.',
+      'Signing in uses a six-digit code sent to your email address. There is no password. Anyone with access to that inbox can sign in, so keep it secure and tell us if you lose control of it.',
+      'You are responsible for the accuracy of what you put in — in particular the serial number, order ID and purchase date of a registered unit. A claim is assessed against the invoice, so a registration that does not match one cannot be honoured.',
+      "One account per person. Do not register a unit you do not own, and do not file a claim on someone else's behalf without telling us that is what you are doing.",
+    ],
+    note: 'You can delete your account, and everything in it, from your account settings at any time. Doing so does not cancel a warranty: cover runs from the invoice date and belongs to the unit, not to the account.',
+  },
+  {
+    heading: 'Suspending or closing an account',
+    body: `We may suspend or close an account that is used to submit false registrations or fraudulent claims, or to abuse our support channels. Where we do, we will say why, to the email address on the account. ${COMPANY.legalName} does not close accounts for raising a complaint or for disagreeing with us.`,
+  },
+  {
     heading: 'Prohibited uses',
     body: [
       'Using the site for any unlawful purpose, or to solicit others to perform unlawful acts.',
       'Violating any international, federal, state or local regulation, rule or law.',
       'Transmitting viruses, malware or any destructive code.',
       'Scraping, crawling or harvesting data or intellectual assets from bluneuron.com without prior written authorisation, or at a rate that degrades the site for other visitors.',
-      'Attempting unauthorised access to our customer records, support systems or server infrastructure.',
+      "Attempting unauthorised access to our customer records, support systems or server infrastructure — including another person's account.",
+      'Automating sign-in requests, or requesting sign-in codes for an email address that is not yours.',
     ],
   },
   {

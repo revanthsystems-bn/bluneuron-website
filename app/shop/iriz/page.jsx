@@ -1,6 +1,5 @@
 import PageShell from '@/components/PageShell';
 import Reveal from '@/components/Reveal';
-import FaqAccordion from '@/components/FaqAccordion';
 import MarketplaceButtons from '@/components/MarketplaceButtons';
 import AddToCart from '@/components/shop/AddToCart';
 import ProductGallery from '@/components/shop/ProductGallery';
@@ -8,7 +7,6 @@ import StickyProductBar from '@/components/shop/StickyProductBar';
 import {
   BOX_CONTENTS,
   BRAND,
-  FAQS,
   GALLERY,
   HERO,
   HIGHLIGHTS,
@@ -42,21 +40,52 @@ import { MARKETPLACE, WARRANTY, formatInr } from '@/lib/site-config';
  *   - No stars, no review count, no "X people bought this". No review data
  *     exists; an empty five-star row reads as a zero rating.
  *   - No MRP strike-through or "% off". We do not set the marketplace price.
- *   - No FAQPage structured data. The questions are rendered here because
- *     they belong on a product page, but the FAQPage markup stays on
- *     /support/faq, which is their canonical home — two pages emitting the
- *     same FAQPage is a duplicate Google reports.
+ *   - No FAQ and no long-form product story. Both live elsewhere already —
+ *     /support/faq owns the questions and the FAQPage markup, the homepage
+ *     owns the ~750-word case — and repeating either would put the same text
+ *     on two indexable URLs, with this page competing against the pages it
+ *     should be feeding from. FURTHER_READING links to all three instead.
  *   - "In the box" renders only when SHOW_PENDING_SPECS is on. BOX_CONTENTS
  *     is INFERRED from marketing copy rather than sourced from the
  *     manufacturer (see the note on it in lib/iriz.js), and a packing list is
  *     exactly the kind of claim a buyer holds you to.
  */
 
+/**
+ * Where the depth lives. Three links, each to a page that owns its subject,
+ * so this page can stay a buying page.
+ */
+const FURTHER_READING = [
+  {
+    href: `${ROUTES.home}#why-iriz`,
+    title: 'Why IRIZ',
+    body: 'What ANSI lumens actually measure, what "native" 1080p means, and how throw distance decides your screen size.',
+    cta: 'Read the case',
+  },
+  {
+    href: ROUTES.specs,
+    title: 'Full specifications',
+    body: 'Every figure: optics, throw, platform, connectivity and audio, in one table.',
+    cta: 'See the spec sheet',
+  },
+  {
+    href: ROUTES.faq,
+    title: 'FAQ & troubleshooting',
+    body: 'Screens, distances, Wi-Fi, input lag, and what to do if the picture is not square.',
+    cta: 'Read the answers',
+  },
+];
+
 export const metadata = {
   ...pageMetadata({
-    title: 'BluNeuron IRIZ Mini Projector — 1080p, 500 ANSI Lumens, Google TV',
+    // BUYING INTENT. This page and the homepage must not chase the same
+    // query: the homepage is the story ("iriz mini projector for home") and
+    // this is the transaction ("buy iriz projector", "iriz price"). Two
+    // pages competing for one phrase split their own authority and Google
+    // picks whichever it likes — usually not the one with the buy button.
+    title: 'Buy BluNeuron IRIZ Mini Projector — ₹13,999 | BluNeuron',
     description:
-      'The BluNeuron IRIZ: native 1080p, true 500 ANSI lumens, built-in Google TV, 1:1 throw up to 200 inches. ₹13,999 inclusive of all taxes, with 1 year warranty.',
+      'Buy the BluNeuron IRIZ mini projector: ₹13,999 inclusive of all taxes, 1 year warranty, on Amazon and Flipkart. Native 1080p and true 500 ANSI lumens.',
     path: ROUTES.product,
   }),
   robots: routeRobots(ROUTES.product),
@@ -91,7 +120,7 @@ export default function ProductPage() {
         <div className="section-container">
           {/* A breadcrumb, not a back button: it states where this page sits
               rather than assuming where the visitor came from. */}
-          <nav aria-label="Breadcrumb" className="mb-8 text-xs text-white/40">
+          <nav aria-label="Breadcrumb" className="mb-5 text-xs text-white/40 sm:mb-8">
             <a href={ROUTES.shop} className="transition-colors hover:text-white/70">
               Shop
             </a>
@@ -101,7 +130,10 @@ export default function ProductPage() {
             <span className="text-white/60">{BRAND.model}</span>
           </nav>
 
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
+          {/* `gap-6` below lg, not `gap-10`: on a phone this gap sits
+              between the gallery and the price, and every pixel of it pushes
+              the buy decision further down the first screen. */}
+          <div className="grid gap-6 lg:grid-cols-2 lg:gap-14">
             <Reveal>
               <ProductGallery shots={GALLERY} />
             </Reveal>
@@ -229,17 +261,40 @@ export default function ProductPage() {
         </div>
       </section>
 
+      {/* NO FAQ ACCORDION HERE, and no long-form product story.
+          Both exist already: the questions on /support/faq (which also owns
+          the FAQPage structured data) and the ~750-word case on the homepage.
+          Repeating either here would put the same text on two indexable URLs
+          and make this page compete with the pages it should be feeding
+          from. A buying page's job is the decision and the price; the depth
+          is one link away, and the links are the point. */}
       <section className="bg-black-soft py-16 sm:py-20">
         <div className="section-container">
-          <Reveal className="mb-10">
-            <p className="eyebrow mb-3">Questions</p>
+          <Reveal className="mb-8">
+            <p className="eyebrow mb-3">Before you decide</p>
             <h2 className="text-2xl font-bold tracking-tighter text-white sm:text-3xl">
-              Before you order.
+              Everything else about the {BRAND.model}.
             </h2>
           </Reveal>
-          <div className="max-w-[760px]">
-            <FaqAccordion items={FAQS} />
-          </div>
+
+          <ul className="grid gap-4 sm:grid-cols-3">
+            {FURTHER_READING.map((item, i) => (
+              <li key={item.href}>
+                <Reveal delay={Math.min(i, 3) * 0.05} y={20}>
+                  <a
+                    href={item.href}
+                    className="group flex h-full flex-col rounded-2xl border border-border-subtle bg-black p-6 transition-colors hover:border-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                  >
+                    <h3 className="text-base font-semibold text-white">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-white/55">{item.body}</p>
+                    <span className="mt-4 text-xs font-semibold text-accent-soft">
+                      {item.cta} →
+                    </span>
+                  </a>
+                </Reveal>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

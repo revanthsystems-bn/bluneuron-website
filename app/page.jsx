@@ -27,20 +27,30 @@ import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
  * lib/iriz.js) still appears in the description, the og:title and the hero h1,
  * none of which are width-constrained.
  */
-const TITLE = 'IRIZ Mini Projector for Home — 1080p, 500 ANSI Lumens | BluNeuron';
+const TITLE = 'IRIZ Mini Projector for Home — True Brightness, Google TV | BluNeuron';
 
-// 147 characters. Under the ~155 Google renders, and carries the three terms
-// this page is meant to rank for: "mini projector for home", "1080p", "India".
+/*
+ * THE STORY PAGE, not the buying page.
+ *
+ * This description and the one on /shop/iriz are deliberately aimed at
+ * different searches: "mini projector for home" and what the thing IS here;
+ * "buy IRIZ projector" and what it COSTS there. They used to be near
+ * paraphrases of each other, which is two pages asking Google the same
+ * question — it answers once, picks one, and the one it picks is as likely
+ * to be the page without the buy button. No price in this description, on
+ * purpose: a price is a transactional signal and belongs to the page that
+ * can act on it.
+ */
 const DESCRIPTION =
-  'The IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, and built-in '
-  + 'Google TV with 10,000+ apps. Designed and supported in India.';
+  'What the IRIZ mini projector for home actually is: true 500 ANSI lumens measured honestly, '
+  + 'native 1080p, and built-in Google TV. Designed and supported in India.';
 
 export const metadata = pageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: ROUTES.home,
   // No width budget on an OG card, so the fuller claim goes here.
-  ogTitle: 'BluNeuron IRIZ — Mini Projector for Home, Native 1080p, 500 ANSI Lumens',
+  ogTitle: 'BluNeuron IRIZ — The Mini Projector for Home, Measured Honestly',
 });
 
 /*

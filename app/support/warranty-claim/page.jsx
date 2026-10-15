@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import DraftBanner from '@/components/DraftBanner';
@@ -104,7 +105,14 @@ export default function WarrantyClaimPage() {
           </Reveal>
 
           <Reveal delay={0.05}>
-            <SupportForm kind="claim" />
+            {/* `useSearchParams` inside SupportForm (the claim link from the
+                account pre-fills the unit) is a request-time API, and a
+                prerendered page containing one without a boundary pulls the
+                WHOLE page out of static rendering. Wrapped, the page stays
+                static and only the form waits for the params. */}
+            <Suspense fallback={<div className="glass-panel h-96" aria-hidden="true" />}>
+              <SupportForm kind="claim" />
+            </Suspense>
           </Reveal>
         </div>
       </section>

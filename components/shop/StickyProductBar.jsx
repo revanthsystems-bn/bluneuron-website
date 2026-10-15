@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCart } from '@/components/cart/CartContext';
+import { trackAddToCart } from '@/lib/shop-analytics';
 import { BRAND } from '@/lib/iriz';
 import { MARKETPLACE, formatInr } from '@/lib/site-config';
 
@@ -30,7 +31,7 @@ import { MARKETPLACE, formatInr } from '@/lib/site-config';
  */
 export default function StickyProductBar({ watchId = 'buy-panel' }) {
   const [visible, setVisible] = useState(false);
-  const { addItem, openCart } = useCart();
+  const { addItem, openCart, unitPrice } = useCart();
 
   useEffect(() => {
     const panel = document.getElementById(watchId);
@@ -72,6 +73,7 @@ export default function StickyProductBar({ watchId = 'buy-panel' }) {
               type="button"
               onClick={() => {
                 addItem(1);
+                trackAddToCart({ unitPrice, quantity: 1 });
                 openCart();
               }}
               className="btn-primary shrink-0 px-6 py-2.5 text-xs"

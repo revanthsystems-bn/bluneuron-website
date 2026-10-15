@@ -1,0 +1,102 @@
+<!--
+  BluNeuron sign-in code — paste into Supabase:
+  Authentication → Emails → Templates → Magic Link.
+
+  `{{ .Token }}` is the six-digit OTP. There is deliberately NO link and no
+  `{{ .ConfirmationURL }}`: the site asks for a typed code, and an email
+  offering a button as well trains people to click the thing we did not build.
+
+  WHY TABLES AND INLINE STYLES. Email clients are not browsers. Outlook on
+  Windows renders with Word's engine (no flexbox, no grid, partial CSS), and
+  Gmail strips <style> blocks in some contexts. Table layout with inline
+  styles is the only thing that renders the same across all of them, which is
+  why this looks nothing like the rest of the codebase.
+
+  DARK, BUT NOT DEPENDENT ON IT. Several clients force their own background
+  behind the message. The outer table paints its own, and every colour is
+  stated explicitly so nothing inherits a client default and disappears.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="margin:0;padding:0;background-color:#000000;">
+  <tr>
+    <td align="center" style="padding:40px 16px;">
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="max-width:480px;background-color:#0a0a0a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;">
+
+        <!-- Wordmark. Text, not an image: most clients block remote images by
+             default, and a brand that only appears after "show images" is a
+             brand that usually does not appear. -->
+        <tr>
+          <td style="padding:32px 32px 0 32px;">
+            <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:18px;font-weight:700;letter-spacing:-0.02em;color:#ffffff;">
+              <span style="color:#3b82f6;">blu</span>neuron
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:28px 32px 0 32px;">
+            <h1 style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.02em;color:#ffffff;">
+              Your sign-in code
+            </h1>
+            <p style="margin:12px 0 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:22px;color:rgba(255,255,255,0.6);">
+              Enter this code on bluneuron.com to sign in to your account.
+            </p>
+          </td>
+        </tr>
+
+        <!-- THE CODE. Large, monospaced and letter-spaced so it can be read
+             off a phone in one go, and selectable as text so it can be copied
+             rather than retyped — the whole reason this is a code and not a
+             link is that people can move it between apps. -->
+        <tr>
+          <td style="padding:28px 32px 0 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                   style="background-color:#121212;border:1px solid rgba(255,255,255,0.12);border-radius:12px;">
+              <tr>
+                <td align="center" style="padding:22px 16px;">
+                  <span style="font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:32px;font-weight:700;letter-spacing:10px;color:#ffffff;">{{ .Token }}</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:20px 32px 0 32px;">
+            <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:rgba(255,255,255,0.45);">
+              The code expires in one hour and can be used once.
+            </p>
+            <p style="margin:12px 0 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;color:rgba(255,255,255,0.45);">
+              If you did not ask to sign in, ignore this email — nothing has changed on your
+              account, and nobody can use this code without your inbox.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:28px 32px 32px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
+                  <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:19px;color:rgba(255,255,255,0.35);">
+                    Bluneuron Technologies<br />
+                    319, Sri Ram Nagar 3rd Street, V.K. Village, Peelamedu, Coimbatore,
+                    Tamil Nadu 641004, India
+                  </p>
+                  <p style="margin:10px 0 0 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:19px;color:rgba(255,255,255,0.35);">
+                    Support: <a href="mailto:support@bluneuron.com" style="color:rgba(255,255,255,0.55);text-decoration:underline;">support@bluneuron.com</a>
+                    &middot; Monday–Saturday, 10:00 AM – 6:00 PM IST
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>

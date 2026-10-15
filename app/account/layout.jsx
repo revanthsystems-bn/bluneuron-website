@@ -1,8 +1,12 @@
+import { redirect } from 'next/navigation';
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import AccountGuard from '@/components/account/AccountGuard';
 import AccountNav from '@/components/account/AccountNav';
 import DemoNotice from '@/components/account/DemoNotice';
+import { DEMO_MODE } from '@/lib/supabase/config';
+import { getServerUser } from '@/lib/supabase/server';
+import { ROUTES } from '@/lib/routes';
 
 /**
  * The account area's chrome: heading, section nav, guard — written once so
@@ -17,7 +21,36 @@ import DemoNotice from '@/components/account/DemoNotice';
  * does not inherit usefully from a layout for this — a layout's `robots`
  * would be replaced, not merged, by any page that sets its own title.
  */
-export default function AccountLayout({ children }) {
+/**
+ * THE GUARD IS HERE, ON THE SERVER, and this is the only one that counts.
+ *
+ * `getServerUser()` validates the session cookie with Supabase before this
+ * layout renders, so a signed-out visitor is redirected before any account
+ * markup is produced — no flash of someone else's chrome, and nothing to
+ * read in the HTML. components/account/AccountGuard still exists for the
+ * client-side loading state; it is a convenience, not a boundary.
+ *
+ * Reading cookies makes these routes DYNAMIC rather than prerendered, which
+ * is correct: an account page is per-visitor by definition and must never be
+ * cached at the edge.
+ *
+ * NOT MIDDLEWARE, deliberately. On Cloudflare Workers via OpenNext,
+ * middleware is a separately bundled function with its own constraints and
+ * no Node runtime; a server component reading `cookies()` is plain Next.js
+ * and behaves identically on Workers, Vercel and `next start`.
+ *
+ * The REAL protection is still Row Level Security. This guard decides
+ * whether to render a page; Postgres decides which rows anyone can read, and
+ * it would hold even if this check were removed entirely.
+ */
+export default async function AccountLayout({ children }) {
+  // Demo mode has no session to check and exists precisely so these screens
+  // can be reviewed without a backend.
+  if (!DEMO_MODE) {
+    const user = await getServerUser();
+    if (!user) redirect(ROUTES.signIn);
+  }
+
   return (
     <PageShell>
       <PageHeading

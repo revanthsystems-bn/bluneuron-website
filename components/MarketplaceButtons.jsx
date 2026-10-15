@@ -4,7 +4,15 @@ import { track } from '@vercel/analytics';
 import Magnetic from './Magnetic';
 import { trackGaEvent } from '@/lib/googleAnalytics';
 import { trackMetaPixelCustom } from '@/lib/metaPixel';
-import { MARKETPLACE, MARKETPLACES, isTBD } from '@/lib/site-config';
+import { trackBeginCheckout } from '@/lib/shop-analytics';
+import {
+  MARKETPLACE,
+  MARKETPLACES,
+  amazonCartUrl,
+  flipkartCheckoutUrl,
+  isPlaceholder,
+  isTBD,
+} from '@/lib/site-config';
 
 /**
  * The two marketplace buttons — the only purchase path this site has.
@@ -73,6 +81,18 @@ export default function MarketplaceButtons({
   verb = 'Buy',
   /** Replaces the fulfilment line. The basket says more than a product card needs to. */
   note = MARKETPLACE.fulfilmentNote,
+  /**
+   * How many units to hand over, and what to report as the checkout value.
+   *
+   * The basket passes both; a product-page "Buy direct" button passes
+   * quantity 1, because it bypasses the basket by definition. The quantity
+   * is what makes Amazon's cart endpoint worth using at all — see
+   * amazonCartUrl() in lib/site-config.js.
+   */
+  quantity = 1,
+  unitPrice = null,
+  /** `begin_checkout` from the basket, a plain click-through from a product surface. */
+  isCheckout = false,
 }) {
   // A listing URL we do not have yet. Rendering the button as a dead link, or
   // pointing it at a marketplace search page, both end with a visitor on
@@ -80,6 +100,18 @@ export default function MarketplaceButtons({
   // below says why. The layout, the hierarchy and the spacing are identical to
   // the live state, so nothing shifts when the URLs land.
   const pending = MARKETPLACES.filter((m) => isTBD(m.url)).map((m) => m.name);
+
+  // A PLACEHOLDER url is a different state from TBD, and renders differently:
+  // it is a real, clickable link (so the whole flow can be reviewed in a
+  // preview) that happens to land on the marketplace's home page instead of
+  // the listing. The note below says so in as many words, and
+  // scripts/check-production.js refuses a production deploy while any of
+  // these are still here. See the PLACEHOLDER block in lib/site-config.js.
+  const placeholders = MARKETPLACES.filter((m) => isPlaceholder(m.url)).map((m) => m.name);
+
+  /** The real destination for one marketplace, with the quantity attached. */
+  const destinationFor = (marketplace) =>
+    marketplace.id === 'amazon' ? amazonCartUrl(quantity) : flipkartCheckoutUrl();
 
   return (
     <div>
@@ -105,7 +137,7 @@ export default function MarketplaceButtons({
             <Magnetic
               key={marketplace.id}
               as="a"
-              href={marketplace.url}
+              href={destinationFor(marketplace)}
               // `noopener` keeps the marketplace tab from reaching back into
               // this one through `window.opener`; `noreferrer` keeps our URL
               // out of their referrer log. Both, explicitly, on every one.
@@ -114,9 +146,18 @@ export default function MarketplaceButtons({
               className={`${tone} ${buttonClassName}`}
               strength={strength}
               onClick={() => {
+                // `buy_click` / `ClickToBuy` are the long-standing
+                // "someone left for a marketplace" counters and fire from
+                // every surface. `begin_checkout` / `InitiateCheckout` are
+                // the funnel step and fire ONLY from the basket — sending
+                // them from a product page too would double-count the step
+                // and make the cart look like it converts twice.
                 trackGaEvent('buy_click', { marketplace: marketplace.name });
                 track('buy_click', { marketplace: marketplace.name });
                 trackMetaPixelCustom('ClickToBuy', { marketplace: marketplace.name });
+                if (isCheckout) {
+                  trackBeginCheckout({ unitPrice, quantity, marketplace: marketplace.name });
+                }
               }}
             >
               {label}
@@ -135,6 +176,15 @@ export default function MarketplaceButtons({
           {pending.join(' and ')} {pending.length > 1 ? 'listings go' : 'listing goes'} live at
           launch — the {pending.length > 1 ? 'buttons' : 'button'} will link straight to the
           product page then.
+        </p>
+      )}
+
+      {placeholders.length > 0 && (
+        <p className="mt-4 text-xs leading-relaxed text-amber-300/80">
+          Preview build: the {placeholders.join(' and ')}{' '}
+          {placeholders.length > 1 ? 'links go' : 'link goes'} to the marketplace home page, not
+          to the IRIZ listing. The real listing {placeholders.length > 1 ? 'URLs' : 'URL'} replaces
+          this before launch.
         </p>
       )}
 

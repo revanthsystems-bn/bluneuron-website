@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import NewsletterPopup from '../NewsletterPopup';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
 
@@ -33,6 +34,7 @@ export function useNotify() {
 }
 
 export default function NotifyProvider({ children }) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [source, setSource] = useState(NOTIFY_SOURCES.timedInvitation);
 
@@ -60,7 +62,28 @@ export default function NotifyProvider({ children }) {
     }
   }, []);
 
+  /**
+   * THE UNPROMPTED INVITATION IS HOMEPAGE-ONLY.
+   *
+   * It used to fire on every route after a delay, which put a launch-list
+   * modal over the product page, the basket, the sign-in form and the
+   * account area — i.e. over every screen where the visitor is already doing
+   * something more valuable than joining a mailing list. Interrupting a
+   * checkout to ask for an email address is the clearest way to lose both.
+   *
+   * The homepage is where someone is browsing rather than transacting, so it
+   * is the one place an invitation is a fair trade. `pathname === '/'`
+   * rather than a list of excluded routes: a deny-list silently fails open
+   * for every page added later, and the next page added is far more likely
+   * to be part of the shop than part of the story.
+   *
+   * This gates ONLY the automatic open. Every explicit "Notify Me" button
+   * still calls `openNotify` directly and still works everywhere — a visitor
+   * who asks for the modal must always get it.
+   */
   useEffect(() => {
+    if (pathname !== '/') return undefined;
+
     try {
       if (window.localStorage.getItem(DISMISSED_KEY)) return undefined;
     } catch {
@@ -68,7 +91,7 @@ export default function NotifyProvider({ children }) {
     }
     const t = setTimeout(() => openNotify(NOTIFY_SOURCES.timedInvitation), AUTO_OPEN_DELAY_MS);
     return () => clearTimeout(t);
-  }, [openNotify]);
+  }, [openNotify, pathname]);
 
   // NO scroll lock or Esc handler here any more. Both used to live in this
   // provider AND in the modal, and the duplication was a real bug: effects
