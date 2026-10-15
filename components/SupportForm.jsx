@@ -3,12 +3,8 @@
 import { useId, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Magnetic from './Magnetic';
-import {
-  isValidEmail,
-  normalizePhone,
-  submitSupportRequest,
-  submitWarrantyRegistration,
-} from '@/lib/web3forms';
+import { isValidEmail, normalizePhone, submitSupportRequest } from '@/lib/web3forms';
+import { registerWarranty } from '@/lib/warranty-registration';
 import { SUPPORT_PURCHASE_SOURCES } from '@/lib/site-config';
 import { ROUTES } from '@/lib/routes';
 
@@ -158,6 +154,11 @@ export default function SupportForm({ kind = 'registration' }) {
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [formError, setFormError] = useState('');
+  // What a registration actually achieved: which of the two destinations
+  // took it, and whether the person was signed in. Drives the success copy,
+  // because "saved to your account" and "saved for our support team" are
+  // genuinely different outcomes and the customer should be told which.
+  const [outcome, setOutcome] = useState(null);
 
   const summaryRef = useRef(null);
   const botcheckRef = useRef(null);
@@ -219,12 +220,19 @@ export default function SupportForm({ kind = 'registration' }) {
         botcheck: Boolean(botcheckRef.current?.checked),
       };
       if (isClaim) {
+        // Claims are unchanged: Web3Forms email, plus the account's own claim
+        // record where there is one. See lib/web3forms.js.
         await submitSupportRequest(kind, {
           ...submissionFields,
           issue: fields.issue.trim(),
         });
       } else {
-        await submitWarrantyRegistration(submissionFields);
+        // Registration writes to the support Sheet AND, when signed in, to
+        // the customer's account — one id across both, neither failure
+        // killing the other. See lib/warranty-registration.js.
+        const result = await registerWarranty(submissionFields);
+        if (!result.ok) throw new Error(result.error);
+        setOutcome(result);
       }
       setStatus('success');
     } catch (err) {
@@ -238,10 +246,52 @@ export default function SupportForm({ kind = 'registration' }) {
     return (
       <div className="glass-panel p-6 sm:p-8" role="status">
         <p className="text-base font-semibold text-accent-soft">{mode.successTitle}</p>
-        <p className="mt-2.5 text-sm leading-relaxed text-white/60">{mode.successBody}</p>
-        <a href={ROUTES.support} className="btn-secondary mt-6 inline-flex">
-          Back to support
-        </a>
+        {/* The registration flow says what actually happened rather than one
+            fixed sentence: whether it reached the account, the support team,
+            or both. A claim has one destination and keeps its static copy. */}
+        <p className="mt-2.5 text-sm leading-relaxed text-white/60">
+          {outcome?.message ?? mode.successBody}
+        </p>
+
+        {/* A GENTLE prompt, and only for someone who is not signed in. It
+            offers a reason ("see it, with its warranty end date") rather than
+            demanding an account — the registration has already succeeded, and
+            nothing here is contingent on them creating one. */}
+        {outcome && !outcome.signedIn && (
+          <div className="mt-5 rounded-2xl border border-border-subtle bg-white/[0.03] p-5">
+            <p className="text-sm font-semibold text-white">Want to see this in one place?</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/55">
+              Sign in with the same email address and this unit appears under My products &amp;
+              warranty, with the date its cover ends. You do not need an account for the warranty
+              itself — it runs from the invoice date either way.
+            </p>
+            <a href={ROUTES.signIn} className="btn-secondary mt-4 inline-flex">
+              Sign in
+            </a>
+          </div>
+        )}
+
+        {/* Half-landed. The registration is safe, so this is informational
+            rather than an error — but staying silent would leave someone
+            wondering why the unit is missing from their account. */}
+        {outcome && outcome.signedIn && !outcome.savedToAccount && (
+          <p className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-xs leading-relaxed text-amber-200/80">
+            We could not add this unit to your account just now, though our support team has the
+            registration. Try registering it again later and it will appear under My products
+            &amp; warranty.
+          </p>
+        )}
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          {outcome?.savedToAccount && (
+            <a href={ROUTES.accountProducts} className="btn-primary inline-flex">
+              See it in your account
+            </a>
+          )}
+          <a href={ROUTES.support} className="btn-secondary inline-flex">
+            Back to support
+          </a>
+        </div>
       </div>
     );
   }

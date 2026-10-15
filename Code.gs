@@ -8,13 +8,28 @@ const HEADERS = [
   "Order ID",
   "Purchase date",
   "Serial number",
+  "Needs verification",
   "Registered at"
 ];
-const PURCHASE_SOURCES = ["Amazon", "Flipkart", "BluNeuron Website"];
+// Kept in step with SUPPORT_PURCHASE_SOURCES in lib/site-config.js. "Other
+// seller" is accepted and flagged rather than refused — the warranty covers
+// units from BluNeuron or an authorised seller, so provenance needs a human
+// check, but refusing the registration here would only teach people to pick
+// "Amazon" and record a confident falsehood.
+//
+// "BluNeuron Website" stays listed so a direct sale validates the day the
+// site takes payments (DIRECT_SALES_ENABLED in lib/site-config.js); until
+// then the form never offers it.
+const PURCHASE_SOURCES = ["Amazon", "Flipkart", "Other seller", "BluNeuron Website"];
 const LEGACY_HEADER_ALIASES = {
   "Invoice number": "Order ID",
   "Updated at": "Registered at"
 };
+// NOTE on adding a column, as "Needs verification" was: ensureHeaders()
+// already migrates for you. It maps every existing row onto the new HEADERS
+// by name and fills anything it cannot find with "", so a sheet created
+// before the column existed is backfilled in place on the next write. No
+// manual edit, and no separate list of optional headers to maintain.
 
 function setup() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -79,6 +94,11 @@ function doPost(event) {
         asPlainText(draft.orderId.trim()),
         asPlainText(draft.purchaseDate),
         asPlainText(draft.serialNumber.trim()),
+        // "Yes"/"" rather than TRUE/FALSE: the column is forced to plain
+        // text (setNumberFormat("@") below), so a boolean would land as the
+        // string "true" and read as noise. A filled cell is scannable down a
+        // column; an empty one is silent, which is the common case.
+        draft.needsVerification ? "Yes" : "",
         new Date().toISOString()
       ]];
       const range = sheet.getRange(rowNumber, 1, 1, HEADERS.length);

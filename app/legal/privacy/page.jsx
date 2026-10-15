@@ -3,7 +3,7 @@ import PageHeading from '@/components/PageHeading';
 import Reveal from '@/components/Reveal';
 import { ROUTES } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { COMPANY, POLICY_LAST_UPDATED, SUPPORT } from '@/lib/site-config';
+import { COMPANY, SUPPORT } from '@/lib/site-config';
 
 /**
  * The privacy policy — the only legal page that does not go through
@@ -39,6 +39,19 @@ import { COMPANY, POLICY_LAST_UPDATED, SUPPORT } from '@/lib/site-config';
  */
 
 const CONTACT_EMAIL = SUPPORT.email;
+
+/**
+ * This policy's own date, separate from POLICY_LAST_UPDATED.
+ *
+ * The shared constant dates the four documents that were written together
+ * (terms, warranty, returns, shipping). This one has been revised since —
+ * for accounts, and again for where a warranty registration is stored — and
+ * a "last updated" that moves on documents whose text did not change is the
+ * one line on a policy page a reader uses to decide whether to re-read it.
+ * See the note on POLICY_LAST_UPDATED in lib/site-config.js, which asked for
+ * exactly this split the moment it stopped being true.
+ */
+const PRIVACY_LAST_UPDATED = '16 October 2026';
 
 export const metadata = pageMetadata({
   title: 'Privacy Policy — BluNeuron',
@@ -86,7 +99,7 @@ export default function PrivacyPage() {
       <PageHeading
         eyebrow="Legal"
         title="Privacy Policy"
-        subtitle={`Last updated: ${POLICY_LAST_UPDATED}`}
+        subtitle={`Last updated: ${PRIVACY_LAST_UPDATED}`}
       />
 
       <section className="bg-black py-16 sm:py-20">
@@ -131,6 +144,13 @@ export default function PrivacyPage() {
                 you add them. If you save an address for a service pickup, we hold that too. Units
                 you register are kept with their marketplace, order ID, purchase date and serial
                 number, along with any warranty claim you raise and its status.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">When you register a product:</strong>{' '}
+                the details above are recorded in two places — our support team&rsquo;s records, so
+                they can answer a claim, and (if you are signed in) your own account, so the unit
+                and its warranty end date appear under My products &amp; warranty. One registration
+                creates one record in each; it is not stored twice over.
               </li>
               <li>
                 <strong className="font-semibold text-white">When you visit the site:</strong> basic
@@ -214,8 +234,12 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong className="font-semibold text-white">Google Workspace:</strong> delivers the
-                sign-in code from support@bluneuron.com. That email contains the code and nothing
-                else.
+                sign-in code from support@bluneuron.com, and hosts the Google Sheet our support team
+                works from. Warranty registrations are written to that sheet — your name, email
+                address, mobile number, where you bought the unit, your order ID, the purchase date
+                and the serial number. The sheet is restricted to named members of the BluNeuron
+                team; it is not shared by link and is not public. Google processes this under its
+                own privacy policy and does not use it for anything of its own.
               </li>
             </ul>
             <p className="mt-4">
@@ -242,6 +266,13 @@ export default function PrivacyPage() {
                 <strong className="font-semibold text-white">Account data:</strong> for as long as
                 you keep the account. Delete it from your account settings and your profile,
                 addresses, registered units and claim history are removed immediately.
+              </li>
+              <li>
+                <strong className="font-semibold text-white">Warranty registrations:</strong> for
+                the length of the warranty and a reasonable period after it, in both places they
+                are held, because a later claim is assessed against them. Deleting your account
+                removes your copy; the support team&rsquo;s record is removed on request — email{' '}
+                <Mail /> with the serial number.
               </li>
             </ul>
 
