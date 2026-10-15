@@ -2,8 +2,13 @@
 
 import { useId, useRef, useState } from 'react';
 import Magnetic from './Magnetic';
-import { isValidEmail, normalizePhone, submitSupportRequest } from '@/lib/web3forms';
-import { MARKETPLACES } from '@/lib/site-config';
+import {
+  isValidEmail,
+  normalizePhone,
+  submitSupportRequest,
+  submitWarrantyRegistration,
+} from '@/lib/web3forms';
+import { SUPPORT_PURCHASE_SOURCES } from '@/lib/site-config';
 import { ROUTES } from '@/lib/routes';
 
 /**
@@ -60,7 +65,10 @@ function Field({ label, htmlFor, hint, error, errorId, children }) {
   return (
     <div>
       <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-medium text-white/50">
-        {label}
+        {label}{' '}
+        <span className="text-accent-soft" aria-hidden="true">
+          *
+        </span>
       </label>
       {children}
       {error ? (
@@ -94,9 +102,9 @@ const MODES = {
   registration: {
     submitLabel: 'Register warranty',
     busyLabel: 'Registering…',
-    successTitle: 'Your IRIZ is registered.',
+    successTitle: 'Your product is registered.',
     successBody:
-      'We have your serial number and purchase details on file. Keep your marketplace invoice — it is the proof of purchase date a claim is assessed against.',
+      'We have your purchase details on file. Keep your invoice or purchase confirmation — it is the proof of purchase date a claim is assessed against.',
   },
   claim: {
     submitLabel: 'Submit claim',
@@ -156,7 +164,9 @@ export default function SupportForm({ kind = 'registration' }) {
     } else if (fields.purchaseDate > todayIso()) {
       next.purchaseDate = 'The purchase date cannot be in the future.';
     }
-    if (!fields.serialNumber.trim()) next.serialNumber = 'Enter the serial number.';
+    if (!fields.serialNumber.trim()) {
+      next.serialNumber = 'Enter the serial number.';
+    }
     if (isClaim && !fields.issue.trim()) {
       next.issue = 'Describe what is happening so we can help.';
     }
@@ -181,7 +191,7 @@ export default function SupportForm({ kind = 'registration' }) {
 
     setStatus('submitting');
     try {
-      await submitSupportRequest(kind, {
+      const submissionFields = {
         name: fields.name.trim(),
         email: fields.email.trim(),
         phone: fields.phone.trim(),
@@ -189,12 +199,16 @@ export default function SupportForm({ kind = 'registration' }) {
         orderId: fields.orderId.trim(),
         purchaseDate: fields.purchaseDate,
         serialNumber: fields.serialNumber.trim(),
-        issue: isClaim ? fields.issue.trim() : '',
-        // Web3Forms' honeypot, read off the live DOM node rather than React
-        // state: nothing in the UI can change it, so state would only ever
-        // report `false` and the trap would never spring.
         botcheck: Boolean(botcheckRef.current?.checked),
-      });
+      };
+      if (isClaim) {
+        await submitSupportRequest(kind, {
+          ...submissionFields,
+          issue: fields.issue.trim(),
+        });
+      } else {
+        await submitWarrantyRegistration(submissionFields);
+      }
       setStatus('success');
     } catch (err) {
       setStatus('error');
@@ -224,6 +238,7 @@ export default function SupportForm({ kind = 'registration' }) {
     value: fields[name],
     onChange: update(name),
     disabled: busy,
+    'aria-required': true,
     'aria-invalid': Boolean(errors[name]),
     'aria-describedby': errors[name] ? errorId(name) : undefined,
     className: `${FIELD_CLASS} ${extraClass} ${errors[name] ? INVALID_CLASS : ''}`,
@@ -301,22 +316,20 @@ export default function SupportForm({ kind = 'registration' }) {
         </Field>
 
         <Field {...fieldProps('marketplace')}>
-          {/* A select, not free text: the answer is one of two listings plus
-              "somewhere else", and typed answers ("amzn", "amazon.in", "amz")
-              cannot be counted or filtered. Options come from MARKETPLACES in
-              lib/site-config.js, so adding a third marketplace adds it here. */}
+          {/* Keep purchase sources controlled so support requests use consistent values. */}
           <select {...inputProps('marketplace')}>
-            <option value="">Select…</option>
-            {MARKETPLACES.map((marketplace) => (
-              <option key={marketplace.id} value={marketplace.name}>
-                {marketplace.name}
+            <option value="" className="bg-black text-white">
+              Select…
+            </option>
+            {SUPPORT_PURCHASE_SOURCES.map((source) => (
+              <option key={source} value={source} className="bg-black text-white">
+                {source}
               </option>
             ))}
-            <option value="Other">Somewhere else</option>
           </select>
         </Field>
 
-        <Field {...fieldProps('orderId', 'From your Amazon or Flipkart invoice.')}>
+        <Field {...fieldProps('orderId', 'From your invoice or purchase confirmation.')}>
           <input type="text" autoComplete="off" {...inputProps('orderId')} />
         </Field>
 
@@ -324,9 +337,6 @@ export default function SupportForm({ kind = 'registration' }) {
           <input type="date" max={todayIso()} {...inputProps('purchaseDate')} />
         </Field>
 
-        {/* Full width: the serial number is the longest value on the form and
-            the one most often copied off a label, so it gets a field wide
-            enough to read back without scrolling inside it. */}
         <div className="sm:col-span-2">
           <Field {...fieldProps('serialNumber', 'On the label underneath the projector.')}>
             <input
