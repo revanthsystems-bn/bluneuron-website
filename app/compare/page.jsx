@@ -12,8 +12,12 @@ export const metadata = pageMetadata({
   path: '/compare',
 });
 
+// No "Voice Assistant" row. It read 'Built-in "Hey Google"', which was a
+// Google TV claim the printed IRIZ box does not make — the box says Android 14
+// and names no assistant. Removed rather than reworded: there is no confirmed
+// assistant to put in the cell, and an empty one would be a comparison the
+// table cannot support.
 const EXTRA_ROWS = [
-  { label: 'Voice Assistant', iriz: 'Built-in "Hey Google"', other: 'Not available' },
   { label: 'App Store', iriz: '10,000+ official apps, pre-installed', other: 'Sideloading required, if supported' },
   { label: 'Video Decoding', iriz: 'Up to 8K (decode)', other: 'Typically 1080p or lower' },
   { label: 'Chipset', iriz: 'Allwinner H723, Quad-core Cortex-A53', other: 'Often unnamed/unspecified' },

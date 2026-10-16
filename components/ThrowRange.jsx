@@ -6,7 +6,7 @@ import Reveal from './Reveal';
 import { THROW_RANGE } from '@/lib/iriz';
 
 /**
- * The projected image growing from 35" to 200" as you scroll — the hard-number
+ * The projected image growing from 40" to 200" as you scroll — the hard-number
  * beat between the lens tunnel and the spec table, and the thing the table's
  * "Throw Ratio 1:1 · 0.9m–5m" row only states in the abstract.
  *
