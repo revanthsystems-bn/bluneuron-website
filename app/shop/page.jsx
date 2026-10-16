@@ -38,7 +38,7 @@ export const metadata = {
   ...pageMetadata({
     title: 'Shop — BluNeuron IRIZ Mini Projector',
     description:
-      'Buy the BluNeuron IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, built-in Google TV. ₹13,999 inclusive of all taxes.',
+      'Buy the BluNeuron IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, built-in Android 14. ₹13,999 inclusive of all taxes.',
     path: ROUTES.shop,
   }),
   robots: routeRobots(ROUTES.shop),

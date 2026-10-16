@@ -83,15 +83,15 @@ const POINTS = [
   {
     heading: 'Set up in about five minutes',
     body: [
-      `Put it on something flat between ${THROW_RANGE.min.distance} and ${THROW_RANGE.max.distance} m from the wall, angle it, and plug it in. Google TV walks you through joining Wi-Fi and signing in, the auto focus and keystone settle the picture while you do, and that is setup finished.`,
+      `Put it on something flat between ${THROW_RANGE.min.distance} and ${THROW_RANGE.max.distance} m from the wall, angle it, and plug it in. Android 14 walks you through joining Wi-Fi and signing in, the auto focus and keystone settle the picture while you do, and that is setup finished.`,
       'If a tricky room defeats the automatic correction, the F+ and F− keys on the remote trim the focus and the keystone can be nudged in Settings. Those are a trim on top of auto focus, not a manual mode you have to switch into.',
     ],
   },
   {
     heading: 'Everything you watch, already on it',
     body: [
-      'Google TV is built in, on Android 14, with "Hey Google" voice search and a remote in the box — so Netflix, YouTube, Disney+, Prime Video and the rest of the 10,000+ official apps are on the device itself. There is no stick to buy, no second remote, no HDMI input occupied before you start.',
-      'The inputs are there when you want them: HDMI for a console or a laptop, USB-A for playing files off a drive, and a 3.5 mm output for headphones or a speaker. A low-latency mode brings response time down to 0.004 s for gaming over HDMI, and HDMI and USB playback work with no network at all — only the Google TV side of it needs Wi-Fi.',
+      'Android 14 is built in, with a remote in the box — so Netflix, YouTube, Disney+, Prime Video and the rest of the 10,000+ official apps are on the device itself. There is no stick to buy, no second remote, no HDMI input occupied before you start.',
+      'The inputs are there when you want them: HDMI for a console or a laptop, USB-A for playing files off a drive, and a 3.5 mm output for headphones or a speaker. A low-latency mode brings response time down to 0.004 s for gaming over HDMI, and HDMI and USB playback work with no network at all — only the streaming side of it needs Wi-Fi.',
     ],
   },
 ];

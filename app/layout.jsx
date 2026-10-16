@@ -53,7 +53,7 @@ const zenDots = Zen_Dots({
 const TITLE = 'BluNeuron IRIZ — Mini Projector for Home';
 const DESCRIPTION =
   'The BluNeuron IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, '
-  + 'and built-in Google TV with 10,000+ apps.';
+  + 'and built-in Android 14 with 10,000+ apps.';
 
 export const metadata = {
   // Resolves every root-relative URL in this file and in `pageMetadata` —

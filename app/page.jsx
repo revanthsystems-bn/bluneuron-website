@@ -27,7 +27,8 @@ import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
  * lib/iriz.js) still appears in the description, the og:title and the hero h1,
  * none of which are width-constrained.
  */
-const TITLE = 'IRIZ Mini Projector for Home — True Brightness, Google TV | BluNeuron';
+const TITLE = 'IRIZ Mini Projector for Home — True Brightness, Android 14 | BluNeuron';
+
 
 /*
  * THE STORY PAGE, not the buying page.
@@ -43,7 +44,8 @@ const TITLE = 'IRIZ Mini Projector for Home — True Brightness, Google TV | Blu
  */
 const DESCRIPTION =
   'What the IRIZ mini projector for home actually is: true 500 ANSI lumens measured honestly, '
-  + 'native 1080p, and built-in Google TV. Designed and supported in India.';
+  + 'native 1080p, and built-in Android 14. Designed and supported in India.';
+
 
 export const metadata = pageMetadata({
   title: TITLE,

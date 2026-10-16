@@ -252,8 +252,15 @@ export default function ProductPage() {
             <Reveal className="mt-10">
               <h3 className="text-base font-semibold tracking-tight text-white">In the box</h3>
               <ul className="mt-3 grid gap-2 text-sm text-white/60 sm:grid-cols-2">
+                {/* BOX_CONTENTS carries rows ({ icon, title, note }) now — it is
+                    read off the printed carton. The sub-line follows the title
+                    after an em dash so each item stays one grid cell. See
+                    BOX_CONTENTS in lib/iriz.js. */}
                 {BOX_CONTENTS.map((item) => (
-                  <li key={item}>{item}</li>
+                  <li key={item.title}>
+                    {item.title}
+                    {item.note && <span className="text-white/40">{' — ' + item.note}</span>}
+                  </li>
                 ))}
               </ul>
             </Reveal>
