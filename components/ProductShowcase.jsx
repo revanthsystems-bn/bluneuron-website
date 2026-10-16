@@ -18,13 +18,23 @@ import { BOX_CONTENTS, BOX_PHOTO, BOX_SUMMARY } from '@/lib/iriz';
  * number BNA-510SH appears on the page for the first time here, because the
  * box is where it is printed.
  *
- * THE PHOTO IS CAPPED AT max-w-[440px], DELIBERATELY. The source file is
- * 603x588 — small. An uncapped half-width column is ~660px at 1440, which
- * would scale a 603px source past 1:1 and visibly soften it. The cap keeps it
- * at or under native size, and the card's own padding is what fills the
- * column instead, so the tile still reads as a framed product shot rather
- * than a small image floating in a large box. Re-shoot the carton at 1600px
- * or wider and the cap can go — see BOX_PHOTO in lib/iriz.js.
+ * THE PHOTO FILLS THE CARD. No inner padding and no max-width: the image IS
+ * the card, clipped to the same 22px radius, so this reads as one clean photo
+ * tile rather than a small picture mounted inside a dark frame.
+ *
+ * The card's aspect ratio is the PHOTO's own (603/588, a shade wider than
+ * square) rather than a rounded-off `aspect-square`. At the photo's exact
+ * ratio `object-cover` has nothing to crop, so the carton is never shaved at
+ * the edges — the cover is there to keep the fit safe if the source is ever
+ * re-shot at a different ratio, not to do work today.
+ *
+ * On the source resolution: the file is 603x588, which is small. At the
+ * widest this section goes (a 1024px container, two columns, 56px gap) the
+ * image renders at ~484 CSS px, so it is still at roughly 1:1 on a standard
+ * display and is upscaled only on a 2x one. That is the same ballpark the
+ * earlier max-w-[440px] cap produced — dropping the cap changed the framing,
+ * not the sharpness. Re-shoot the carton at 1600px or wider to fix it
+ * properly; see BOX_PHOTO in lib/iriz.js.
  *
  * ICONS ARE INLINE SVG, not lucide-react, even though lucide is already a
  * dependency and TrustBadges uses it. In v1.47 every lucide icon renders
@@ -126,22 +136,19 @@ export default function ProductShowcase() {
         <div className="mx-auto grid max-w-5xl grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-14">
           {/* LEFT — the carton */}
           <Reveal delay={0.05}>
-            <div className="relative overflow-hidden rounded-[22px] border border-white/10 bg-black-elevated p-6 shadow-[0_24px_70px_-28px_rgba(0,0,0,0.9)] sm:p-10">
-              {/* Ambient lift behind the box, the same cool cast the product
-                  renders sit on elsewhere. Purely decorative, and under the
-                  image via DOM order rather than a z-index. */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_62%_52%_at_50%_42%,rgba(96,165,250,0.10),transparent_72%)]"
-              />
+            {/* `overflow-hidden` is what clips the photo to the 22px radius —
+                without it the image's own square corners sit proudly outside
+                the card's rounded ones. The aspect ratio is the photo's, so
+                the box below is exactly the shape of what goes in it. */}
+            <div className="relative aspect-[603/588] overflow-hidden rounded-[22px] border border-white/10 shadow-[0_24px_70px_-28px_rgba(0,0,0,0.9)]">
               <Image
                 src={BOX_PHOTO.src}
                 alt={BOX_PHOTO.alt}
                 width={BOX_PHOTO.width}
                 height={BOX_PHOTO.height}
                 loading="lazy"
-                sizes="(min-width: 1024px) 440px, (min-width: 640px) 60vw, 80vw"
-                className="relative mx-auto h-auto w-full max-w-[440px]"
+                sizes="(min-width: 1024px) 484px, (min-width: 640px) 60vw, 90vw"
+                className="h-full w-full object-cover"
               />
             </div>
           </Reveal>
