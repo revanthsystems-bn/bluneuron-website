@@ -15,6 +15,16 @@ import { SUPPORT, WARRANTY } from '@/lib/warranty';
  * if you did the paperwork — and someone with a dead projector who believes
  * they forfeited their cover does not write in at all. Saying it plainly here
  * costs a line and prevents that.
+ *
+ * On a phone the form comes FIRST and all of that sits under it, for the
+ * reason set out at length on /support/warranty-registration: someone filing
+ * a claim from a phone has a broken projector in front of them and has
+ * already decided to write in. The one point that must survive being moved
+ * below the form — that you can claim without having registered — is also
+ * the mobile subtitle, so it is read before the first field either way.
+ *
+ * From `lg` up nothing changes; `order-*` only bites while the grid is one
+ * column.
  */
 
 export const metadata = pageMetadata({
@@ -27,15 +37,31 @@ export const metadata = pageMetadata({
 export default function WarrantyClaimPage() {
   return (
     <PageShell>
+      {/* Two subtitles, one per breakpoint — see the registration page. The
+          mobile line is not "takes about a minute": a claim is not a quick
+          errand someone chose to run, and promising speed to a person whose
+          projector has died would read as glib. It carries the fact that
+          actually unblocks them instead. */}
       <PageHeading
         eyebrow="Support"
         title="Make a warranty claim"
-        subtitle="Tell us what is happening, with your order and serial details, and we will take it from there."
+        subtitle={
+          <>
+            <span className="lg:hidden">
+              {WARRANTY.months} months cover from your invoice date. You do not need to have
+              registered first.
+            </span>
+            <span className="hidden lg:inline">
+              Tell us what is happening, with your order and serial details, and we will take it
+              from there.
+            </span>
+          </>
+        }
       />
 
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <Reveal className="max-w-md lg:sticky lg:top-28">
+          <Reveal className="order-2 max-w-md lg:order-1 lg:sticky lg:top-28">
             <h2 className="text-2xl font-bold tracking-tighter text-white">
               Something not right?
             </h2>
@@ -87,7 +113,7 @@ export default function WarrantyClaimPage() {
             </div>
           </Reveal>
 
-          <Reveal delay={0.05}>
+          <Reveal delay={0.05} className="order-1 lg:order-2">
             <ClaimForm />
           </Reveal>
         </div>

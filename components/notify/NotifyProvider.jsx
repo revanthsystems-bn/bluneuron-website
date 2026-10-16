@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import NewsletterPopup from '../NewsletterPopup';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
 
@@ -25,6 +26,31 @@ const NotifyContext = createContext(null);
 
 const DISMISSED_KEY = 'bluneuron-iriz-popup-dismissed';
 const AUTO_OPEN_DELAY_MS = 8000;
+
+/**
+ * The ONLY route the invitation opens itself on.
+ *
+ * It used to open on every page after 8 seconds, which is fine on a landing
+ * page someone is browsing and wrong everywhere else. The warranty pages
+ * made that obvious: /support/warranty-registration is reached by scanning
+ * a QR code on the carton, usually by someone standing over a projector
+ * they have just unboxed or one that has stopped working. Covering that
+ * form with "Be the first to see IRIZ" interrupts a task — and invites
+ * someone to a launch list for a product they have already bought.
+ *
+ * The same reasoning covers /legal/*: a policy page is read by someone
+ * looking up a term, which is the worst possible moment for a marketing
+ * modal, and a consent-adjacent document is the worst possible place for
+ * one.
+ *
+ * So the auto-open is allow-listed to the home page rather than blocked
+ * page by page. A deny-list would mean every page added from now on opts
+ * out by being remembered, and the warranty pages are proof that does not
+ * happen. MANUAL opens are unaffected: the masthead "Notify Me", the mobile
+ * menu and the sticky bar all call openNotify() directly and still work on
+ * every route, including these.
+ */
+const AUTO_OPEN_PATHS = new Set(['/']);
 
 export function useNotify() {
   const ctx = useContext(NotifyContext);
@@ -60,7 +86,14 @@ export default function NotifyProvider({ children }) {
     }
   }, []);
 
+  // `usePathname` returns the path with no query or hash, and no trailing
+  // slash (trailingSlash is false), so '/' is an exact match. It changes on
+  // client navigation, so the timer below is re-armed on arriving at the
+  // home page and torn down on leaving it.
+  const pathname = usePathname();
+
   useEffect(() => {
+    if (!AUTO_OPEN_PATHS.has(pathname)) return undefined;
     try {
       if (window.localStorage.getItem(DISMISSED_KEY)) return undefined;
     } catch {
@@ -68,7 +101,7 @@ export default function NotifyProvider({ children }) {
     }
     const t = setTimeout(() => openNotify(NOTIFY_SOURCES.timedInvitation), AUTO_OPEN_DELAY_MS);
     return () => clearTimeout(t);
-  }, [openNotify]);
+  }, [openNotify, pathname]);
 
   // NO scroll lock or Esc handler here any more. Both used to live in this
   // provider AND in the modal, and the duplication was a real bug: effects

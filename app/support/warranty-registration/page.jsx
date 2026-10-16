@@ -18,6 +18,25 @@ import { WARRANTY } from '@/lib/warranty';
  * This is the page the QR code printed on the carton leads to, via the /warranty
  * redirect in next.config.js. It therefore has to keep working at this exact
  * path indefinitely; see the comment on that redirect.
+ *
+ * ---------------------------------------------------------------------------
+ * WHY THE FORM COMES FIRST ON A PHONE
+ * ---------------------------------------------------------------------------
+ * Almost everyone who reaches this page on a phone has just scanned the QR
+ * code on the carton, which means they are standing over a newly unboxed
+ * projector having already decided to register it. They do not need
+ * persuading and they have not come to read — so a screen of preamble before
+ * the first field is a scroll between a decided visitor and the one thing
+ * they came to do.
+ *
+ * So below `lg` the order is: short header, form, then the supporting
+ * material. "What you'll need" is genuinely useful, but it is useful BESIDE
+ * the form (where it is a checklist you glance at) or AFTER it (where it
+ * answers "what was that serial number again?") — not in front of it.
+ *
+ * From `lg` up nothing changes: the two-column layout is untouched, because
+ * on a desktop both columns are on the same screen and there is no sequence
+ * to get wrong. `order-*` only has an effect while the grid is one column.
  */
 
 export const metadata = pageMetadata({
@@ -43,25 +62,47 @@ function Need({ children }) {
 export default function WarrantyRegistrationPage() {
   return (
     <PageShell>
+      {/* Two subtitles, one per breakpoint. On a phone the header has to be
+          short enough that the first field is on the first screen, so it is
+          a single line of fact. On a desktop the longer sentence stays
+          exactly as it was — there is room for it, and "registering is
+          optional" is worth saying up front where it does not cost a
+          scroll. */}
       <PageHeading
         eyebrow="Support"
         title="Register your warranty"
-        subtitle={`Optional, and takes a minute. Your ${BRAND.model} is covered from the date on your invoice either way — registering just means a claim does not start with paperwork.`}
+        subtitle={
+          <>
+            <span className="lg:hidden">
+              {WARRANTY.months} months cover from your invoice date. Takes about a minute.
+            </span>
+            <span className="hidden lg:inline">
+              Optional, and takes a minute. Your {BRAND.model} is covered from the date on your
+              invoice either way — registering just means a claim does not start with paperwork.
+            </span>
+          </>
+        }
       />
 
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          {/* `lg:sticky` so the list of what you need stays beside the form
+          {/* `order-2` below lg puts this AFTER the form; `lg:order-1` puts
+              it back in the first column from lg up, where the grid is two
+              columns and order is left-to-right again.
+
+              `lg:sticky` so the list of what you need stays beside the form
               while you scroll it on a desktop — it is a checklist, and a
               checklist that scrolls away is a checklist you re-scroll for. */}
-          <Reveal className="max-w-md lg:sticky lg:top-28">
-            <p className="text-sm leading-relaxed text-white/60">
+          <Reveal className="order-2 max-w-md lg:order-1 lg:sticky lg:top-28">
+            {/* Hidden below lg: the mobile subtitle already says this, and
+                repeating it here would be the first thing under the form. */}
+            <p className="hidden text-sm leading-relaxed text-white/60 lg:block">
               Cover runs for{' '}
               <span className="font-semibold text-white/85">{WARRANTY.months} months</span> from
               the invoice date.
             </p>
 
-            <h2 className="mt-8 text-2xl font-bold tracking-tighter text-white">
+            <h2 className="text-2xl font-bold tracking-tighter text-white lg:mt-8">
               What you&apos;ll need
             </h2>
             <ul className="mt-5 space-y-3 text-sm leading-relaxed text-white/60">
@@ -94,7 +135,7 @@ export default function WarrantyRegistrationPage() {
             </p>
           </Reveal>
 
-          <Reveal delay={0.05}>
+          <Reveal delay={0.05} className="order-1 lg:order-2">
             <RegistrationForm />
           </Reveal>
         </div>
