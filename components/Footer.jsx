@@ -262,34 +262,49 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* The legal identity line. Its own row above the copyright, because
-            an address is long enough that sharing a line with anything else
-            wraps badly at 390px. */}
-        {showIdentity && (
-          <div className="mt-8 border-t border-border-subtle pt-6 text-xs leading-relaxed text-white/40">
-            <p className="font-medium text-white/55">{COMPANY.legalName}</p>
-            <p className="mt-1">{COMPANY.registeredAddress}</p>
-            {allKnown(COMPANY.gstin) && <p className="mt-1">GSTIN: {COMPANY.gstin}</p>}
-          </div>
-        )}
+        {/*
+          THE LEGAL BLOCK: identity and copyright as ONE unit.
 
-        {/* Stacked below sm so the two never crowd on a phone, side by side
-            above it. With SHOW_PRIVACY off there is a single child again, and
-            `gap` on a one-child flex row reserves nothing — so this lays out
-            identically either way. */}
-        <div
-          className={`flex flex-col gap-2 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between sm:gap-5 ${
-            showIdentity ? 'mt-6' : 'mt-8 border-t border-border-subtle pt-6'
-          }`}
-        >
-          <p>© {new Date().getFullYear()} BluNeuron. All rights reserved.</p>
-          {/* Privacy Policy and nothing else. The warranty links belong to
-              the cloudflare footer, not this one — see "THE BOTTOM ROW IS
-              PRIVACY POLICY ONLY ON THIS BRANCH" above. */}
+          These used to be two sibling rows with their own spacing, which
+          read as two unrelated afterthoughts — the registered entity, a
+          gap, then the copyright. They are the same statement ("who
+          publishes this site"), so they are now three lines of one block:
+          legal name, registered address, copyright.
+
+          `items-end` on the row, not `items-center`: the left column is
+          three lines tall and the right is one, and the requirement is that
+          the privacy link sits on the COPYRIGHT's line — the last one — not
+          floating halfway up the address. Aligning the bottom edges puts
+          the two single-line boxes on the same baseline, because both end
+          with the same `leading-relaxed` text.
+
+          Below sm it stacks and the link simply follows the copyright,
+          where `items-end` has no effect on a one-column flex.
+        */}
+        <div className="mt-8 flex flex-col gap-3 border-t border-border-subtle pt-6 text-xs leading-relaxed text-white/40 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+          <div className="min-w-0">
+            {showIdentity && (
+              <>
+                <p className="font-medium text-white/55">{COMPANY.legalName}</p>
+                <p className="mt-1">{COMPANY.registeredAddress}</p>
+                {allKnown(COMPANY.gstin) && <p className="mt-1">GSTIN: {COMPANY.gstin}</p>}
+              </>
+            )}
+            <p className={showIdentity ? 'mt-1 text-white/45' : 'text-white/45'}>
+              © {new Date().getFullYear()} BluNeuron. All rights reserved.
+            </p>
+          </div>
+
+          {/* Privacy Policy, right-aligned, on the copyright's line. It is
+              the one link down here: the warranty links belong to the
+              cloudflare footer — see "THE BOTTOM ROW IS PRIVACY POLICY ONLY
+              ON THIS BRANCH" above — and everything else is in the columns.
+              This repeats the Policies column entry on purpose; a privacy
+              link beside the copyright is where people look for it. */}
           {SHOW_PRIVACY && (
             <a
               href={ROUTES.privacy}
-              className="underline underline-offset-2 transition-colors hover:text-white"
+              className="shrink-0 text-white/45 underline underline-offset-2 transition-colors hover:text-white sm:text-right"
             >
               Privacy Policy
             </a>

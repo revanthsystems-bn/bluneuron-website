@@ -15,6 +15,36 @@
     background-color: #000000;
     color: #ffffff;
   }
+
+  /*
+   * EXACTLY ONE DIVIDER ABOVE THE FOOTER.
+   *
+   * Section components across this site each carry their own
+   * `border-b border-border-subtle` (35 of them), which is how consecutive
+   * sections are separated. <footer> carries a matching `border-t`, because
+   * most pages end with a section that has no bottom border and would
+   * otherwise run straight into the footer with no division at all.
+   *
+   * Those two rules collide on whichever page happens to end with a bordered
+   * section. Measured on this build: /, /where-to-buy and /support/contact
+   * each painted a 1px border-bottom ending at exactly the y where the
+   * footer's 1px border-top began — zero gap, two hairlines, reading as one
+   * thick or smudged line rather than the single clean rule every other page
+   * gets.
+   *
+   * Fixing it here rather than in the three components is deliberate. The
+   * offending border is only wrong because of WHERE the section landed, not
+   * what it is: BuySection is correct mid-page on /shop/iriz and wrong only
+   * as the last child on /. A `:last-child` rule says exactly that, and it
+   * keeps being true for pages added later — whereas deleting the border
+   * from those three components would remove a divider they need elsewhere.
+   *
+   * The footer's own border-t stays the single source of the line, so the
+   * 18 pages that already relied on it are untouched.
+   */
+  main > :last-child {
+    border-bottom-width: 0;
+  }
 }
 
 @layer components {
