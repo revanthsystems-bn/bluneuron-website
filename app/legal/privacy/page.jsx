@@ -25,7 +25,7 @@ import { pageMetadata } from '@/lib/seo';
  */
 
 const CONTACT_EMAIL = 'systems@bluneuron.com';
-const LAST_UPDATED = '10 October 2026';
+const LAST_UPDATED = '16 October 2026';
 
 export const metadata = pageMetadata({
   title: 'Privacy Policy — BluNeuron',
@@ -72,11 +72,34 @@ export default function PrivacyPage() {
                 email address, and your mobile number if you choose to give it.
               </li>
               <li>
+                <strong className="font-semibold text-white">
+                  When you register a warranty or make a claim:
+                </strong>{' '}
+                your name, email address and mobile number; where you bought the unit, your order
+                ID, the purchase date and the unit&rsquo;s serial number; and, on a claim, what is
+                going wrong and your description of it.
+              </li>
+              <li>
                 <strong className="font-semibold text-white">When you visit the site:</strong> basic information
                 about your visit, such as pages viewed, device and browser type, approximate location (country or
                 city), and how you arrived (for example, from an ad).
               </li>
             </ul>
+            <p className="mt-4">
+              Warranty registrations and claims are stored in a Google Sheet that only our support
+              team can open. We use them only to register your warranty, to assess a claim against
+              it, and to arrange the repair or replacement that follows — never for advertising,
+              and none of these details are sent to Google Analytics or the Meta Pixel. If a claim
+              cannot be written to that sheet, it is emailed to our support inbox instead so it is
+              not lost. You can ask us to delete a registration or a claim at any time by emailing{' '}
+              <Mail /> with your registration ID or claim reference.
+            </p>
+            <p className="mt-4">
+              Give us only what a form asks for. A warranty claim needs the serial number and the
+              order ID to be assessed; it does not need your address, and the form does not ask for
+              one. We never collect payment details — the purchase happens on Amazon or Flipkart,
+              and we are not given your card, your UPI ID or your delivery address.
+            </p>
 
             <H2>How we use it</H2>
             <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
