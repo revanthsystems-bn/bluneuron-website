@@ -23,6 +23,50 @@ const nextConfig = {
     // takes the 75 default.
     qualities: [75, 82],
   },
+
+  /**
+   * ===================================================================
+   * PRINTED ON PACKAGING — never remove or change.
+   * ===================================================================
+   * `/warranty` is the short address behind the QR code printed on the IRIZ
+   * carton. Cartons are already manufactured; the ones in a warehouse today
+   * will be opened years from now. This redirect therefore has to keep
+   * working FOREVER, and it cannot be renamed, retargeted at a page that
+   * might be deleted, or "tidied up" — a dead QR code on retail packaging
+   * cannot be recalled or patched.
+   *
+   * If /support/warranty-registration is ever moved, change the
+   * DESTINATION here. Do not change the source.
+   *
+   * `permanent: true` emits a 308, which browsers and search engines cache
+   * hard — correct for an address that is now physically printed, and the
+   * reason this must not be pointed somewhere temporary.
+   *
+   * THE QUERY STRING IS PRESERVED AUTOMATICALLY. Next carries any query it
+   * did not consume in the match onto the destination, so `/warranty?src=qr`
+   * arrives as `/support/warranty-registration?src=qr` and GA4 records it as
+   * a page URL. Nothing reads `src`; it exists so print runs can be told
+   * apart in analytics, and it carries no personal data.
+   *
+   * It lives here, in next.config.js, rather than in custom-worker.js or a
+   * Cloudflare redirect rule, because next.config.js is the one file all
+   * three hosts read. A Workers-only rule would mean /warranty 404s on the
+   * Vercel and GoDaddy builds — see the "must keep working on all three"
+   * rule in CLAUDE.md. The trailing-slash form is handled before this by
+   * Next's own normalisation (trailingSlash defaults to false, so
+   * `/warranty/` 308s to `/warranty` and then lands here), and the apex
+   * bluneuron.com → www redirect happens at the DNS/Cloudflare layer above
+   * the Worker, so bluneuron.com/warranty arrives here too.
+   */
+  async redirects() {
+    return [
+      {
+        source: '/warranty',
+        destination: '/support/warranty-registration',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 /**

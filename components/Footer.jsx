@@ -65,6 +65,29 @@ const ICONS = {
 // config object.
 const SOCIAL_ORDER = ['linkedin', 'instagram', 'youtube'];
 
+/**
+ * The bottom row's links, in render order, before Privacy Policy.
+ *
+ * The warranty three are here and NOT in the masthead deliberately. They are
+ * looked for, not browsed: someone reaches for them with a dead projector or
+ * a carton in hand, and the footer is where a person looks for that kind of
+ * link. Putting them in the nav would spend the masthead's attention budget
+ * on an errand almost no visitor is on.
+ *
+ * The registration page is also reachable at /warranty, the short address
+ * printed on the carton — see the redirect in next.config.js.
+ *
+ * Not gated on SHOW_PRIVACY: that flag turns off the privacy SURFACES
+ * together (components/ConsentNotice, the signup fine print, the link
+ * below). A warranty policy is a product promise, not a privacy disclosure,
+ * and must stay reachable whatever that flag says.
+ */
+const BOTTOM_LINKS = [
+  { href: ROUTES.warranty, label: 'Warranty' },
+  { href: ROUTES.warrantyClaim, label: 'Warranty claim' },
+  { href: ROUTES.warrantyRegistration, label: 'Warranty registration' },
+];
+
 export default function Footer() {
   // An icon renders only when its URL is non-empty, so no icon can ever link
   // to "#". All three are set today; this is what keeps that true when one is
@@ -237,14 +260,29 @@ export default function Footer() {
           }`}
         >
           <p>© {new Date().getFullYear()} BluNeuron. All rights reserved.</p>
-          {SHOW_PRIVACY && (
-            <a
-              href={ROUTES.privacy}
-              className="underline underline-offset-2 transition-colors hover:text-white"
-            >
-              Privacy Policy
-            </a>
-          )}
+          {/* `flex-wrap` plus `gap-x-4 gap-y-2`, not a single-line row: four
+              links plus Privacy Policy is wider than a 390px phone, so they
+              wrap onto a second line rather than pushing the page into a
+              horizontal scroll. */}
+          <nav className="flex flex-wrap items-center gap-x-4 gap-y-2" aria-label="Legal and warranty">
+            {BOTTOM_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="underline underline-offset-2 transition-colors hover:text-white"
+              >
+                {link.label}
+              </a>
+            ))}
+            {SHOW_PRIVACY && (
+              <a
+                href={ROUTES.privacy}
+                className="underline underline-offset-2 transition-colors hover:text-white"
+              >
+                Privacy Policy
+              </a>
+            )}
+          </nav>
         </div>
       </div>
     </footer>

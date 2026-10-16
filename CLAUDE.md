@@ -25,8 +25,15 @@ Two things differ from a clean checkout, and both look like project bugs:
 
 - **Node 22 for anything touching wrangler.** The system Node is 20, and
   wrangler refuses to start below 22. A portable Node 22 lives at
-  `C:\Users\MEENA\AppData\Local\node22\` — prepend it to `PATH`. `next build`
-  itself is fine on Node 20.
+  `C:\Users\MEENA\AppData\Local\node22\node-v22.23.3-win-x64\` — prepend
+  **that** to `PATH`, not its parent. `node22\` alone is the extraction
+  folder and contains no `node.exe`, so putting it on `PATH` fails with
+  `Wrangler requires at least Node.js v22.0.0` and looks exactly like Node 22
+  not being installed. `next build` itself is fine on Node 20.
+
+  ```bash
+  export PATH="/c/Users/MEENA/AppData/Local/node22/node-v22.23.3-win-x64:$PATH"
+  ```
 - **`.env.local` overrides `.env.production`.** Next loads `.env.local` at
   higher priority, and the local one sets `NEXT_PUBLIC_META_PIXEL_ID` and
   `NEXT_PUBLIC_WEB3FORMS_KEY` to EMPTY — so `scripts/assert-build-env.js`
