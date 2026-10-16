@@ -25,11 +25,11 @@ import { ORGANIZATION_JSON_LD, pageMetadata, productJsonLd } from '@/lib/seo';
  */
 const TITLE = 'IRIZ Mini Projector for Home — 1080p, 500 ANSI Lumens | BluNeuron';
 
-// 147 characters. Under the ~155 Google renders, and carries the three terms
+// 145 characters. Under the ~155 Google renders, and carries the three terms
 // this page is meant to rank for: "mini projector for home", "1080p", "India".
 const DESCRIPTION =
   'The IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, and built-in '
-  + 'Google TV with 10,000+ apps. Designed and supported in India.';
+  + 'Android 14 with 10,000+ apps. Designed and supported in India.';
 
 export const metadata = pageMetadata({
   title: TITLE,

@@ -32,7 +32,7 @@ export const metadata = pageMetadata({
   // description search engines show for content that is not there.
   description: SHOW_PENDING_SPECS
     ? 'Full specifications for the BluNeuron IRIZ mini projector: native 1080p optics, 500 ANSI lumens, connectivity, dimensions, box contents and warranty.'
-    : 'Full specifications for the BluNeuron IRIZ mini projector: native 1080p optics and display, throw and screen size, Google TV platform and connectivity.',
+    : 'Full specifications for the BluNeuron IRIZ mini projector: native 1080p optics and display, throw and screen size, Android 14 platform and connectivity.',
   path: '/specs',
 });
 
@@ -97,11 +97,21 @@ export default function SpecsPage() {
           <div className="section-container bento-grid">
             <Reveal y={20} className="bento-tile p-6 sm:p-8 lg:col-span-7">
               <h2 className="mb-5 text-lg font-semibold text-white">In the Box</h2>
+              {/* BOX_CONTENTS carries rows ({ icon, title, note }), not plain
+                  strings — it is read off the printed carton now and the
+                  homepage section renders it with icon tiles. This list stays
+                  a plain bulleted one: it is a spec-sheet tile beside the
+                  warranty card, not the showcase. The sub-line is appended
+                  after an em dash rather than set on its own line, so a row
+                  here stays one row. See BOX_CONTENTS in lib/iriz.js. */}
               <ul className="space-y-2.5 text-sm text-white/70">
                 {BOX_CONTENTS.map((item) => (
-                  <li key={item} className="flex items-center gap-3">
+                  <li key={item.title} className="flex items-center gap-3">
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent-soft" aria-hidden="true" />
-                    {item}
+                    <span>
+                      {item.title}
+                      {item.note && <span className="text-white/45">{' — ' + item.note}</span>}
+                    </span>
                   </li>
                 ))}
               </ul>
