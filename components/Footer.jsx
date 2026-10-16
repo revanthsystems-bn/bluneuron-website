@@ -65,28 +65,51 @@ const ICONS = {
 // config object.
 const SOCIAL_ORDER = ['linkedin', 'instagram', 'youtube'];
 
-/**
- * The bottom row's links, in render order, before Privacy Policy.
+/*
+ * ===========================================================================
+ * THE BOTTOM ROW IS PRIVACY POLICY ONLY ON THIS BRANCH. Do not add Warranty,
+ * Warranty claim or Warranty registration to it here.
+ * ===========================================================================
  *
- * The warranty three are here and NOT in the masthead deliberately. They are
- * looked for, not browsed: someone reaches for them with a dead projector or
- * a carton in hand, and the footer is where a person looks for that kind of
- * link. Putting them in the nav would spend the masthead's attention budget
- * on an errand almost no visitor is on.
+ * Those three links are real, and they belong to the CLOUDFLARE branch's
+ * footer. That footer has no link columns at all — the live site is a
+ * single-product launch page, so its bottom row is the only place a warranty
+ * link can live, and a visitor with a dead projector or a carton in hand has
+ * nowhere else to look.
  *
- * The registration page is also reachable at /warranty, the short address
- * printed on the carton — see the redirect in next.config.js.
+ * This branch is the opposite case. FOOTER_COLUMNS (lib/routes.js) already
+ * carries all three, a few centimetres above this row:
  *
- * Not gated on SHOW_PRIVACY: that flag turns off the privacy SURFACES
- * together (components/ConsentNotice, the signup fine print, the link
- * below). A warranty policy is a product promise, not a privacy disclosure,
- * and must stay reachable whatever that flag says.
+ *   Support   -> Warranty registration, Warranty claim
+ *   Policies  -> Warranty
+ *
+ * so repeating them here renders each one twice in the same footer. That is
+ * exactly what the 2026-10-16 cloudflare -> launch-site merge did, and this
+ * comment exists because the merge will happen again.
+ *
+ * MERGING, IN BOTH DIRECTIONS:
+ *
+ *   cloudflare -> launch-site   The bottom-row links will conflict here
+ *                               again. Keep THIS version (`--ours` on
+ *                               launch-site). Do not take the cloudflare
+ *                               footer wholesale; it has no columns, so the
+ *                               warranty links would be the only copy there
+ *                               and the only copy here would be duplicated.
+ *
+ *   launch-site -> cloudflare   Take CLOUDFLARE's footer (`--ours` on
+ *                               cloudflare), not this one. Resolving that
+ *                               conflict in launch-site's favour would strip
+ *                               the warranty links off the live site
+ *                               entirely — this branch's columns, which are
+ *                               where they would have gone, do not exist
+ *                               there. /warranty is printed on the carton,
+ *                               so a live footer with no warranty link is
+ *                               not a cosmetic regression.
+ *
+ * In short: the two footers are deliberately different and neither is the
+ * merge winner in both directions. Resolve per branch, never by taking
+ * whichever side the tool offers first.
  */
-const BOTTOM_LINKS = [
-  { href: ROUTES.warranty, label: 'Warranty' },
-  { href: ROUTES.warrantyClaim, label: 'Warranty claim' },
-  { href: ROUTES.warrantyRegistration, label: 'Warranty registration' },
-];
 
 export default function Footer() {
   // An icon renders only when its URL is non-empty, so no icon can ever link
@@ -260,29 +283,17 @@ export default function Footer() {
           }`}
         >
           <p>© {new Date().getFullYear()} BluNeuron. All rights reserved.</p>
-          {/* `flex-wrap` plus `gap-x-4 gap-y-2`, not a single-line row: four
-              links plus Privacy Policy is wider than a 390px phone, so they
-              wrap onto a second line rather than pushing the page into a
-              horizontal scroll. */}
-          <nav className="flex flex-wrap items-center gap-x-4 gap-y-2" aria-label="Legal and warranty">
-            {BOTTOM_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="underline underline-offset-2 transition-colors hover:text-white"
-              >
-                {link.label}
-              </a>
-            ))}
-            {SHOW_PRIVACY && (
-              <a
-                href={ROUTES.privacy}
-                className="underline underline-offset-2 transition-colors hover:text-white"
-              >
-                Privacy Policy
-              </a>
-            )}
-          </nav>
+          {/* Privacy Policy and nothing else. The warranty links belong to
+              the cloudflare footer, not this one — see "THE BOTTOM ROW IS
+              PRIVACY POLICY ONLY ON THIS BRANCH" above. */}
+          {SHOW_PRIVACY && (
+            <a
+              href={ROUTES.privacy}
+              className="underline underline-offset-2 transition-colors hover:text-white"
+            >
+              Privacy Policy
+            </a>
+          )}
         </div>
       </div>
     </footer>
