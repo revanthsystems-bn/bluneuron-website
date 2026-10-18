@@ -173,9 +173,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...
 ```
 
 Both are **browser values** — they ship in the page source, and Row Level
-Security is what protects the data, not their secrecy. They are kept out of git
-anyway so that rotating the key is a dashboard action and a rebuild rather than
-a commit and a history rewrite.
+Security is what protects the data, not their secrecy. They are **committed to
+`.env.production`**, like every other `NEXT_PUBLIC_` value this project builds
+with: the build inlines them, so they have to exist when the build runs, and a
+committed file is the version of that which cannot be forgotten. Rotating the
+key is then a dashboard action and a commit — no history rewrite, because
+there is no secret in the history to erase.
 
 **Do not send me the `service_role` key.** Nothing in this application uses it,
 and it bypasses RLS entirely. If a future server-only job needs it, you add it
@@ -190,16 +193,14 @@ set -a; . ./.env.production; set +a
 npx opennextjs-cloudflare build
 ```
 
-For production you will want them permanent. Two options:
+For production they are permanent already: **they are in `.env.production`**,
+on the same branch and for the same reason as the Pixel ID and the Web3Forms
+key, so `set -a; . ./.env.production; set +a` is the whole of it and the
+`export` lines above are only for pointing a build at a different project.
 
-1. **Append them to `.env.production`** (committed on this branch, same as the
-   Pixel ID and Web3Forms key). Simplest, and the file already holds only
-   browser-visible values — but the key then lives in git history.
-2. **Set them in the Cloudflare Workers Builds environment** if you ever
-   connect the repo, or export them in whatever shell runs the deploy.
-
-I have left this to you deliberately. Option 1 is the one this project already
-uses for every other `NEXT_PUBLIC_` value.
+Setting them in the Cloudflare Workers Builds environment as well is harmless
+if the repo is ever connected, but it is not a substitute — a dashboard value
+can be forgotten; the committed file cannot.
 
 ---
 
