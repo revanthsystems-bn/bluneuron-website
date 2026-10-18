@@ -1,6 +1,6 @@
 import PageShell from '@/components/PageShell';
 import Reveal from '@/components/Reveal';
-import MarketplaceButtons from '@/components/MarketplaceButtons';
+import BuyButton from '@/components/buy/BuyButton';
 import AddToCart from '@/components/shop/AddToCart';
 import ProductGallery from '@/components/shop/ProductGallery';
 import StickyProductBar from '@/components/shop/StickyProductBar';
@@ -120,20 +120,31 @@ export default function ProductPage() {
         <div className="section-container">
           {/* A breadcrumb, not a back button: it states where this page sits
               rather than assuming where the visitor came from. */}
-          <nav aria-label="Breadcrumb" className="mb-5 text-xs text-white/40 sm:mb-8">
-            <a href={ROUTES.shop} className="transition-colors hover:text-white/70">
+          <nav aria-label="Breadcrumb" className="mb-5 text-step-1 text-ink-3 sm:mb-8">
+            <a href={ROUTES.shop} className="transition-colors hover:text-ink-2">
               Shop
             </a>
             <span className="px-2" aria-hidden="true">
               /
             </span>
-            <span className="text-white/60">{BRAND.model}</span>
+            <span className="text-ink-3">{BRAND.model}</span>
           </nav>
 
           {/* `gap-6` below lg, not `gap-10`: on a phone this gap sits
               between the gallery and the price, and every pixel of it pushes
               the buy decision further down the first screen. */}
-          <div className="grid gap-6 lg:grid-cols-2 lg:gap-14">
+          {/* `min-w-0` on the grid, applied to its children.
+
+              A grid item defaults to `min-width: auto`, which refuses to
+              shrink below its MIN-CONTENT. The gallery contains a
+              horizontally scrolling thumbnail row whose min-content is the
+              full un-scrolled strip, so the single mobile column was being
+              blown out to 396px inside a 350px grid — and the page scrolled
+              sideways by 46px with the body copy clipped mid-sentence.
+              `minmax(0, 1fr)` via min-w-0 is the standard fix and the one
+              thing that makes `overflow-x: auto` actually mean "scroll"
+              rather than "grow". */}
+          <div className="grid gap-6 [&>*]:min-w-0 lg:grid-cols-2 lg:gap-14">
             <Reveal>
               <ProductGallery shots={GALLERY} />
             </Reveal>
@@ -144,45 +155,50 @@ export default function ProductPage() {
                 grid row. */}
             <Reveal id="buy-panel" delay={0.06} className="lg:sticky lg:top-28 lg:self-start">
               <p className="eyebrow mb-3">{HERO.eyebrow}</p>
-              <h1 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+              <h1 className="h2">
                 {BRAND.fullName}
               </h1>
-              <p className="mt-3 text-sm leading-relaxed text-white/60 sm:text-base">{HERO.body}</p>
+              <p className="mt-3 text-step-2 leading-relaxed text-ink-3 sm:text-step-3">{HERO.body}</p>
 
               <div className="mt-7 border-t border-border-subtle pt-7">
-                <p className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                <p className="h2">
                   {formatInr(MARKETPLACE.priceInr)}
                 </p>
-                <p className="mt-1.5 text-xs text-white/50">{MARKETPLACE.priceNote}</p>
+                <p className="mt-1.5 text-step-1 text-ink-3">{MARKETPLACE.priceNote}</p>
               </div>
 
+              {/* ONE BUY, not two.
+                  This block used to offer "Add to cart" AND, underneath it,
+                  a second heading reading "Or buy direct from a
+                  marketplace" with both store buttons listed out — three
+                  ways to do one thing, stacked, with the real one last.
+                  The basket is switched off (CART_ENABLED) and the sheet
+                  asks the marketplace question properly, with the price
+                  and the fulfilment note in it. AddToCart is still
+                  rendered: it returns null while the flag is false, and
+                  comes back in place if it is ever turned on. */}
               <AddToCart className="mt-7" idPrefix="pdp" />
 
-              <div className="mt-8 border-t border-border-subtle pt-7">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
-                  Or buy direct from a marketplace
-                </p>
-                <MarketplaceButtons
-                  className="flex flex-col gap-3"
-                  buttonClassName="w-full justify-center"
-                  note="Payment, invoicing and delivery are handled by the marketplace. We provide the manufacturer warranty and support."
-                />
-              </div>
+              <BuyButton className="btn-primary mt-7 w-full" />
+
+              <p className="mt-3 text-step-1 leading-relaxed text-ink-3">
+                {MARKETPLACE.fulfilmentNote}
+              </p>
 
               {/* THE WARRANTY BADGE. A real, sourced fact with a link to the
                   policy behind it — a badge that cannot be checked is
                   decoration. */}
-              <div className="mt-8 flex items-start gap-3 rounded-2xl border border-border-subtle bg-white/[0.03] p-5">
+              <div className="mt-8 flex items-start gap-3 rounded-ctl border border-border-subtle bg-white/[0.03] p-5">
                 <ShieldGlyph />
                 <div>
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-step-2 font-semibold text-white">
                     {WARRANTY.label} manufacturer warranty
                   </p>
-                  <p className="mt-1 text-xs leading-relaxed text-white/50">
+                  <p className="mt-1 text-step-1 leading-relaxed text-ink-3">
                     Carry-in service through an authorised centre, on every genuine unit.{' '}
                     <a
                       href={ROUTES.warranty}
-                      className="underline underline-offset-2 transition-colors hover:text-white/80"
+                      className="underline underline-offset-2 transition-colors hover:text-ink-2"
                     >
                       Warranty policy
                     </a>
@@ -199,11 +215,11 @@ export default function ProductPage() {
           in public/ (see the note on GALLERY). Rendering the copy alone is
           both honest and, on a page that already opens with a six-shot
           gallery, less repetitive than a second grid of pictures. */}
-      <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black-soft section-y">
         <div className="section-container">
           <Reveal className="mb-10">
             <p className="eyebrow mb-3">Highlights</p>
-            <h2 className="text-2xl font-bold tracking-tighter text-white sm:text-3xl">
+            <h2 className="h2">
               What you get for the money.
             </h2>
           </Reveal>
@@ -211,8 +227,8 @@ export default function ProductPage() {
           <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
             {HIGHLIGHTS.map((item, i) => (
               <Reveal key={item.title} delay={Math.min(i, 3) * 0.05} y={20}>
-                <h3 className="text-base font-semibold tracking-tight text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/55">{item.subtitle}</p>
+                <h3 className="text-step-3 font-semibold tracking-tight text-white">{item.title}</h3>
+                <p className="mt-2 text-step-2 leading-relaxed text-ink-3">{item.subtitle}</p>
               </Reveal>
             ))}
           </div>
@@ -222,12 +238,12 @@ export default function ProductPage() {
       {/* SPECS — the six headline figures, with the full sheet one click
           away. The whole FULL_SPEC_SHEET here would be a 30-row table on a
           page whose job is a decision, not a reference. */}
-      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black section-y">
         <div className="section-container">
           <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="eyebrow mb-3">Specifications</p>
-              <h2 className="text-2xl font-bold tracking-tighter text-white sm:text-3xl">
+              <h2 className="h2">
                 The numbers that matter.
               </h2>
             </div>
@@ -236,22 +252,22 @@ export default function ProductPage() {
             </a>
           </Reveal>
 
-          <dl className="grid gap-px overflow-hidden rounded-2xl border border-border-subtle bg-border-subtle sm:grid-cols-2 lg:grid-cols-3">
+          <dl className="grid gap-px overflow-hidden rounded-ctl border border-border-subtle bg-border-subtle sm:grid-cols-2 lg:grid-cols-3">
             {SPECS.map((spec) => (
               <div key={spec.label} className="bg-black p-6">
-                <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                <dt className="text-step-0 font-semibold uppercase tracking-[0.16em] text-ink-3">
                   {spec.label}
                 </dt>
-                <dd className="mt-2 text-2xl font-bold tracking-tight text-white">{spec.value}</dd>
-                <dd className="mt-1 text-xs text-white/45">{spec.unit}</dd>
+                <dd className="h3 mt-2">{spec.value}</dd>
+                <dd className="mt-1 text-step-1 text-ink-3">{spec.unit}</dd>
               </div>
             ))}
           </dl>
 
           {SHOW_PENDING_SPECS && (
             <Reveal className="mt-10">
-              <h3 className="text-base font-semibold tracking-tight text-white">In the box</h3>
-              <ul className="mt-3 grid gap-2 text-sm text-white/60 sm:grid-cols-2">
+              <h3 className="text-step-3 font-semibold tracking-tight text-white">In the box</h3>
+              <ul className="mt-3 grid gap-2 text-step-2 text-ink-3 sm:grid-cols-2">
                 {/* BOX_CONTENTS carries rows ({ icon, title, note }) now — it is
                     read off the printed carton. The sub-line follows the title
                     after an em dash so each item stays one grid cell. See
@@ -259,7 +275,7 @@ export default function ProductPage() {
                 {BOX_CONTENTS.map((item) => (
                   <li key={item.title}>
                     {item.title}
-                    {item.note && <span className="text-white/40">{' — ' + item.note}</span>}
+                    {item.note && <span className="text-ink-3">{' — ' + item.note}</span>}
                   </li>
                 ))}
               </ul>
@@ -275,11 +291,11 @@ export default function ProductPage() {
           and make this page compete with the pages it should be feeding
           from. A buying page's job is the decision and the price; the depth
           is one link away, and the links are the point. */}
-      <section className="bg-black-soft py-16 sm:py-20">
+      <section className="bg-black-soft section-y">
         <div className="section-container">
           <Reveal className="mb-8">
             <p className="eyebrow mb-3">Before you decide</p>
-            <h2 className="text-2xl font-bold tracking-tighter text-white sm:text-3xl">
+            <h2 className="h2">
               Everything else about the {BRAND.model}.
             </h2>
           </Reveal>
@@ -290,11 +306,11 @@ export default function ProductPage() {
                 <Reveal delay={Math.min(i, 3) * 0.05} y={20}>
                   <a
                     href={item.href}
-                    className="group flex h-full flex-col rounded-2xl border border-border-subtle bg-black p-6 transition-colors hover:border-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                    className="group flex h-full flex-col rounded-ctl border border-border-subtle bg-black p-6 transition-colors hover:border-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                   >
-                    <h3 className="text-base font-semibold text-white">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-white/55">{item.body}</p>
-                    <span className="mt-4 text-xs font-semibold text-accent-soft">
+                    <h3 className="text-step-3 font-semibold text-white">{item.title}</h3>
+                    <p className="mt-2 text-step-2 leading-relaxed text-ink-3">{item.body}</p>
+                    <span className="mt-4 text-step-1 font-semibold text-accent-soft">
                       {item.cta} →
                     </span>
                   </a>

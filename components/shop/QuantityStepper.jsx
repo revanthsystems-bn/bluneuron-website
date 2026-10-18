@@ -26,7 +26,7 @@ export default function QuantityStepper({ value, onChange, min = 1, max = 10, id
 
   return (
     <div className="flex items-center gap-3">
-      <label htmlFor={id} className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+      <label htmlFor={id} className="text-step-1 font-semibold uppercase tracking-[0.18em] text-ink-3">
         Qty
       </label>
 
@@ -36,7 +36,7 @@ export default function QuantityStepper({ value, onChange, min = 1, max = 10, id
           onClick={() => onChange(clamp(value - 1))}
           disabled={value <= min}
           aria-label="Decrease quantity"
-          className="flex h-11 w-11 items-center justify-center rounded-full text-white/70 transition-colors hover:text-white disabled:cursor-not-allowed disabled:text-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+          className="flex h-11 w-11 items-center justify-center rounded-full text-ink-2 transition-colors hover:text-white disabled:cursor-not-allowed disabled:text-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
         >
           <Minus size={16} aria-hidden="true" />
         </button>
@@ -52,7 +52,7 @@ export default function QuantityStepper({ value, onChange, min = 1, max = 10, id
             if (Number.isFinite(next) && next > 0) onChange(clamp(next));
           }}
           aria-label="Quantity"
-          className="w-10 border-0 bg-transparent text-center text-sm font-semibold text-white outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+          className="w-10 border-0 bg-transparent text-center text-step-2 font-semibold text-white outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
         />
 
         <button
@@ -60,7 +60,7 @@ export default function QuantityStepper({ value, onChange, min = 1, max = 10, id
           onClick={() => onChange(clamp(value + 1))}
           disabled={value >= max}
           aria-label="Increase quantity"
-          className="flex h-11 w-11 items-center justify-center rounded-full text-white/70 transition-colors hover:text-white disabled:cursor-not-allowed disabled:text-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+          className="flex h-11 w-11 items-center justify-center rounded-full text-ink-2 transition-colors hover:text-white disabled:cursor-not-allowed disabled:text-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
         >
           <Plus size={16} aria-hidden="true" />
         </button>

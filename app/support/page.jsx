@@ -48,7 +48,7 @@ export default function SupportPage() {
         subtitle={`Everything for your ${BRAND.model} in one place — warranty, answers, documents, and a direct line to our team.`}
       />
 
-      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black section-y">
         <div className="section-container">
           <SupportTiles />
         </div>
@@ -58,14 +58,14 @@ export default function SupportPage() {
           problem is not on any tile should not have to work out which tile is
           closest — "none of these" needs its own exit, and it is the last
           thing on the page where they will be looking for it. */}
-      <section className="bg-black-soft py-16 sm:py-20">
+      <section className="bg-black-soft section-y">
         <div className="section-container">
           <Reveal className="glass-panel flex flex-col gap-6 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-lg">
-              <h2 className="text-2xl font-bold tracking-tighter text-white">
+            <div className="max-w-prose">
+              <h2 className="h3">
                 Not sure where to start?
               </h2>
-              <p className="mt-2.5 text-sm leading-relaxed text-white/55">
+              <p className="mt-2.5 text-step-2 leading-relaxed text-ink-3">
                 Tell us what is happening and we will point you at the right thing — no bots, no
                 ticket queue purgatory.
               </p>

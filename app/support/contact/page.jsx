@@ -104,9 +104,9 @@ export default function ContactPage() {
         subtitle="Order, delivery and refund questions go to Amazon or Flipkart. Everything about the product itself comes to us."
       />
 
-      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black section-y">
         <div className="section-container">
-          <DraftBanner path={ROUTES.contact} className="mb-10 max-w-[680px]" />
+          <DraftBanner path={ROUTES.contact} className="mb-10 max-w-prose-wide" />
 
           <div className="bento-grid">
             {VISIBLE_CHANNELS.map((channel, i) => {
@@ -119,17 +119,17 @@ export default function ContactPage() {
                   y={20}
                   className={`bento-tile p-6 ${TILE_SPAN}`}
                 >
-                  <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft">
+                  <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-ctl border border-white/10 bg-white/[0.06] text-accent-soft">
                     <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                   </span>
 
-                  <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+                  <h2 className="text-step-1 font-semibold uppercase tracking-[0.18em] text-ink-3">
                     {channel.label}
                   </h2>
 
                   {/* `break-words`: an email address is one unbroken token and
                       will push a 390px tile into horizontal scroll without it. */}
-                  <p className="mt-2 break-words text-base font-semibold text-white">
+                  <p className="mt-2 break-words text-step-3 font-semibold text-white">
                     {channel.href ? (
                       <a
                         href={channel.href}
@@ -142,7 +142,7 @@ export default function ContactPage() {
                     )}
                   </p>
 
-                  <p className="mt-auto pt-4 text-sm leading-relaxed text-white/50">
+                  <p className="mt-auto pt-4 text-step-2 leading-relaxed text-ink-3">
                     {channel.note}
                   </p>
                 </Reveal>
@@ -152,14 +152,14 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black-soft section-y">
         <div className="section-container grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
           <Reveal className="max-w-md">
             <p className="eyebrow mb-3">Send a message</p>
-            <h2 className="mb-4 text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+            <h2 className="h2 mb-4">
               Write to our team
             </h2>
-            <p className="text-sm leading-relaxed text-white/55">
+            <p className="text-step-2 leading-relaxed text-ink-3">
               Tell us what is happening and we will get back to you. If it is a hardware fault on a
               unit you own, the{' '}
               <a
@@ -191,24 +191,24 @@ export default function ContactPage() {
           unfinished. Fill in GRIEVANCE_OFFICER (lib/site-config.js) and the
           panel and the /legal/grievance link return together. */}
       {HAS_GRIEVANCE_OFFICER && (
-      <section className="bg-black py-16 sm:py-20">
+      <section className="bg-black section-y">
         <div className="section-container">
-          <Reveal className="glass-panel max-w-[680px] p-8 sm:p-10">
+          <Reveal className="glass-panel max-w-prose-wide p-8 sm:p-10">
             <p className="eyebrow mb-3">Escalation</p>
-            <h2 className="text-2xl font-bold tracking-tighter text-white">Grievance officer</h2>
-            <p className="mt-3 text-sm leading-relaxed text-white/60">
+            <h2 className="h3">Grievance officer</h2>
+            <p className="mt-3 text-step-2 leading-relaxed text-ink-3">
               If a complaint has not been resolved through the channels above, it can be escalated
               to our grievance officer, who is responsible for consumer complaints under India&apos;s
               Consumer Protection (E-Commerce) Rules.
             </p>
 
-            <dl className="mt-6 space-y-3 text-sm">
+            <dl className="mt-6 space-y-3 text-step-2">
               <div className="flex flex-wrap gap-x-3 gap-y-1">
-                <dt className="text-white/45">Name</dt>
+                <dt className="text-ink-3">Name</dt>
                 <dd className="font-medium text-white">{GRIEVANCE_OFFICER.name}</dd>
               </div>
               <div className="flex flex-wrap gap-x-3 gap-y-1">
-                <dt className="text-white/45">Email</dt>
+                <dt className="text-ink-3">Email</dt>
                 <dd className="break-words font-medium text-white">
                   {isTBD(GRIEVANCE_OFFICER.email) ? (
                     GRIEVANCE_OFFICER.email

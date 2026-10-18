@@ -35,21 +35,21 @@ export default function WarrantyRegistrationPage() {
         subtitle={`Optional, and takes a minute. Your ${BRAND.model} is covered from the date on your invoice either way — registering just means a claim does not start with paperwork.`}
       />
 
-      <section className="bg-black py-16 sm:py-20">
+      <section className="bg-black section-y">
         <div className="section-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <Reveal className="max-w-md lg:sticky lg:top-28">
             <DraftBanner path={ROUTES.warrantyRegistration} className="mb-8" />
 
-            <h2 className="text-2xl font-bold tracking-tighter text-white">
+            <h2 className="h3">
               What you&apos;ll need
             </h2>
-            <ul className="mt-5 space-y-3 text-sm leading-relaxed text-white/60">
+            <ul className="mt-5 space-y-3 text-step-2 leading-relaxed text-ink-3">
               <li className="flex gap-2.5">
                 <span
                   className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
                   aria-hidden="true"
                 />
-                Your <strong className="font-semibold text-white/85">order ID</strong> from your
+                Your <strong className="font-semibold text-ink-2">order ID</strong> from your
                 invoice or purchase confirmation.
               </li>
               <li className="flex gap-2.5">
@@ -57,7 +57,7 @@ export default function WarrantyRegistrationPage() {
                   className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
                   aria-hidden="true"
                 />
-                The <strong className="font-semibold text-white/85">serial number</strong> on the
+                The <strong className="font-semibold text-ink-2">serial number</strong> on the
                 label underneath the projector.
               </li>
               <li className="flex gap-2.5">
@@ -65,13 +65,13 @@ export default function WarrantyRegistrationPage() {
                   className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
                   aria-hidden="true"
                 />
-                The <strong className="font-semibold text-white/85">purchase date</strong> — the
+                The <strong className="font-semibold text-ink-2">purchase date</strong> — the
                 invoice date, not the delivery date.
               </li>
             </ul>
 
-            <p className="mt-6 text-sm leading-relaxed text-white/50">
-              Cover runs for <span className="font-semibold text-white/80">{WARRANTY.months}</span>{' '}
+            <p className="mt-6 text-step-2 leading-relaxed text-ink-3">
+              Cover runs for <span className="font-semibold text-ink-2">{WARRANTY.months}</span>{' '}
               months from the purchase date.{' '}
               <a
                 href={ROUTES.warranty}
@@ -82,7 +82,7 @@ export default function WarrantyRegistrationPage() {
               .
             </p>
 
-            <p className="mt-4 text-sm leading-relaxed text-white/50">
+            <p className="mt-4 text-step-2 leading-relaxed text-ink-3">
               Keep your invoice regardless — it is the proof of purchase date any claim is assessed
               against, and we cannot reconstruct it from a registration alone.
             </p>

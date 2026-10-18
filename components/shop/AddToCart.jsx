@@ -5,6 +5,7 @@ import { Check } from 'lucide-react';
 import QuantityStepper from './QuantityStepper';
 import { useCart } from '@/components/cart/CartContext';
 import { trackAddToCart } from '@/lib/shop-analytics';
+import { CART_ENABLED } from '@/lib/site-config';
 
 /**
  * Quantity + "Add to cart", as one unit.
@@ -26,7 +27,21 @@ import { trackAddToCart } from '@/lib/shop-analytics';
  * see the basket), while adding from the shop CARD should not pull a panel
  * over the page they are still scanning.
  */
-export default function AddToCart({
+/**
+ * The gate. A separate component with NO HOOKS of its own, so the early
+ * return cannot change hook order — which is what a bare `if` at the top
+ * of the component below would do, and what rules-of-hooks forbids even
+ * when the condition is a module constant.
+ *
+ * See CART_ENABLED in lib/site-config: the basket is switched off while
+ * buying happens on Amazon and Flipkart.
+ */
+export default function AddToCart(props) {
+  if (!CART_ENABLED) return null;
+  return <AddToCartControl {...props} />;
+}
+
+function AddToCartControl({
   openDrawer = true,
   className = '',
   buttonClassName = 'btn-primary w-full justify-center',

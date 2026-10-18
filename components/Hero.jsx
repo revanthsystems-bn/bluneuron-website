@@ -48,7 +48,7 @@
 //   // 60%-alpha label to AA. At full white the same spot measures 5.65:1.
 //   const eyebrowClass = light ? 'text-black-obsidian/75' : 'text-white';
 //   const displayClass = light ? 'text-black-obsidian' : 'text-white';
-//   const taglineClass = light ? 'text-black-obsidian/90' : 'text-white/85';
+//   const taglineClass = light ? 'text-black-obsidian/90' : 'text-ink-2';
 //   // On the dark path the cue sits mid-frame on footage nothing darkens any
 //   // more, so it is full white and carries its own shadow (`.hero-cue` /
 //   // `.scroll-cue`, app/globals.css) rather than leaning on a scrim. It was
@@ -175,7 +175,7 @@
 //             </h1>
 //           </Reveal>
 //           <Reveal amount={0.2} delay={0.16}>
-//             <p className={`type-lede relative mt-5 max-w-xl ${taglineClass}`}>{HERO.tagline}</p>
+//             <p className={`type-lede relative mt-5 max-w-prose ${taglineClass}`}>{HERO.tagline}</p>
 //           </Reveal>
 //         </div>
 //       </div>
@@ -217,13 +217,15 @@
 import HeroBackdrop from './HeroBackdrop';
 import Reveal from './Reveal';
 import { HERO } from '@/lib/iriz';
+import BuyButton from '@/components/buy/BuyButton';
+import { SHOW_BUY } from '@/lib/site-config';
 
 export default function Hero({ theme = 'dark' }) {
   const light = theme === 'light';
 
   const eyebrowClass = light ? 'text-black-obsidian/75' : 'text-white';
   const displayClass = light ? 'text-black-obsidian' : 'text-white';
-  const taglineClass = light ? 'text-black-obsidian/90' : 'text-white/85';
+  const taglineClass = light ? 'text-black-obsidian/90' : 'text-ink-2';
   const cueClass = light
     ? 'text-black-obsidian/75 group-hover:text-black-obsidian'
     : 'text-white hero-cue';
@@ -272,9 +274,13 @@ export default function Hero({ theme = 'dark' }) {
             // decayed to ~0.08 alpha under its last third — which measured
             // 4.36:1 against the brightest frame of the loop and missed AA. At
             // -25vw the same text measures 5.58:1. Phones only (sm: restores
-            // -6vw): desktop never had the problem, and a wider wash there
-            // would do nothing but dim the footage.
-            <span aria-hidden className="hero-text-plate pointer-events-none absolute -inset-y-20 -left-[50vw] -right-[25vw] sm:-right-[6vw]" />
+            // -6vw). Desktop was ALSO failing, which the original note
+            // got wrong: measured on the live build the eyebrow at 1440
+            // came out at 1.29:1, so the right falloff is -14vw there now
+            // and the plate's own alpha and mask were widened too (see
+            // `.hero-text-plate`). Re-check with
+            // scripts/ui/hero-contrast.mjs after touching any of it.
+            <span aria-hidden className="hero-text-plate pointer-events-none absolute -inset-y-28 -left-[50vw] -right-[25vw] sm:-right-[14vw]" />
           )}
 
           <Reveal amount={0.2}>
@@ -317,8 +323,26 @@ export default function Hero({ theme = 'dark' }) {
           </Reveal>
 
           <Reveal amount={0.2} delay={0.16}>
-            <p className={`type-lede relative mt-5 max-w-xl ${taglineClass}`}>{HERO.tagline}</p>
+            <p className={`type-lede relative mt-5 max-w-prose ${taglineClass}`}>{HERO.tagline}</p>
           </Reveal>
+
+          {/* THE HERO'S OWN BUY. The hero used to offer only a scroll cue,
+              which meant the first screen of the site — the one with the
+              product on it — had no way to act on it, and the nearest Buy
+              was in the masthead above the fold's own eyeline.
+
+              `btn-primary-ink` over the LIGHT hero: the white pill that
+              works on black is invisible on the white studio backdrop.
+              Same geometry and motion either way, only the two colours
+              swap, which is what lets the handover read as a colour
+              change rather than a different button (lib/heroTheme.js). */}
+          {SHOW_BUY && (
+            <Reveal amount={0.2} delay={0.24}>
+              <div className="relative mt-8">
+                <BuyButton className={light ? 'btn-primary-ink' : 'btn-primary'} />
+              </div>
+            </Reveal>
+          )}
         </div>
       </div>
 

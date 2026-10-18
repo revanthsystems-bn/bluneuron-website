@@ -55,15 +55,15 @@ export default function WhereToBuyPage() {
         subtitle="We do not sell direct. Both listings are the official BluNeuron store, and both ship the same unit with the same warranty."
       />
 
-      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black section-y">
         <div className="section-container">
-          <DraftBanner path={ROUTES.whereToBuy} className="mb-10 max-w-[680px]" />
+          <DraftBanner path={ROUTES.whereToBuy} className="mb-10 max-w-prose-wide" />
 
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             {/* Square frame, no padding — see the comment in
                 components/BuySection for why the mask needs the element box to
                 match the 1600×1600 source. */}
-            <Reveal className="product-glow relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl">
+            <Reveal className="product-glow relative mx-auto aspect-square w-full max-w-prose overflow-hidden rounded-card">
               <Image
                 src={MEDIA.product.heroClean}
                 alt={`${BRAND.fullName} projector`}
@@ -73,17 +73,17 @@ export default function WhereToBuyPage() {
               />
             </Reveal>
 
-            <Reveal delay={0.08} className="max-w-xl">
-              <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+            <Reveal delay={0.08} className="max-w-prose">
+              <h2 className="h2">
                 {BRAND.fullName}
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-white/60 sm:text-base">{HERO.body}</p>
+              <p className="mt-3 text-step-2 leading-relaxed text-ink-3 sm:text-step-3">{HERO.body}</p>
 
               <div className="mt-7">
-                <p className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                <p className="h2">
                   {formatInr(MARKETPLACE.priceInr)}
                 </p>
-                <p className="mt-1.5 text-xs text-white/50">{MARKETPLACE.priceNote}</p>
+                <p className="mt-1.5 text-step-1 text-ink-3">{MARKETPLACE.priceNote}</p>
               </div>
 
               <div className="mt-8">
@@ -94,7 +94,7 @@ export default function WhereToBuyPage() {
                   here because this is the page someone lands on from a search
                   for the price, and a stale number is exactly what they would
                   otherwise take away. */}
-              <p className="mt-6 text-xs leading-relaxed text-white/40">
+              <p className="mt-6 text-step-1 leading-relaxed text-ink-3">
                 Amazon and Flipkart set their own prices and run their own offers, so the listing
                 price can differ from the one above. The price on the listing is the price that
                 applies to your order.
@@ -104,11 +104,11 @@ export default function WhereToBuyPage() {
         </div>
       </section>
 
-      <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black-soft section-y">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <Reveal className="mb-10 max-w-prose">
             <p className="eyebrow mb-3">After you order</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+            <h2 className="h2">
               Who handles what
             </h2>
           </Reveal>
@@ -121,8 +121,8 @@ export default function WhereToBuyPage() {
                 y={20}
                 className="bento-tile p-6 sm:p-8 lg:col-span-6"
               >
-                <h3 className="mb-4 text-base font-semibold text-white">{group.title}</h3>
-                <ul className="space-y-2.5 text-sm leading-relaxed text-white/60">
+                <h3 className="mb-4 text-step-3 font-semibold text-white">{group.title}</h3>
+                <ul className="space-y-2.5 text-step-2 leading-relaxed text-ink-3">
                   {group.items.map((item) => (
                     <li key={item} className="flex gap-2.5">
                       <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft" aria-hidden="true" />
@@ -151,10 +151,10 @@ export default function WhereToBuyPage() {
           the closing block says where things stand instead, and disappears the
           moment SHOW_BUY goes true. See lib/site-config.js. */}
       {!SHOW_BUY && (
-        <section className="bg-black py-16 text-center sm:py-20">
+        <section className="bg-black section-y text-center">
           <div className="section-container">
             <Reveal>
-              <p className="mx-auto max-w-md text-sm leading-relaxed text-white/50">
+              <p className="mx-auto max-w-md text-step-2 leading-relaxed text-ink-3">
                 The {BRAND.model} is not listed yet. Join the launch list on the homepage and we
                 will send one message the day it goes on sale.
               </p>

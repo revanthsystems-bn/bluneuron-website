@@ -63,13 +63,13 @@ export default function CartPanel() {
 
   if (qty === 0) {
     return (
-      <div className="flex flex-col items-center gap-6 rounded-3xl border border-border-subtle bg-black-soft px-6 py-16 text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full border border-border-subtle text-white/35">
+      <div className="flex flex-col items-center gap-6 rounded-card border border-border-subtle bg-black-soft px-6 section-y text-center">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full border border-border-subtle text-ink-3">
           <ShoppingBag size={26} aria-hidden="true" />
         </span>
         <div>
-          <h2 className="text-lg font-semibold text-white">Your cart is empty</h2>
-          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/50">
+          <h2 className="text-step-4 font-semibold text-white">Your cart is empty</h2>
+          <p className="mx-auto mt-2 max-w-sm text-step-2 leading-relaxed text-ink-3">
             The {BRAND.model} is the only thing we make. Pick a quantity on the product page and
             it will show up here.
           </p>
@@ -89,13 +89,13 @@ export default function CartPanel() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-12 lg:items-start">
       {/* ITEMS */}
-      <div className="rounded-3xl border border-border-subtle bg-black-soft p-6 sm:p-8">
+      <div className="rounded-card border border-border-subtle bg-black-soft p-6 sm:p-8">
         <h2 className="sr-only">Items in your cart</h2>
 
         <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
           <a
             href={ROUTES.product}
-            className="relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl border border-border-subtle bg-black sm:h-32 sm:w-32"
+            className="relative aspect-square w-full shrink-0 overflow-hidden rounded-ctl border border-border-subtle bg-black sm:h-32 sm:w-32"
           >
             <Image
               src={PRODUCT.image}
@@ -109,14 +109,14 @@ export default function CartPanel() {
           <div className="min-w-0 flex-1">
             <a
               href={ROUTES.product}
-              className="text-base font-semibold text-white transition-colors hover:text-white/80"
+              className="text-step-3 font-semibold text-white transition-colors hover:text-ink-2"
             >
               {BRAND.fullName}
             </a>
-            <p className="mt-1 text-sm text-white/50">
+            <p className="mt-1 text-step-2 text-ink-3">
               {unitPrice === null ? '—' : formatInr(unitPrice)} each · {MARKETPLACE.priceNote}
             </p>
-            <p className="mt-1 text-xs text-white/40">
+            <p className="mt-1 text-step-1 text-ink-3">
               {WARRANTY.label} manufacturer warranty included
             </p>
 
@@ -126,7 +126,7 @@ export default function CartPanel() {
               <button
                 type="button"
                 onClick={removeItem}
-                className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs text-white/45 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-step-1 text-ink-3 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
               >
                 <Trash2 size={14} aria-hidden="true" />
                 Remove
@@ -137,7 +137,7 @@ export default function CartPanel() {
           {/* The line total, right-aligned on desktop where there is room for
               a third column, and inline under the controls on a phone. */}
           <div className="sm:text-right">
-            <p className="text-lg font-bold text-white">
+            <p className="text-step-4 font-bold text-white">
               {subtotal === null ? '—' : formatInr(subtotal)}
             </p>
           </div>
@@ -145,50 +145,49 @@ export default function CartPanel() {
       </div>
 
       {/* SUMMARY + CHECKOUT */}
-      <div className="rounded-3xl border border-border-subtle bg-black-soft p-6 sm:p-8 lg:sticky lg:top-28">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
+      <div className="rounded-card border border-border-subtle bg-black-soft p-6 sm:p-8 lg:sticky lg:top-28">
+        <h2 className="text-step-2 font-semibold uppercase tracking-[0.18em] text-ink-2">
           Order summary
         </h2>
 
-        <dl className="mt-6 space-y-3 border-b border-border-subtle pb-6 text-sm">
+        <dl className="mt-6 space-y-3 border-b border-border-subtle pb-6 text-step-2">
           <div className="flex items-baseline justify-between">
-            <dt className="text-white/55">Subtotal</dt>
+            <dt className="text-ink-3">Subtotal</dt>
             <dd className="font-semibold text-white">
               {subtotal === null ? '—' : formatInr(subtotal)}
             </dd>
           </div>
           <div className="flex items-baseline justify-between">
-            <dt className="text-white/55">Delivery</dt>
+            <dt className="text-ink-3">Delivery</dt>
             {/* NOT "Free". Amazon and Flipkart set delivery per order, per
                 pincode and per membership, and we are not told which applies
                 to you. "Shown at checkout" is the only true answer. */}
-            <dd className="text-white/45">Shown at checkout</dd>
+            <dd className="text-ink-3">Shown at checkout</dd>
           </div>
         </dl>
 
-        <p className="mt-5 text-xs leading-relaxed text-white/40">
+        <p className="mt-5 text-step-1 leading-relaxed text-ink-3">
           {MARKETPLACE.priceNote}. The marketplace price at the time you order is the one that
           applies.
         </p>
 
         <div className="mt-7">
+          {/* `verb`, `isCheckout`, `quantity` and `unitPrice` are gone from
+              MarketplaceButtons along with the `begin_checkout` event and
+              Amazon's cart endpoint — see the note on that component. This
+              panel only renders while CART_ENABLED is true, and the flag is
+              false, so nothing here is reachable today; it is left wired so
+              the basket still works the day it comes back. */}
           <MarketplaceButtons
-            verb="Checkout"
             className="flex flex-col gap-3"
             buttonClassName="w-full justify-center"
-            // The basket is the only surface that reports `begin_checkout`,
-            // and the only one that hands a quantity to Amazon's cart
-            // endpoint. See lib/shop-analytics.js and amazonCartUrl().
-            isCheckout
-            quantity={qty}
-            unitPrice={unitPrice}
             note="Payment and delivery are handled securely by the marketplace. Your card details never touch this site — we are not given them."
           />
         </div>
 
         <a
           href={ROUTES.shop}
-          className="mt-6 block text-center text-xs text-white/45 transition-colors hover:text-white/70"
+          className="mt-6 block text-center text-step-1 text-ink-3 transition-colors hover:text-ink-2"
         >
           Continue shopping
         </a>

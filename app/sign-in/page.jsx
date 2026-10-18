@@ -3,6 +3,8 @@ import PageHeading from '@/components/PageHeading';
 import SignInForm from '@/components/account/SignInForm';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
+import AccountsDisabled from '@/components/account/AccountsDisabled';
+import { ACCOUNTS_ENABLED } from '@/lib/site-config';
 
 export const metadata = {
   ...pageMetadata({
@@ -22,6 +24,24 @@ export const metadata = {
  * marketplace), so the only honest pitch is warranty and support.
  */
 export default function SignInPage() {
+  /*
+   * ACCOUNTS ARE OFF (ACCOUNTS_ENABLED, lib/site-config). This renders the
+   * same page the /account area does rather than redirecting to it — a
+   * redirect would send someone who clicked "Sign in" to a URL they did
+   * not ask for, and the page they need to read is identical either way.
+   */
+  if (!ACCOUNTS_ENABLED) {
+    return (
+      <PageShell>
+        <section className="bg-black section-y">
+          <div className="section-container">
+            <AccountsDisabled />
+          </div>
+        </section>
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell>
       <PageHeading
@@ -30,7 +50,7 @@ export default function SignInPage() {
         subtitle="An account is for after the purchase — register a unit's warranty, keep your serial numbers in one place, and raise a claim without typing it all out again."
       />
 
-      <section className="bg-black py-14 sm:py-20">
+      <section className="bg-black section-y">
         <div className="section-container">
           <SignInForm />
         </div>

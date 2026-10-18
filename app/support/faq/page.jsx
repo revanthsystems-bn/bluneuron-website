@@ -52,11 +52,11 @@ export default function FaqPage() {
         subtitle="The questions that get asked most, and the fixes for the things that go wrong most."
       />
 
-      <section id="faq" className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section id="faq" className="scroll-mt-24 border-b border-border-subtle bg-black section-y">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <Reveal className="mb-10 max-w-prose">
             <p className="eyebrow mb-3">Common questions</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">FAQ</h2>
+            <h2 className="h2">FAQ</h2>
           </Reveal>
 
           <FaqAccordion items={FAQS} />
@@ -65,12 +65,12 @@ export default function FaqPage() {
 
       <section
         id="troubleshooting"
-        className="scroll-mt-24 border-b border-border-subtle bg-black-soft py-16 sm:py-20"
+        className="scroll-mt-24 border-b border-border-subtle bg-black-soft section-y"
       >
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <Reveal className="mb-10 max-w-prose">
             <p className="eyebrow mb-3">Something not working?</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+            <h2 className="h2">
               Troubleshooting
             </h2>
           </Reveal>
@@ -85,18 +85,18 @@ export default function FaqPage() {
                   i === TROUBLESHOOTING.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
                 }`}
               >
-                <h3 className="mb-2 text-sm font-semibold text-white">{item.issue}</h3>
-                <p className="text-sm leading-relaxed text-white/55">{item.fix}</p>
+                <h3 className="mb-2 text-step-2 font-semibold text-white">{item.issue}</h3>
+                <p className="text-step-2 leading-relaxed text-ink-3">{item.fix}</p>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-black py-16 text-center sm:py-20">
+      <section className="bg-black section-y text-center">
         <div className="section-container">
           <Reveal>
-            <p className="mx-auto max-w-md text-sm leading-relaxed text-white/50">
+            <p className="mx-auto max-w-md text-step-2 leading-relaxed text-ink-3">
               Still stuck, or think your unit has a fault? Tell us what is happening.
             </p>
             <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">

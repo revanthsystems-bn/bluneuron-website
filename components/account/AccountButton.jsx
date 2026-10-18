@@ -3,6 +3,7 @@
 import { User } from 'lucide-react';
 import { useAccount } from './AccountContext';
 import { ROUTES } from '@/lib/routes';
+import { ACCOUNTS_ENABLED } from '@/lib/site-config';
 
 /**
  * The masthead's account control: a link, not a menu.
@@ -20,13 +21,24 @@ import { ROUTES } from '@/lib/routes';
  * `ink` is the light-hero test (lib/heroTheme.js) — over the white hero the
  * icon has to be dark. Same prop, same meaning, as CartButton.
  */
-export default function AccountButton({ className = '', ink = false }) {
+/**
+ * The gate. No hooks of its own, so the early return cannot reorder the
+ * ones below. Accounts are off site-wide: nothing here needs a sign-in,
+ * and warranty registration and claims stay guest forms. See
+ * ACCOUNTS_ENABLED in lib/site-config.
+ */
+export default function AccountButton(props) {
+  if (!ACCOUNTS_ENABLED) return null;
+  return <AccountButtonControl {...props} />;
+}
+
+function AccountButtonControl({ className = '', ink = false }) {
   const { user, hydrated } = useAccount();
 
-  const base = `relative flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
+  const base = `relative flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
     ink
       ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
-      : 'text-white/80 hover:bg-white/5 hover:text-white'
+      : 'text-ink-2 hover:bg-white/5 hover:text-white'
   } ${className}`;
 
   // Before hydration we do not know whether anyone is signed in. Render the
@@ -45,7 +57,7 @@ export default function AccountButton({ className = '', ink = false }) {
     <a href={ROUTES.account} aria-label={`Account — signed in as ${user.name || user.email}`} className={base}>
       <span
         aria-hidden="true"
-        className="flex h-7 w-7 items-center justify-center rounded-full border border-accent/40 bg-accent/15 text-[11px] font-semibold uppercase tracking-wide text-accent-soft"
+        className="flex h-7 w-7 items-center justify-center rounded-full border border-accent/40 bg-accent/15 text-step-0 font-semibold uppercase tracking-wide text-accent-soft"
       >
         {initialsOf(user)}
       </span>

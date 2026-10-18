@@ -18,7 +18,8 @@
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "preview:upload": "opennextjs-cloudflare build && wrangler versions upload",
     "deploy": "npm run check:production && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "test:buy": "node scripts/test-buy-links.mjs"
   },
   "keywords": [],
   "author": "",

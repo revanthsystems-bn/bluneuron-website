@@ -68,7 +68,22 @@ export default function CountUp({ value, duration = 1.4, className = '' }) {
   }, [value]);
 
   return (
-    <span ref={ref} className={className} aria-label={String(value)}>
+    /*
+     * TWO CHILDREN, one for each audience — the same shape the hero
+     * wordmark uses (components/Hero).
+     *
+     * The final value is a REAL TEXT NODE in an `sr-only` span, not an
+     * `aria-label` on the wrapper. ARIA prohibits `aria-label` on a
+     * <span> with no role: a generic element has no accessible name to
+     * set, so the attribute is ignored by some AT and flagged by every
+     * audit. It was, here — "500" and "5W" both failed axe's
+     * aria-prohibited-attr rule.
+     *
+     * The visible half stays `aria-hidden` so the counting digits are
+     * never announced mid-animation.
+     */
+    <span ref={ref} className={className}>
+      <span className="sr-only">{String(value)}</span>
       <span aria-hidden="true">{display}</span>
     </span>
   );

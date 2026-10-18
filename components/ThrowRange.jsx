@@ -88,13 +88,13 @@ export default function ThrowRange() {
           <div>
             <Reveal>
               <p className="eyebrow mb-3">{THROW_RANGE.eyebrow}</p>
-              <h2 className="max-w-md text-3xl font-bold tracking-tighter text-white sm:text-4xl md:text-5xl">
+              <h2 className="h2 max-w-md">
                 From {THROW_RANGE.min.size} inches to{' '}
                 <span className="text-accent-soft">{THROW_RANGE.max.size}</span>.
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/55 sm:text-base">
+              <p className="mt-4 max-w-md text-step-2 leading-relaxed text-ink-3 sm:text-step-3">
                 {THROW_RANGE.line}
               </p>
             </Reveal>
@@ -104,14 +104,14 @@ export default function ThrowRange() {
               so it cannot be reached by the image at any zoom. */}
           <Reveal delay={0.3}>
             <div className="inline-flex shrink-0 items-center gap-4 rounded-full border border-white/10 bg-white/[0.06] px-6 py-4 backdrop-blur-glass">
-              <p className="flex items-baseline gap-1 text-3xl font-bold tracking-tighter text-white">
+              <p className="h2 flex items-baseline gap-1">
                 <motion.span>{inchLabel}</motion.span>
-                <span className="text-base font-medium text-white/45">in</span>
+                <span className="text-step-3 font-medium text-ink-3">in</span>
               </p>
               <span aria-hidden="true" className="h-8 w-px bg-white/15" />
-              <p className="flex items-baseline gap-1 text-3xl font-bold tracking-tighter text-white">
+              <p className="h2 flex items-baseline gap-1">
                 <motion.span>{metreLabel}</motion.span>
-                <span className="text-base font-medium text-white/45">m</span>
+                <span className="text-step-3 font-medium text-ink-3">m</span>
               </p>
               <span className="sr-only">
                 Screen size against projection distance, from{' '}
@@ -137,6 +137,9 @@ export default function ThrowRange() {
                 projector throws. `justify-end` then keeps the beam's tip
                 pinned to the wrapper's bottom edge, which is both the scale
                 origin and where the lens flare is drawn. */}
+            {/* `rounded-[3px]` is off the radius scale deliberately: this
+                is the PROJECTED SCREEN in the throw diagram, and the 22px
+                card radius stops it reading as a screen at all. */}
             <div className="relative min-h-0 w-full flex-1 overflow-hidden rounded-[3px] bg-[linear-gradient(135deg,#FFFFFF_0%,#E8F1FF_45%,#CFE0FF_100%)] shadow-[0_0_140px_36px_rgba(59,130,246,0.3)] [max-height:min(46vw,574px)]">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(255,255,255,0.95),transparent_78%)]" />
             </div>

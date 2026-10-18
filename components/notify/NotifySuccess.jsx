@@ -30,7 +30,7 @@ export default function NotifySuccess({ onDone }) {
       </div>
 
       <h3 className="type-display mt-6 text-[1.6rem] text-white">You&apos;re on the list.</h3>
-      <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/55">
+      <p className="mt-3 max-w-xs text-step-2 leading-relaxed text-ink-3">
         We&apos;ll email you the moment IRIZ launches. Keep an eye on your inbox.
       </p>
 
@@ -38,7 +38,7 @@ export default function NotifySuccess({ onDone }) {
         <button
           type="button"
           onClick={onDone}
-          className="mt-7 w-full rounded-[14px] border border-white/12 bg-white/[0.04] py-3.5 text-sm font-semibold text-white/80 transition-colors hover:bg-white/[0.08] hover:text-white"
+          className="mt-7 w-full rounded-ctl border border-white/12 bg-white/[0.04] py-3.5 text-step-2 font-semibold text-ink-2 transition-colors hover:bg-white/[0.08] hover:text-white"
         >
           Done
         </button>

@@ -62,25 +62,25 @@ export default function ProductList() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
+          <h2 className="text-step-2 font-semibold uppercase tracking-[0.18em] text-ink-2">
             My products &amp; warranty
           </h2>
-          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+          <p className="mt-2 max-w-prose text-step-1 leading-relaxed text-ink-3">
             Registering a unit records its serial number and purchase date against your account, so
             a claim does not depend on finding the invoice again.
           </p>
         </div>
-        <a href={ROUTES.warrantyRegistration} className="btn-secondary px-5 py-2 text-xs">
+        <a href={ROUTES.warrantyRegistration} className="btn-secondary px-5 py-2 text-step-1">
           Register a unit
         </a>
       </div>
 
       {loading ? (
-        <p className="text-sm text-white/40">Loading…</p>
+        <p className="text-step-2 text-ink-3">Loading…</p>
       ) : products.length === 0 ? (
-        <div className="rounded-3xl border border-border-subtle bg-black-soft px-6 py-14 text-center">
-          <h3 className="text-base font-semibold text-white">No units registered yet</h3>
-          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/50">
+        <div className="rounded-card border border-border-subtle bg-black-soft px-6 section-y text-center">
+          <h3 className="text-step-3 font-semibold text-white">No units registered yet</h3>
+          <p className="mx-auto mt-2 max-w-sm text-step-2 leading-relaxed text-ink-3">
             Register your IRIZ with its order ID and serial number and its warranty status will
             show here.
           </p>
@@ -95,28 +95,28 @@ export default function ProductList() {
             return (
               <li
                 key={product.id}
-                className="rounded-3xl border border-border-subtle bg-black-soft p-6 sm:p-7"
+                className="rounded-card border border-border-subtle bg-black-soft p-6 sm:p-7"
               >
                 <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-border-subtle bg-black">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-ctl border border-border-subtle bg-black">
                     <Image src={product.image} alt="" fill sizes="80px" className="object-cover" />
                   </div>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h3 className="text-base font-semibold text-white">{product.name}</h3>
+                      <h3 className="text-step-3 font-semibold text-white">{product.name}</h3>
                       <span
-                        className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                        className={`rounded-full border px-2.5 py-0.5 text-step-0 font-semibold uppercase tracking-wide ${
                           active
                             ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
-                            : 'border-white/15 bg-white/5 text-white/50'
+                            : 'border-white/15 bg-white/5 text-ink-3'
                         }`}
                       >
                         {active ? 'In warranty' : 'Warranty expired'}
                       </span>
                     </div>
 
-                    <dl className="mt-4 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+                    <dl className="mt-4 grid gap-x-8 gap-y-3 text-step-2 sm:grid-cols-2">
                       <Row label="Bought from" value={product.marketplace} />
                       <Row label="Order ID" value={product.orderId} mono />
                       <Row label="Serial number" value={product.serialNumber} mono />
@@ -128,12 +128,12 @@ export default function ProductList() {
                     </dl>
 
                     <div className="mt-6 flex flex-wrap gap-3">
-                      <a href={claimHref(product)} className="btn-secondary px-5 py-2 text-xs">
+                      <a href={claimHref(product)} className="btn-secondary px-5 py-2 text-step-1">
                         Raise a claim
                       </a>
                       <a
                         href={ROUTES.warranty}
-                        className="px-2 py-2 text-xs text-white/45 underline underline-offset-2 transition-colors hover:text-white/70"
+                        className="px-2 py-2 text-step-1 text-ink-3 underline underline-offset-2 transition-colors hover:text-ink-2"
                       >
                         What is covered
                       </a>
@@ -146,10 +146,10 @@ export default function ProductList() {
         </ul>
       )}
 
-      <section className="rounded-3xl border border-border-subtle bg-black-soft p-6 sm:p-7">
-        <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">Claims</h3>
+      <section className="rounded-card border border-border-subtle bg-black-soft p-6 sm:p-7">
+        <h3 className="text-step-2 font-semibold uppercase tracking-[0.18em] text-ink-2">Claims</h3>
         {claims.length === 0 ? (
-          <p className="mt-4 text-sm leading-relaxed text-white/45">
+          <p className="mt-4 text-step-2 leading-relaxed text-ink-3">
             No claims raised. If something goes wrong with a registered unit, a claim from here
             arrives with its serial number and purchase date already attached.
           </p>
@@ -158,10 +158,10 @@ export default function ProductList() {
             {claims.map((claim) => (
               <li key={claim.id} className="flex flex-wrap items-baseline justify-between gap-3 py-4 first:pt-0 last:pb-0">
                 <div className="min-w-0">
-                  <p className="text-sm text-white/80">{claim.issue}</p>
-                  <p className="mt-1 text-xs text-white/40">{formatDate(claim.createdAt)}</p>
+                  <p className="text-step-2 text-ink-2">{claim.issue}</p>
+                  <p className="mt-1 text-step-1 text-ink-3">{formatDate(claim.createdAt)}</p>
                 </div>
-                <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/60">
+                <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-step-0 font-semibold uppercase tracking-wide text-ink-3">
                   {claim.status}
                 </span>
               </li>
@@ -176,13 +176,13 @@ export default function ProductList() {
 function Row({ label, value, mono = false }) {
   return (
     <div>
-      <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
+      <dt className="text-step-0 font-semibold uppercase tracking-[0.16em] text-ink-3">
         {label}
       </dt>
       {/* `break-all` on the identifiers: an Amazon order ID is a single
           unbroken 23-character token and will push a 390px card into
           horizontal scroll without it. */}
-      <dd className={`mt-1 text-white/75 ${mono ? 'break-all font-mono text-xs' : 'text-sm'}`}>
+      <dd className={`mt-1 text-ink-2 ${mono ? 'break-all font-mono text-step-1' : 'text-step-2'}`}>
         {value || '—'}
       </dd>
     </div>

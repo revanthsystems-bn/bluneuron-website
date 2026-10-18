@@ -26,7 +26,7 @@ import { ROUTES } from '@/lib/routes';
  */
 
 const FIELD_CLASS =
-  'w-full rounded-xl border border-border bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-white/30 focus-visible:ring-2 focus-visible:ring-accent-soft';
+  'w-full rounded-ctl border border-border bg-white/[0.04] px-4 py-3 text-step-2 text-white placeholder-white/30 outline-none transition-colors focus:border-white/30 focus-visible:ring-2 focus-visible:ring-accent-soft';
 const INVALID_CLASS = 'border-red-400/60';
 
 const LABELS = { name: 'Name', email: 'Email', message: 'Message' };
@@ -90,8 +90,8 @@ export default function ContactForm() {
   if (status === 'success') {
     return (
       <div className="glass-panel p-8" role="status">
-        <p className="text-base font-semibold text-accent-soft">Your message is in.</p>
-        <p className="mt-2.5 text-sm leading-relaxed text-white/60">
+        <p className="text-step-3 font-semibold text-accent-soft">Your message is in.</p>
+        <p className="mt-2.5 text-step-2 leading-relaxed text-ink-3">
           We will get back to you on the email address you gave.
         </p>
       </div>
@@ -132,13 +132,13 @@ export default function ContactForm() {
           ref={summaryRef}
           role="alert"
           tabIndex={-1}
-          className="rounded-2xl border border-red-400/30 bg-red-400/10 p-4 outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
+          className="rounded-ctl border border-red-400/30 bg-red-400/10 p-4 outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
         >
-          <p className="text-sm font-semibold text-red-300">
+          <p className="text-step-2 font-semibold text-red-300">
             {formError || 'There is a problem with this form.'}
           </p>
           {fieldErrors.length > 0 && (
-            <ul className="mt-2 space-y-1 text-sm text-red-200/80">
+            <ul className="mt-2 space-y-1 text-step-2 text-red-200/80">
               {fieldErrors.map((key) => (
                 <li key={key}>
                   <a href={`#${id(key)}`} className="underline underline-offset-2">
@@ -152,36 +152,36 @@ export default function ContactForm() {
       )}
 
       <div>
-        <label htmlFor={id('name')} className="mb-1.5 block text-xs font-medium text-white/50">
+        <label htmlFor={id('name')} className="mb-1.5 block text-step-1 font-medium text-ink-3">
           {LABELS.name}
         </label>
         <input type="text" autoComplete="name" {...inputProps('name')} />
         {errors.name && (
-          <p id={errorId('name')} className="mt-1.5 text-xs font-medium text-red-400">
+          <p id={errorId('name')} className="mt-1.5 text-step-1 font-medium text-red-400">
             {errors.name}
           </p>
         )}
       </div>
 
       <div>
-        <label htmlFor={id('email')} className="mb-1.5 block text-xs font-medium text-white/50">
+        <label htmlFor={id('email')} className="mb-1.5 block text-step-1 font-medium text-ink-3">
           {LABELS.email}
         </label>
         <input type="email" autoComplete="email" {...inputProps('email')} />
         {errors.email && (
-          <p id={errorId('email')} className="mt-1.5 text-xs font-medium text-red-400">
+          <p id={errorId('email')} className="mt-1.5 text-step-1 font-medium text-red-400">
             {errors.email}
           </p>
         )}
       </div>
 
       <div>
-        <label htmlFor={id('message')} className="mb-1.5 block text-xs font-medium text-white/50">
+        <label htmlFor={id('message')} className="mb-1.5 block text-step-1 font-medium text-ink-3">
           {LABELS.message}
         </label>
         <textarea rows={5} {...inputProps('message', 'resize-none')} />
         {errors.message && (
-          <p id={errorId('message')} className="mt-1.5 text-xs font-medium text-red-400">
+          <p id={errorId('message')} className="mt-1.5 text-step-1 font-medium text-red-400">
             {errors.message}
           </p>
         )}
@@ -197,11 +197,11 @@ export default function ContactForm() {
         {busy ? 'Sending…' : 'Send message'}
       </Magnetic>
 
-      <p className="text-xs leading-relaxed text-white/35">
+      <p className="text-step-1 leading-relaxed text-ink-3">
         We use what you send only to answer you.{' '}
         <a
           href={ROUTES.privacy}
-          className="underline underline-offset-2 transition-colors hover:text-white/60"
+          className="underline underline-offset-2 transition-colors hover:text-ink-3"
         >
           Privacy Policy
         </a>

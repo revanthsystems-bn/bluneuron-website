@@ -9,6 +9,7 @@ import { useCart } from './CartContext';
 import { BRAND, PRODUCT } from '@/lib/iriz';
 import { ROUTES } from '@/lib/routes';
 import { MARKETPLACE, formatInr } from '@/lib/site-config';
+import { CART_ENABLED } from '@/lib/site-config';
 
 /**
  * The cart drawer — a right-hand slide-over, and the basket's quick view.
@@ -36,7 +37,17 @@ import { MARKETPLACE, formatInr } from '@/lib/site-config';
  * reducedMotion="user"> in app/layout.jsx, which drops the transform and
  * leaves the fade.
  */
+/**
+ * The gate. No hooks here, so the early return cannot reorder the ones in
+ * the panel below — see the same shape in components/shop/AddToCart.
+ * CART_ENABLED lives in lib/site-config.
+ */
 export default function CartDrawer() {
+  if (!CART_ENABLED) return null;
+  return <CartDrawerPanel />;
+}
+
+function CartDrawerPanel() {
   const { isOpen, closeCart, qty, unitPrice, subtotal, setItemQty, removeItem } = useCart();
   const panelRef = useRef(null);
   const closeRef = useRef(null);
@@ -112,7 +123,7 @@ export default function CartDrawer() {
             className="fixed inset-y-0 right-0 z-[61] flex w-full max-w-md flex-col border-l border-border-subtle bg-black"
           >
             <header className="flex items-center justify-between border-b border-border-subtle px-6 py-5">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
+              <h2 className="text-step-2 font-semibold uppercase tracking-[0.18em] text-ink-2">
                 Your cart
               </h2>
               <button
@@ -120,7 +131,7 @@ export default function CartDrawer() {
                 type="button"
                 onClick={closeCart}
                 aria-label="Close cart"
-                className="flex h-10 w-10 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
               >
                 <X size={18} aria-hidden="true" />
               </button>
@@ -130,12 +141,12 @@ export default function CartDrawer() {
               /* An empty state with a way out of it. A panel that just says
                  "your cart is empty" makes closing it the only move. */
               <div className="flex flex-1 flex-col items-center justify-center gap-5 px-8 text-center">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full border border-border-subtle text-white/35">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full border border-border-subtle text-ink-3">
                   <ShoppingBag size={22} aria-hidden="true" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-white">Your cart is empty</p>
-                  <p className="mt-2 text-sm leading-relaxed text-white/45">
+                  <p className="text-step-2 font-semibold text-white">Your cart is empty</p>
+                  <p className="mt-2 text-step-2 leading-relaxed text-ink-3">
                     The {BRAND.model} is the only thing we make — and it is one tap away.
                   </p>
                 </div>
@@ -147,7 +158,7 @@ export default function CartDrawer() {
               <>
                 <div className="flex-1 overflow-y-auto px-6 py-6">
                   <div className="flex gap-4">
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-black-soft">
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-ctl border border-border-subtle bg-black-soft">
                       <Image
                         src={PRODUCT.image}
                         alt=""
@@ -158,8 +169,8 @@ export default function CartDrawer() {
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-white">{BRAND.fullName}</p>
-                      <p className="mt-1 text-xs text-white/45">
+                      <p className="text-step-2 font-semibold text-white">{BRAND.fullName}</p>
+                      <p className="mt-1 text-step-1 text-ink-3">
                         {unitPrice === null ? '—' : formatInr(unitPrice)} each
                       </p>
 
@@ -169,7 +180,7 @@ export default function CartDrawer() {
                           type="button"
                           onClick={removeItem}
                           aria-label="Remove from cart"
-                          className="flex h-10 w-10 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                          className="flex h-10 w-10 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                         >
                           <Trash2 size={16} aria-hidden="true" />
                         </button>
@@ -180,12 +191,12 @@ export default function CartDrawer() {
 
                 <footer className="border-t border-border-subtle px-6 py-6">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-sm text-white/60">Subtotal</span>
-                    <span className="text-lg font-bold text-white">
+                    <span className="text-step-2 text-ink-3">Subtotal</span>
+                    <span className="text-step-4 font-bold text-white">
                       {subtotal === null ? '—' : formatInr(subtotal)}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-white/40">{MARKETPLACE.priceNote}</p>
+                  <p className="mt-1 text-step-1 text-ink-3">{MARKETPLACE.priceNote}</p>
 
                   <a href={ROUTES.cart} onClick={closeCart} className="btn-primary mt-5 w-full justify-center">
                     Go to cart
@@ -193,7 +204,7 @@ export default function CartDrawer() {
                   <button
                     type="button"
                     onClick={closeCart}
-                    className="mt-3 w-full text-center text-xs text-white/45 transition-colors hover:text-white/70"
+                    className="mt-3 w-full text-center text-step-1 text-ink-3 transition-colors hover:text-ink-2"
                   >
                     Continue browsing
                   </button>

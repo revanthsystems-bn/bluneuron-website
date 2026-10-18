@@ -9,17 +9,33 @@ import { AccountProvider } from '@/components/account/AccountContext';
 import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import NotifyProvider from '@/components/notify/NotifyProvider';
+import BuyProvider from '@/components/buy/BuyProvider';
 import MetaPixel from '@/components/MetaPixel';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL } from '@/lib/site';
 import { Analytics } from '@vercel/analytics/next';
 
 /**
- * The hero display face. Inter Tight rather than the `--font-sans` stack.
+ * THE site face — body copy and headings both.
+ *
+ * It used to be loaded only as `--font-display` for the hero, while
+ * `--font-sans` named 'Inter' (no relation) which was never loaded at all.
+ * Every paragraph on the site therefore rendered in whatever `system-ui`
+ * resolved to on the visitor's machine: Segoe UI on Windows, SF on macOS,
+ * Roboto on Android — three different sites.
+ *
+ * One family now covers both roles. `--font-display` is kept as an alias
+ * rather than deleted because `.type-display` and the hero wordmark's
+ * fallback chain both name it, and a display role that can diverge later is
+ * worth preserving even while it points at the same family.
+ *
+ * Weights are explicit: 300 carries `.type-lede`, 700 the display sizes.
+ * Left to default, next/font ships 400 only and both render synthesised.
  */
 const interTight = Inter_Tight({
   subsets: ['latin'],
-  variable: '--font-display',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-inter-tight',
   display: 'swap',
 });
 
@@ -103,11 +119,19 @@ export default function RootLayout({ children }) {
           <AccountProvider>
             <CartProvider>
               <NotifyProvider>
-                <SmoothScroll />
-                <PageIntro />
-                {children}
-                <ConsentNotice />
-                <CartDrawer />
+                {/* One "choose where to buy" sheet for the whole document.
+                    Every Buy button on the site opens this one instance
+                    rather than mounting its own — a page has up to four
+                    Buy affordances, and four modals would mean four focus
+                    traps and four colliding label ids. It renders nothing
+                    until opened. See components/buy/BuyProvider. */}
+                <BuyProvider>
+                  <SmoothScroll />
+                  <PageIntro />
+                  {children}
+                  <ConsentNotice />
+                  <CartDrawer />
+                </BuyProvider>
               </NotifyProvider>
             </CartProvider>
           </AccountProvider>

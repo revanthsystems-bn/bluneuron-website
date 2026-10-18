@@ -60,9 +60,9 @@ export default function Highlights() {
           ends up underneath it. */}
       <div className="flex min-h-svh flex-col justify-center pt-16">
         <div className="section-container">
-          <Reveal className="max-w-2xl">
+          <Reveal className="max-w-prose-wide">
             <p className="eyebrow mb-3">What You Get</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl md:text-5xl">
+            <h2 className="h2">
               The things that actually change the picture.
             </h2>
           </Reveal>

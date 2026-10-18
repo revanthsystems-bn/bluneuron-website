@@ -87,11 +87,11 @@ export default function VideoPlayer() {
   };
 
   return (
-    <section id="video" className="border-b border-border-subtle bg-black-soft py-20 scroll-mt-20">
+    <section id="video" className="border-b border-border-subtle bg-black-soft section-y scroll-mt-20">
       <div className="section-container">
         <Reveal className="mb-10 text-center">
           <p className="eyebrow mb-3">See It In Action</p>
-          <h2 className="mx-auto max-w-xl text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+          <h2 className="h2 mx-auto max-w-prose">
             The IRIZ, on a real wall.
           </h2>
         </Reveal>
@@ -136,17 +136,17 @@ export default function VideoPlayer() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <button onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'} className="text-white hover:text-white/70">
+                  <button onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'} className="text-white hover:text-ink-2">
                     {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                   </button>
-                  <button onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'} className="text-white hover:text-white/70">
+                  <button onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'} className="text-white hover:text-ink-2">
                     {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                   </button>
                 </div>
                 <button
                   onClick={toggleFullscreen}
                   aria-label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-                  className="text-white hover:text-white/70"
+                  className="text-white hover:text-ink-2"
                 >
                   {fullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
                 </button>

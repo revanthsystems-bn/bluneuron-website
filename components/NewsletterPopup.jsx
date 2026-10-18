@@ -129,7 +129,7 @@ export default function NewsletterPopup({ open, source, onClose, onSubscribed })
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="notify-panel relative w-full max-w-[460px] overflow-hidden rounded-t-[28px] px-7 pb-[max(2rem,env(safe-area-inset-bottom))] pt-11 sm:rounded-[28px] sm:px-10 sm:pb-8"
+            className="notify-panel relative w-full max-w-[460px] overflow-hidden rounded-t-[28px] px-7 pb-[max(2rem,env(safe-area-inset-bottom))] pt-11 sm:rounded-sheet sm:px-10 sm:pb-8"
             initial={reduced ? false : { opacity: 0, scale: 0.96, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 16 }}
@@ -144,7 +144,7 @@ export default function NewsletterPopup({ open, source, onClose, onSubscribed })
               type="button"
               aria-label="Close"
               onClick={onClose}
-              className="absolute right-5 top-5 flex h-[34px] w-[34px] items-center justify-center rounded-full border border-white/12 text-white/55 transition-colors hover:border-white/25 hover:bg-white/[0.06] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+              className="absolute right-5 top-5 flex h-[34px] w-[34px] items-center justify-center rounded-full border border-white/12 text-ink-3 transition-colors hover:border-white/25 hover:bg-white/[0.06] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
                 <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
@@ -182,7 +182,7 @@ export default function NewsletterPopup({ open, source, onClose, onSubscribed })
                     <h2 id={titleId} className="type-display mt-5 text-[2rem] leading-[1.05] text-white">
                       Be the first to see <span className="notify-brand">IRIZ</span>.
                     </h2>
-                    <p className="mt-3 text-sm leading-relaxed text-white/55">
+                    <p className="mt-3 text-step-2 leading-relaxed text-ink-3">
                       One message the day IRIZ launches. That&apos;s it.
                     </p>
 
@@ -191,13 +191,13 @@ export default function NewsletterPopup({ open, source, onClose, onSubscribed })
                     {/* The consent line sits under the button, where the action is. With
                         SHOW_PRIVACY off it falls back to the reassurance copy rather than to
                         nothing, so the fine print never disappears entirely. */}
-                    <p className="mt-5 text-center text-[11px] leading-relaxed text-white/35">
+                    <p className="mt-5 text-center text-step-0 leading-relaxed text-ink-3">
                       {SHOW_PRIVACY ? (
                         <>
                           By signing up, you agree to our{' '}
                           <a
                             href="/legal/privacy"
-                            className="underline underline-offset-2 transition-colors hover:text-white/60"
+                            className="underline underline-offset-2 transition-colors hover:text-ink-3"
                           >
                             Privacy Policy
                           </a>
@@ -216,7 +216,7 @@ export default function NewsletterPopup({ open, source, onClose, onSubscribed })
                       <button
                         type="button"
                         onClick={onClose}
-                        className="text-xs text-white/40 underline-offset-4 transition-colors hover:text-white/70 hover:underline"
+                        className="text-step-1 text-ink-3 underline-offset-4 transition-colors hover:text-ink-2 hover:underline"
                       >
                         Maybe later
                       </button>

@@ -100,7 +100,7 @@ export default function WhyIriz() {
   return (
     <section
       id="why-iriz"
-      className="scroll-mt-20 border-b border-border-subtle bg-black-soft py-20"
+      className="scroll-mt-20 border-b border-border-subtle bg-black-soft section-y"
     >
       <div className="section-container">
         {/* Column widths are chosen to USE the container rather than to look
@@ -118,10 +118,10 @@ export default function WhyIriz() {
               leave a sliver to read the prose through. */}
           <Reveal className="lg:sticky lg:top-28 lg:self-start">
             <p className="eyebrow mb-3">Why {BRAND.model}</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+            <h2 className="h2">
               The case for it, in plain terms.
             </h2>
-            <p className="mt-5 text-sm leading-relaxed text-white/55 sm:text-base">
+            <p className="mt-5 text-step-2 leading-relaxed text-ink-3 sm:text-step-3">
               Projector specifications are unusually easy to inflate, and the two numbers that
               matter most — brightness and resolution — are the two most often quoted from the
               wrong measurement. Here is what the {BRAND.fullName} is, how it behaves in a real
@@ -129,11 +129,11 @@ export default function WhyIriz() {
             </p>
           </Reveal>
 
-          {/* THE PROSE. `max-w-[680px]` is the measure the policy pages use
+          {/* THE PROSE. `max-w-prose-wide` is the measure the policy pages use
               for continuous text — 65-75 characters at this size — and
               `gap-10` between points so each heading has air above it and
               reads as an entry point rather than a paragraph break. */}
-          <div className="flex max-w-[680px] flex-col gap-10">
+          <div className="flex max-w-prose-wide flex-col gap-10">
             {POINTS.map((point, i) => (
               <Reveal
                 key={point.heading}
@@ -142,13 +142,13 @@ export default function WhyIriz() {
                 delay={Math.min(i, 3) * 0.05}
                 y={20}
               >
-                <h3 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
+                <h3 className="text-step-4 font-semibold tracking-tight text-white sm:text-step-4">
                   {point.heading}
                 </h3>
                 {point.body.map((paragraph) => (
                   <p
                     key={paragraph.slice(0, 48)}
-                    className="mt-3 text-sm leading-relaxed text-white/60 sm:text-[15px]"
+                    className="mt-3 text-step-2 leading-relaxed text-ink-3 sm:text-[15px]"
                   >
                     {paragraph}
                   </p>

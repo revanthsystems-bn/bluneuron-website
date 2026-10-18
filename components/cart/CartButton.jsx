@@ -2,6 +2,7 @@
 
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from './CartContext';
+import { CART_ENABLED } from '@/lib/site-config';
 
 /**
  * The masthead's basket.
@@ -23,7 +24,18 @@ import { useCart } from './CartContext';
  * in anyway. Suppressing it until then costs nothing — the badge is
  * absolutely positioned and reserves no layout.
  */
-export default function CartButton({ className = '', ink = false }) {
+/**
+ * The gate. No hooks of its own, so the early return cannot reorder the
+ * ones below. Gating HERE rather than at the call sites keeps every
+ * masthead variant — desktop, mobile menu, ink mode — consistent from one
+ * decision. See CART_ENABLED in lib/site-config.
+ */
+export default function CartButton(props) {
+  if (!CART_ENABLED) return null;
+  return <CartButtonControl {...props} />;
+}
+
+function CartButtonControl({ className = '', ink = false }) {
   const { itemCount, openCart, hydrated } = useCart();
   const count = hydrated ? itemCount : 0;
 
@@ -32,15 +44,15 @@ export default function CartButton({ className = '', ink = false }) {
       type="button"
       onClick={openCart}
       aria-label={count > 0 ? `Open cart, ${count} item${count > 1 ? 's' : ''}` : 'Open cart'}
-      className={`relative flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
+      className={`relative flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
         ink
           ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
-          : 'text-white/80 hover:bg-white/5 hover:text-white'
+          : 'text-ink-2 hover:bg-white/5 hover:text-white'
       } ${className}`}
     >
       <ShoppingCart size={20} aria-hidden="true" />
       {count > 0 && (
-        <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white">
+        <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-step-0 font-bold text-white">
           {count}
         </span>
       )}

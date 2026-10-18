@@ -11,7 +11,8 @@ import NotifyButton from './NotifyButton';
 import { useCart } from './cart/CartContext';
 import { runBuyNow } from '@/lib/commerce';
 import { COMMERCE_ENABLED } from '@/lib/launch';
-import { BUY_HREF, NAV_ITEMS, ROUTES } from '@/lib/routes';
+import { NAV_ITEMS, ROUTES } from '@/lib/routes';
+import BuyButton from '@/components/buy/BuyButton';
 import { SHOW_BUY } from '@/lib/site-config';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
 
@@ -139,12 +140,14 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
    *
    * Three states, in priority order:
    *
-   *   SHOW_BUY          "Buy", an anchor to the homepage buy card. The product
-   *                     sells on Amazon and Flipkart, so the masthead's job is
-   *                     to get you to the two marketplace buttons — not to
-   *                     pick a marketplace for you from up here, which is a
-   *                     decision the buy card makes properly with the price
-   *                     and the fulfilment note beside it.
+   *   SHOW_BUY          "Buy", which opens the "choose where to buy" sheet
+   *                     (components/buy). It used to be an <a> to the
+   *                     homepage's buy card, which worked on the homepage
+   *                     and was a cross-page jump from everywhere else —
+   *                     press Buy on a policy page and you landed on / and
+   *                     had to find the card. The sheet answers the
+   *                     question where it is asked, with the price and the
+   *                     fulfilment note in it.
    *   COMMERCE_ENABLED  the old in-site "Buy Now". Dead today (that flag is
    *                     false, see lib/launch.js) and kept intact rather than
    *                     deleted, so the in-site cart path still works if it is
@@ -156,17 +159,17 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
    * the real purchase path now, so if both were ever on, the masthead must
    * send people to the marketplaces rather than to the dummy checkout.
    *
-   * An `<a>` for the buy state, not a button: it navigates to a URL, so it
-   * must be middle-clickable, copyable and keyboard-activatable like any link.
-   * `/#buy` rather than a bare `#buy` so it also works from /specs, /support
-   * and every other page the masthead appears on.
+   * A <button> for the buy state, not an <a>: it opens a dialog on the
+   * current page and navigates nowhere, so there is no URL to middle-click
+   * or copy. BuyButton carries the aria-haspopup that says so.
    */
   const renderCta = (className, { onNavigate, strength = 0.15 } = {}) => {
     if (SHOW_BUY) {
       return (
-        <Magnetic as="a" href={BUY_HREF} className={className} strength={strength} onClick={onNavigate}>
-          Buy
-        </Magnetic>
+        <BuyButton
+          className={className}
+          onClick={onNavigate}
+        />
       );
     }
 
@@ -276,7 +279,7 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
                 // reader and, at this contrast, easy to miss at a glance;
                 // this is what actually announces "you are here".
                 aria-current={current ? 'page' : undefined}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors duration-500 ${
+                className={`rounded-full px-4 py-2 text-step-2 font-medium transition-colors duration-500 ${
                   ink
                     ? current
                       ? 'bg-black/[0.06] text-black-obsidian'
@@ -285,7 +288,7 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
                       ? 'bg-white/10 text-white'
                       : frosted
                         ? 'text-white hover:bg-white/10'
-                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                        : 'text-ink-2 hover:bg-white/5 hover:text-white'
                 }`}
               >
                 {item.label}
@@ -303,18 +306,18 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
           <AccountButton ink={ink} />
           <CartButton ink={ink} />
           {renderCta(
-            `ml-1 hidden px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
+            `ml-1 hidden px-5 py-2.5 text-step-1 sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
           )}
           <button
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
-            className={`rounded-full p-2 transition-colors duration-500 lg:hidden ${
+            className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-500 lg:hidden ${
               ink
                 ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
                 : frosted
                   ? 'text-white hover:bg-white/10'
-                  : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  : 'text-ink-2 hover:bg-white/5 hover:text-white'
             }`}
             onClick={() => setMobileOpen((v) => !v)}
           >
@@ -351,14 +354,14 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
                   // `py-3` on a full-width row is a ~44px target, which is
                   // the floor for a thumb. Do not tighten it to match the
                   // desktop nav's `py-2`.
-                  className={`rounded-lg px-3 py-3 text-sm font-medium ${
+                  className={`rounded-lg px-3 py-3 text-step-2 font-medium ${
                     ink
                       ? current
                         ? 'bg-black/[0.06] text-black-obsidian'
                         : 'text-black-obsidian/80 hover:bg-black/5 hover:text-black-obsidian'
                       : current
                         ? 'bg-white/10 text-white'
-                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                        : 'text-ink-2 hover:bg-white/5 hover:text-white'
                   }`}
                 >
                   {item.label}
@@ -371,10 +374,10 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
             <a
               href={ROUTES.account}
               onClick={() => setMobileOpen(false)}
-              className={`rounded-lg px-3 py-3 text-sm font-medium ${
+              className={`rounded-lg px-3 py-3 text-step-2 font-medium ${
                 ink
                   ? 'text-black-obsidian/80 hover:bg-black/5 hover:text-black-obsidian'
-                  : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  : 'text-ink-2 hover:bg-white/5 hover:text-white'
               }`}
             >
               Account

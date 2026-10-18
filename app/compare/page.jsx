@@ -43,11 +43,11 @@ export default function ComparePage() {
         showViewMore={false}
       />
 
-      <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
-        <div className="section-container max-w-2xl">
+      <section className="border-b border-border-subtle bg-black-soft section-y">
+        <div className="section-container max-w-prose-wide">
           <Reveal>
-            <h2 className="text-2xl font-bold tracking-tighter text-white">A note on "lumens"</h2>
-            <p className="mt-4 text-sm leading-relaxed text-white/60">
+            <h2 className="h3">A note on "lumens"</h2>
+            <p className="mt-4 text-step-2 leading-relaxed text-ink-3">
               Many budget projectors advertise "LED lumens" or "light source lumens" — a number measured at the
               bulb, before any glass, housing, or optical loss. It has no standardized relationship to what you
               actually see on the wall. ANSI lumens is the industry's standardized, independently measurable
@@ -58,7 +58,7 @@ export default function ComparePage() {
         </div>
       </section>
 
-      <section className="bg-black py-16 text-center sm:py-20">
+      <section className="bg-black section-y text-center">
         <div className="section-container">
           <Reveal>
             <a href="/specs" className="btn-secondary inline-flex">

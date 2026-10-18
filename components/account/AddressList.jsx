@@ -96,10 +96,10 @@ export default function AddressList() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
+          <h2 className="text-step-2 font-semibold uppercase tracking-[0.18em] text-ink-2">
             Saved addresses
           </h2>
-          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+          <p className="mt-2 max-w-prose text-step-1 leading-relaxed text-ink-3">
             Used to arrange a service pickup or return when you raise a warranty claim. Your
             marketplace delivery address stays with Amazon or Flipkart — we are not given it.
           </p>
@@ -108,14 +108,14 @@ export default function AddressList() {
           type="button"
           onClick={() => setAdding((v) => !v)}
           disabled={readOnly}
-          className="btn-secondary px-5 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-45"
+          className="btn-secondary px-5 py-2 text-step-1 disabled:cursor-not-allowed disabled:opacity-45"
         >
           {adding ? 'Cancel' : 'Add address'}
         </button>
       </div>
 
       {error && (
-        <p role="alert" className="text-xs text-red-300">
+        <p role="alert" className="text-step-1 text-red-300">
           {error}
         </p>
       )}
@@ -123,7 +123,7 @@ export default function AddressList() {
       {adding && !readOnly && (
         <form
           onSubmit={addAddress}
-          className="grid gap-4 rounded-3xl border border-border-subtle bg-black-soft p-6 sm:grid-cols-2"
+          className="grid gap-4 rounded-card border border-border-subtle bg-black-soft p-6 sm:grid-cols-2"
         >
           <Field name="label" label="Label" placeholder="Home" />
           <Field name="full_name" label="Full name" required />
@@ -142,28 +142,28 @@ export default function AddressList() {
       )}
 
       {loading ? (
-        <p className="text-sm text-white/40">Loading…</p>
+        <p className="text-step-2 text-ink-3">Loading…</p>
       ) : addresses.length === 0 ? (
-        <div className="rounded-3xl border border-border-subtle bg-black-soft px-6 py-14 text-center">
-          <h3 className="text-base font-semibold text-white">No addresses saved</h3>
-          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/50">
+        <div className="rounded-card border border-border-subtle bg-black-soft px-6 section-y text-center">
+          <h3 className="text-step-3 font-semibold text-white">No addresses saved</h3>
+          <p className="mx-auto mt-2 max-w-sm text-step-2 leading-relaxed text-ink-3">
             Add one and a warranty claim can be arranged without asking you for it again.
           </p>
         </div>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {addresses.map((address) => (
-            <li key={address.id} className="rounded-3xl border border-border-subtle bg-black-soft p-6">
+            <li key={address.id} className="rounded-card border border-border-subtle bg-black-soft p-6">
               <div className="flex items-center gap-3">
-                <h3 className="text-sm font-semibold text-white">{address.label}</h3>
+                <h3 className="text-step-2 font-semibold text-white">{address.label}</h3>
                 {address.isDefault && (
-                  <span className="rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent-soft">
+                  <span className="rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-step-0 font-semibold uppercase tracking-wide text-accent-soft">
                     Default
                   </span>
                 )}
               </div>
 
-              <address className="mt-4 text-sm not-italic leading-relaxed text-white/60">
+              <address className="mt-4 text-step-2 not-italic leading-relaxed text-ink-3">
                 {address.name}
                 <br />
                 {address.line1}
@@ -183,13 +183,13 @@ export default function AddressList() {
                 )}
               </address>
 
-              <div className="mt-5 flex gap-4 text-xs">
+              <div className="mt-5 flex gap-4 text-step-1">
                 {!address.isDefault && (
                   <button
                     type="button"
                     onClick={() => makeDefault(address.id)}
                     disabled={readOnly || busy}
-                    className="text-white/55 underline underline-offset-2 transition-colors hover:text-white disabled:cursor-not-allowed disabled:text-white/25 disabled:no-underline"
+                    className="text-ink-3 underline underline-offset-2 transition-colors hover:text-white disabled:cursor-not-allowed disabled:text-white/25 disabled:no-underline"
                   >
                     Make default
                   </button>
@@ -198,7 +198,7 @@ export default function AddressList() {
                   type="button"
                   onClick={() => removeAddress(address.id)}
                   disabled={readOnly || busy}
-                  className="text-white/55 underline underline-offset-2 transition-colors hover:text-red-300 disabled:cursor-not-allowed disabled:text-white/25 disabled:no-underline"
+                  className="text-ink-3 underline underline-offset-2 transition-colors hover:text-red-300 disabled:cursor-not-allowed disabled:text-white/25 disabled:no-underline"
                 >
                   Remove
                 </button>
@@ -215,16 +215,16 @@ export default function AddressList() {
 function Field({ name, label, className = '', ...rest }) {
   return (
     <div className={className}>
-      <label htmlFor={`addr-${name}`} className="mb-1.5 block text-xs font-medium text-white/60">
+      <label htmlFor={`addr-${name}`} className="mb-1.5 block text-step-1 font-medium text-ink-3">
         {label}
-        {rest.required && <span className="text-white/35"> *</span>}
+        {rest.required && <span className="text-ink-3"> *</span>}
       </label>
       <input
         id={`addr-${name}`}
         name={name}
         type="text"
         {...rest}
-        className="w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+        className="w-full rounded-ctl border border-border-subtle bg-black px-3 py-2.5 text-step-2 text-white outline-none transition-colors placeholder:text-ink-3 focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
       />
     </div>
   );

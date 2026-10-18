@@ -41,19 +41,19 @@ export default function WarrantyClaimPage() {
         subtitle="Tell us what is happening, with the order and serial details, and we will take it from there."
       />
 
-      <section className="bg-black py-16 sm:py-20">
+      <section className="bg-black section-y">
         <div className="section-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <Reveal className="max-w-md lg:sticky lg:top-28">
             <DraftBanner path={ROUTES.warrantyClaim} className="mb-8" />
 
-            <h2 className="text-2xl font-bold tracking-tighter text-white">Try these first</h2>
-            <p className="mt-4 text-sm leading-relaxed text-white/60">
+            <h2 className="h3">Try these first</h2>
+            <p className="mt-4 text-step-2 leading-relaxed text-ink-3">
               Two things are quicker than a claim, and one of them is usually the answer:
             </p>
 
-            <ol className="mt-5 space-y-4 text-sm leading-relaxed text-white/60">
+            <ol className="mt-5 space-y-4 text-step-2 leading-relaxed text-ink-3">
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-step-1 font-bold text-white">
                   1
                 </span>
                 <span>
@@ -69,12 +69,12 @@ export default function WarrantyClaimPage() {
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-step-1 font-bold text-white">
                   2
                 </span>
                 <span>
                   If you are still inside Amazon or Flipkart&apos;s own return window, open a
-                  return or replacement <strong className="font-semibold text-white/85">there</strong>{' '}
+                  return or replacement <strong className="font-semibold text-ink-2">there</strong>{' '}
                   — it is faster than a warranty claim and they collect the unit.{' '}
                   <a
                     href={ROUTES.returns}
@@ -88,11 +88,11 @@ export default function WarrantyClaimPage() {
             </ol>
 
             <div className="mt-8 border-t border-border-subtle pt-6">
-              <p className="text-sm leading-relaxed text-white/50">
+              <p className="text-step-2 leading-relaxed text-ink-3">
                 Cover runs for{' '}
-                <span className="font-semibold text-white/80">{WARRANTY.months}</span> months from
+                <span className="font-semibold text-ink-2">{WARRANTY.months}</span> months from
                 the purchase date. Claims are handled{' '}
-                <span className="font-semibold text-white/80">{WARRANTY.claimRoute}</span>.{' '}
+                <span className="font-semibold text-ink-2">{WARRANTY.claimRoute}</span>.{' '}
                 <a
                   href={ROUTES.warranty}
                   className="underline underline-offset-2 transition-colors hover:text-white"

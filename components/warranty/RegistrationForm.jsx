@@ -238,14 +238,14 @@ export default function RegistrationForm() {
     const until = formatLongDate(coveredUntil(registered.purchaseDate));
     return (
       <div className="glass-panel p-6 sm:p-8" role="status">
-        <p className="text-base font-semibold text-accent-soft">You&rsquo;re registered.</p>
-        <p className="mt-2.5 text-sm leading-relaxed text-white/60">
+        <p className="text-step-3 font-semibold text-accent-soft">You&rsquo;re registered.</p>
+        <p className="mt-2.5 text-step-2 leading-relaxed text-ink-3">
           We have your purchase details on file, so a claim does not have to start with paperwork.
         </p>
 
-        <dl className="mt-6 divide-y divide-border-subtle border-y border-border-subtle text-sm">
+        <dl className="mt-6 divide-y divide-border-subtle border-y border-border-subtle text-step-2">
           <Row label="Registration ID">
-            <span className="break-all font-mono text-xs text-white/80">
+            <span className="break-all font-mono text-step-1 text-ink-2">
               {registered.registrationId}
             </span>
           </Row>
@@ -254,8 +254,8 @@ export default function RegistrationForm() {
           {until && <Row label="Covered until">{until}</Row>}
         </dl>
 
-        <p className="mt-5 rounded-2xl border border-border-subtle bg-white/[0.03] p-4 text-xs leading-relaxed text-white/55">
-          <strong className="font-semibold text-white/85">Keep your invoice.</strong> It is the
+        <p className="mt-5 rounded-ctl border border-border-subtle bg-white/[0.03] p-4 text-step-1 leading-relaxed text-ink-3">
+          <strong className="font-semibold text-ink-2">Keep your invoice.</strong> It is the
           proof of purchase date a claim is assessed against, and a registration on its own does
           not replace it.
         </p>
@@ -308,8 +308,8 @@ export default function RegistrationForm() {
           screen at once, so a progress bar would be measuring nothing. */}
       <div className="mb-6 md:hidden">
         <div className="mb-2 flex items-baseline justify-between">
-          <p className="text-sm font-semibold text-white">{STEP_TITLES[step]}</p>
-          <p className="text-xs text-white/45">Step {step} of 2</p>
+          <p className="text-step-2 font-semibold text-white">{STEP_TITLES[step]}</p>
+          <p className="text-step-1 text-ink-3">Step {step} of 2</p>
         </div>
         <div
           className="h-1 w-full overflow-hidden rounded-full bg-white/10"
@@ -341,7 +341,7 @@ export default function RegistrationForm() {
           stray line of text above the first input. */}
       <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
         <fieldset className={`${groupClass(1)} min-w-0 space-y-5`} disabled={busy}>
-          <legend className="mb-1 hidden text-sm font-semibold text-white md:block">
+          <legend className="mb-1 hidden text-step-2 font-semibold text-white md:block">
             Your details
           </legend>
 
@@ -368,7 +368,7 @@ export default function RegistrationForm() {
         </fieldset>
 
         <fieldset className={`${groupClass(2)} min-w-0 space-y-5`} disabled={busy}>
-          <legend className="mb-1 hidden text-sm font-semibold text-white md:block">
+          <legend className="mb-1 hidden text-step-2 font-semibold text-white md:block">
             Purchase details
           </legend>
 
@@ -409,7 +409,7 @@ export default function RegistrationForm() {
             described in the{' '}
             <a
               href="/legal/privacy"
-              className="underline underline-offset-2 transition-colors hover:text-white/80"
+              className="underline underline-offset-2 transition-colors hover:text-ink-2"
             >
               Privacy Policy
             </a>
@@ -460,12 +460,12 @@ export default function RegistrationForm() {
         </Magnetic>
       </div>
 
-      <p className="mt-5 text-xs leading-relaxed text-white/35">
+      <p className="mt-5 text-step-1 leading-relaxed text-ink-3">
         We use these details only to register and service your warranty. They are not used for
         advertising and are never sent to any advertising platform. Trouble registering? Email{' '}
         <a
           href={`mailto:${SUPPORT.email}`}
-          className="underline underline-offset-2 transition-colors hover:text-white/60"
+          className="underline underline-offset-2 transition-colors hover:text-ink-3"
         >
           {SUPPORT.email}
         </a>
@@ -479,8 +479,8 @@ export default function RegistrationForm() {
 function Row({ label, children }) {
   return (
     <div className="flex items-baseline justify-between gap-4 py-2.5">
-      <dt className="shrink-0 text-xs text-white/45">{label}</dt>
-      <dd className="text-right text-sm font-medium text-white/85">{children}</dd>
+      <dt className="shrink-0 text-step-1 text-ink-3">{label}</dt>
+      <dd className="text-right text-step-2 font-medium text-ink-2">{children}</dd>
     </div>
   );
 }

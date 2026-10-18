@@ -47,14 +47,14 @@ const DESTINATIONS = [
 export default function NotFound() {
   return (
     <PageShell>
-      <section className="bg-black py-24 sm:py-32">
+      <section className="bg-black section-y">
         <div className="section-container">
-          <Reveal className="max-w-xl">
+          <Reveal className="max-w-prose">
             <p className="eyebrow mb-4">404</p>
-            <h1 className="text-4xl font-bold tracking-tighter text-white sm:text-5xl">
+            <h1 className="h2">
               That page isn&apos;t here.
             </h1>
-            <p className="mt-4 text-base leading-relaxed text-white/55">
+            <p className="mt-4 text-step-3 leading-relaxed text-ink-3">
               The link may be out of date, or the address may have a typo in it. Nothing is broken
               on your end — here is where most people are heading.
             </p>
@@ -72,9 +72,9 @@ export default function NotFound() {
                   href={item.href}
                   className="flex h-full flex-col p-6 outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                 >
-                  <h2 className="text-base font-semibold text-white">{item.label}</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-white/55">{item.body}</p>
-                  <span className="mt-auto pt-5 text-sm font-medium text-white/70" aria-hidden="true">
+                  <h2 className="text-step-3 font-semibold text-white">{item.label}</h2>
+                  <p className="mt-2 text-step-2 leading-relaxed text-ink-3">{item.body}</p>
+                  <span className="mt-auto pt-5 text-step-2 font-medium text-ink-2" aria-hidden="true">
                     →
                   </span>
                 </a>

@@ -6,6 +6,7 @@ import { useCart } from '@/components/cart/CartContext';
 import { trackAddToCart } from '@/lib/shop-analytics';
 import { BRAND } from '@/lib/iriz';
 import { MARKETPLACE, formatInr } from '@/lib/site-config';
+import BuyButton from '@/components/buy/BuyButton';
 
 /**
  * The product page's sticky buy bar.
@@ -62,24 +63,17 @@ export default function StickyProductBar({ watchId = 'buy-panel' }) {
               {/* `truncate` matters at 390: the full name plus the price in
                   one row is wider than the viewport, and the price is the
                   half that must survive. */}
-              <p className="truncate text-sm font-semibold text-white">{BRAND.fullName}</p>
-              <p className="text-xs text-white/50">
+              <p className="truncate text-step-2 font-semibold text-white">{BRAND.fullName}</p>
+              <p className="text-step-1 text-ink-3">
                 {formatInr(MARKETPLACE.priceInr)}{' '}
                 <span className="hidden sm:inline">· {MARKETPLACE.priceNote}</span>
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                addItem(1);
-                trackAddToCart({ unitPrice, quantity: 1 });
-                openCart();
-              }}
-              className="btn-primary shrink-0 px-6 py-2.5 text-xs"
-            >
-              Add to cart
-            </button>
+            {/* "Add to cart" here would be a dead end: the basket is off
+                (CART_ENABLED) and buying happens on a marketplace. Same
+                sheet as every other Buy on the site. */}
+            <BuyButton className="btn-primary shrink-0 px-6" />
           </div>
         </motion.div>
       )}

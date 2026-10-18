@@ -24,12 +24,12 @@ export default function DraftBanner({ path, className = '' }) {
   return (
     <div
       role="note"
-      className={`rounded-2xl border border-amber-400/30 bg-amber-400/10 p-5 ${className}`}
+      className={`rounded-ctl border border-amber-400/30 bg-amber-400/10 p-5 ${className}`}
     >
-      <p className="text-sm font-semibold text-amber-300">
+      <p className="text-step-2 font-semibold text-amber-300">
         Draft — this page is not final.
       </p>
-      <p className="mt-1.5 text-sm leading-relaxed text-amber-200/70">
+      <p className="mt-1.5 text-step-2 leading-relaxed text-amber-200/70">
         Anything marked <span className="font-semibold">[TBD]</span> is still being confirmed and
         must not be relied on. The finished version replaces every placeholder on this page.
       </p>

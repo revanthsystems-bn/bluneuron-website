@@ -178,7 +178,7 @@ export default function Footer() {
         >
           {columns.map((column) => (
             <div key={column.title} className="mb-10 break-inside-avoid lg:mb-0">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+              <h2 className="text-step-1 font-semibold uppercase tracking-[0.18em] text-ink-3">
                 {column.title}
               </h2>
               <ul className="mt-4 space-y-2.5">
@@ -186,7 +186,7 @@ export default function Footer() {
                   <li key={`${column.title}-${link.href}-${link.label}`}>
                     <a
                       href={link.href}
-                      className="text-sm text-white/60 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                      className="text-step-2 text-ink-3 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     >
                       {link.label}
                     </a>
@@ -212,7 +212,7 @@ export default function Footer() {
           <div className="flex items-center gap-5">
             {/* Static label, not a one-option <select>. See REGION in
                 lib/iriz.js for why the picker is gone rather than disabled. */}
-            <p className="flex items-center gap-1.5 text-xs text-white/60">
+            <p className="flex items-center gap-1.5 text-step-1 text-ink-3">
               {/* A drawn globe, not a flag emoji — see REGION in lib/iriz.js.
                   Stroked at 1.5 to match the masthead's icons. */}
               <svg
@@ -244,7 +244,7 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`BluNeuron on ${social.label}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle text-white/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle text-ink-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     >
                       <svg
                         viewBox="0 0 24 24"
@@ -281,16 +281,16 @@ export default function Footer() {
           Below sm it stacks and the link simply follows the copyright,
           where `items-end` has no effect on a one-column flex.
         */}
-        <div className="mt-8 flex flex-col gap-3 border-t border-border-subtle pt-6 text-xs leading-relaxed text-white/40 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div className="mt-8 flex flex-col gap-3 border-t border-border-subtle pt-6 text-step-1 leading-relaxed text-ink-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
           <div className="min-w-0">
             {showIdentity && (
               <>
-                <p className="font-medium text-white/55">{COMPANY.legalName}</p>
+                <p className="font-medium text-ink-3">{COMPANY.legalName}</p>
                 <p className="mt-1">{COMPANY.registeredAddress}</p>
                 {allKnown(COMPANY.gstin) && <p className="mt-1">GSTIN: {COMPANY.gstin}</p>}
               </>
             )}
-            <p className={showIdentity ? 'mt-1 text-white/45' : 'text-white/45'}>
+            <p className={showIdentity ? 'mt-1 text-ink-3' : 'text-ink-3'}>
               © {new Date().getFullYear()} BluNeuron. All rights reserved.
             </p>
           </div>
@@ -304,7 +304,7 @@ export default function Footer() {
           {SHOW_PRIVACY && (
             <a
               href={ROUTES.privacy}
-              className="shrink-0 text-white/45 underline underline-offset-2 transition-colors hover:text-white sm:text-right"
+              className="shrink-0 text-ink-3 underline underline-offset-2 transition-colors hover:text-white sm:text-right"
             >
               Privacy Policy
             </a>

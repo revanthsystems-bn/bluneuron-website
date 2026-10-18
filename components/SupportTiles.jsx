@@ -48,18 +48,18 @@ export default function SupportTiles() {
               href={tile.href}
               className="flex h-full flex-col p-6 outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
-              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft">
+              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-ctl border border-white/10 bg-white/[0.06] text-accent-soft">
                 <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
               </span>
 
-              <h3 className="text-base font-semibold text-white">{tile.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/55">{tile.body}</p>
+              <h3 className="text-step-3 font-semibold text-white">{tile.title}</h3>
+              <p className="mt-2 text-step-2 leading-relaxed text-ink-3">{tile.body}</p>
 
               {/* `mt-auto` pins the cue to the bottom edge, so tiles with one
                   line of body and tiles with three still line their arrows up
                   across the row. */}
               <span
-                className="mt-auto pt-5 text-sm font-medium text-white/70"
+                className="mt-auto pt-5 text-step-2 font-medium text-ink-2"
                 aria-hidden="true"
               >
                 →

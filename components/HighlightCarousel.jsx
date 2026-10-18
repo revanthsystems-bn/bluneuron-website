@@ -99,7 +99,19 @@ export default function HighlightCarousel() {
         ))}
       </div>
 
-      <div className="mt-5 flex items-center justify-center gap-2">
+      {/*
+        THE DOT IS THE MARK, THE BUTTON IS THE TARGET.
+        These were 6x6px controls — the smallest tappable thing on the
+        site by a wide margin. The button is now 44x44 and the dot is an
+        inner span, so the mark keeps its size and the target meets the
+        touch floor.
+
+        `gap-0` with full-width boxes, NOT a 44px overlay on the old
+        14px-pitch layout: overlapping targets mean the neighbouring dot
+        answers the tap, which is worse than a small one that doesn't.
+        The row is wider as a result, and that is the honest cost.
+      */}
+      <div className="mt-3 flex items-center justify-center gap-0">
         {HIGHLIGHT_BOARDS.map((board, i) => (
           <button
             key={board.image}
@@ -107,10 +119,15 @@ export default function HighlightCarousel() {
             onClick={() => goTo(i)}
             aria-label={`Go to highlight ${i + 1}`}
             aria-current={i === active}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === active ? 'w-5 bg-white/80' : 'w-1.5 bg-white/25'
-            }`}
-          />
+            className="flex h-11 w-11 items-center justify-center rounded-full"
+          >
+            <span
+              aria-hidden="true"
+              className={`block h-1.5 rounded-full transition-all duration-base ease-brand ${
+                i === active ? 'w-5 bg-white/80' : 'w-1.5 bg-white/25'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>

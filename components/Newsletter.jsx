@@ -25,7 +25,7 @@ export default function Newsletter() {
   const [done, setDone] = useState(false);
 
   return (
-    <section id="buy" className="relative overflow-hidden border-b border-border-subtle bg-black py-20 scroll-mt-20">
+    <section id="buy" className="relative overflow-hidden border-b border-border-subtle bg-black section-y scroll-mt-20">
       <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
       <div className="pointer-events-none absolute inset-0 bg-noise" />
       <div className="section-container relative">
@@ -34,10 +34,10 @@ export default function Newsletter() {
             <span className="notify-dot" aria-hidden="true" />
             Launching soon
           </p>
-          <h2 className="type-display mx-auto mt-5 max-w-lg text-[2rem] leading-[1.05] text-white sm:text-[2.5rem]">
+          <h2 className="type-display mx-auto mt-5 max-w-prose text-[2rem] leading-[1.05] text-white sm:text-[2.5rem]">
             Be the first to see <span className="notify-brand">IRIZ</span>.
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/55">
+          <p className="mx-auto mt-3 max-w-md text-step-2 leading-relaxed text-ink-3">
             One message the day IRIZ launches. That&apos;s it.
           </p>
         </Reveal>
@@ -56,13 +56,13 @@ export default function Newsletter() {
               {/* The consent line sits under the button, where the action is. With
                   SHOW_PRIVACY off it falls back to the reassurance copy rather than to
                   nothing, so the fine print never disappears entirely. */}
-              <p className="mt-5 text-center text-[11px] leading-relaxed text-white/35">
+              <p className="mt-5 text-center text-step-0 leading-relaxed text-ink-3">
                 {SHOW_PRIVACY ? (
                   <>
                     By signing up, you agree to our{' '}
                     <a
                       href="/legal/privacy"
-                      className="underline underline-offset-2 transition-colors hover:text-white/60"
+                      className="underline underline-offset-2 transition-colors hover:text-ink-3"
                     >
                       Privacy Policy
                     </a>

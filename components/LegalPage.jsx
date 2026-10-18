@@ -48,7 +48,7 @@ function linkify(text) {
         // eslint-disable-next-line react/no-array-index-key
         key={`${part}-${i}`}
         href={part}
-        className="text-white/85 underline underline-offset-2 transition-colors hover:text-white"
+        className="text-ink-2 underline underline-offset-2 transition-colors hover:text-white"
       >
         {part}
       </a>
@@ -91,8 +91,8 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
     <PageShell>
       <PageHeading eyebrow="Legal" title={title} subtitle={intro} />
 
-      <section className="bg-black py-16 sm:py-20">
-        {/* `max-w-[680px]` on the PROSE, not on the container, so the page keeps
+      <section className="bg-black section-y">
+        {/* `max-w-prose-wide` on the PROSE, not on the container, so the page keeps
             the same left gutter as the heading above it and as every other
             section on the site — the same call /legal/privacy makes, and the
             reason this does not read as a centred column floating under a
@@ -102,12 +102,12 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
             skimmed, and 680px at 16px keeps lines near the 65-75 characters
             that stay comfortable for continuous text. */}
         <div className="section-container">
-          <DraftBanner path={path} className="mb-10 max-w-[680px]" />
+          <DraftBanner path={path} className="mb-10 max-w-prose-wide" />
 
-          <div className="max-w-[680px] space-y-9 text-sm leading-relaxed text-white/65">
+          <div className="max-w-prose-wide space-y-9 text-step-2 leading-relaxed text-ink-3">
             {sections.map((section) => (
               <div key={section.heading}>
-                <h2 className="mb-2.5 text-lg font-semibold tracking-tight text-white">
+                <h2 className="mb-2.5 text-step-4 font-semibold tracking-tight text-white">
                   {section.heading}
                 </h2>
 
@@ -122,7 +122,7 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
                 )}
 
                 {section.note && (
-                  <p className="mt-2.5 text-xs leading-relaxed text-white/40">
+                  <p className="mt-2.5 text-step-1 leading-relaxed text-ink-3">
                     {linkify(section.note)}
                   </p>
                 )}
@@ -131,8 +131,8 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
           </div>
 
           {lastUpdated && (
-            <Reveal className="mt-12 max-w-[680px] border-t border-border-subtle pt-6">
-              <p className="text-xs text-white/40">Last updated {lastUpdated}.</p>
+            <Reveal className="mt-12 max-w-prose-wide border-t border-border-subtle pt-6">
+              <p className="text-step-1 text-ink-3">Last updated {lastUpdated}.</p>
             </Reveal>
           )}
         </div>

@@ -43,7 +43,7 @@ import { ROUTES } from '@/lib/routes';
  * on :root, so nothing else on the site (scrollbars included) changes.
  */
 const FIELD_CLASS =
-  'w-full rounded-xl border border-border bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition-colors [color-scheme:dark] focus:border-white/30 focus-visible:ring-2 focus-visible:ring-accent-soft';
+  'w-full rounded-ctl border border-border bg-white/[0.04] px-4 py-3 text-step-2 text-white placeholder-white/30 outline-none transition-colors [color-scheme:dark] focus:border-white/30 focus-visible:ring-2 focus-visible:ring-accent-soft';
 const INVALID_CLASS = 'border-red-400/60';
 
 /**
@@ -61,7 +61,7 @@ const INVALID_CLASS = 'border-red-400/60';
 function Field({ label, htmlFor, hint, error, errorId, children }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-medium text-white/50">
+      <label htmlFor={htmlFor} className="mb-1.5 block text-step-1 font-medium text-ink-3">
         {label}{' '}
         <span className="text-accent-soft" aria-hidden="true">
           *
@@ -69,11 +69,11 @@ function Field({ label, htmlFor, hint, error, errorId, children }) {
       </label>
       {children}
       {error ? (
-        <p id={errorId} className="mt-1.5 text-xs font-medium text-red-400">
+        <p id={errorId} className="mt-1.5 text-step-1 font-medium text-red-400">
           {error}
         </p>
       ) : (
-        hint && <p className="mt-1.5 text-xs text-white/35">{hint}</p>
+        hint && <p className="mt-1.5 text-step-1 text-ink-3">{hint}</p>
       )}
     </div>
   );
@@ -245,11 +245,11 @@ export default function SupportForm({ kind = 'registration' }) {
   if (status === 'success') {
     return (
       <div className="glass-panel p-6 sm:p-8" role="status">
-        <p className="text-base font-semibold text-accent-soft">{mode.successTitle}</p>
+        <p className="text-step-3 font-semibold text-accent-soft">{mode.successTitle}</p>
         {/* The registration flow says what actually happened rather than one
             fixed sentence: whether it reached the account, the support team,
             or both. A claim has one destination and keeps its static copy. */}
-        <p className="mt-2.5 text-sm leading-relaxed text-white/60">
+        <p className="mt-2.5 text-step-2 leading-relaxed text-ink-3">
           {outcome?.message ?? mode.successBody}
         </p>
 
@@ -258,9 +258,9 @@ export default function SupportForm({ kind = 'registration' }) {
             demanding an account — the registration has already succeeded, and
             nothing here is contingent on them creating one. */}
         {outcome && !outcome.signedIn && (
-          <div className="mt-5 rounded-2xl border border-border-subtle bg-white/[0.03] p-5">
-            <p className="text-sm font-semibold text-white">Want to see this in one place?</p>
-            <p className="mt-1.5 text-sm leading-relaxed text-white/55">
+          <div className="mt-5 rounded-ctl border border-border-subtle bg-white/[0.03] p-5">
+            <p className="text-step-2 font-semibold text-white">Want to see this in one place?</p>
+            <p className="mt-1.5 text-step-2 leading-relaxed text-ink-3">
               Sign in with the same email address and this unit appears under My products &amp;
               warranty, with the date its cover ends. You do not need an account for the warranty
               itself — it runs from the invoice date either way.
@@ -275,7 +275,7 @@ export default function SupportForm({ kind = 'registration' }) {
             rather than an error — but staying silent would leave someone
             wondering why the unit is missing from their account. */}
         {outcome && outcome.signedIn && !outcome.savedToAccount && (
-          <p className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-xs leading-relaxed text-amber-200/80">
+          <p className="mt-5 rounded-ctl border border-amber-400/30 bg-amber-400/10 p-4 text-step-1 leading-relaxed text-amber-200/80">
             We could not add this unit to your account just now, though our support team has the
             registration. Try registering it again later and it will appear under My products
             &amp; warranty.
@@ -344,13 +344,13 @@ export default function SupportForm({ kind = 'registration' }) {
           ref={summaryRef}
           role="alert"
           tabIndex={-1}
-          className="mb-6 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
+          className="mb-6 rounded-ctl border border-red-400/30 bg-red-400/10 p-4 outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
         >
-          <p className="text-sm font-semibold text-red-300">
+          <p className="text-step-2 font-semibold text-red-300">
             {formError || 'There is a problem with this form.'}
           </p>
           {fieldErrors.length > 0 && (
-            <ul className="mt-2 space-y-1 text-sm text-red-200/80">
+            <ul className="mt-2 space-y-1 text-step-2 text-red-200/80">
               {fieldErrors.map((key) => (
                 <li key={key}>
                   <a href={`#${id(key)}`} className="underline underline-offset-2">
@@ -439,12 +439,12 @@ export default function SupportForm({ kind = 'registration' }) {
         {busy ? mode.busyLabel : mode.submitLabel}
       </Magnetic>
 
-      <p className="mt-5 text-xs leading-relaxed text-white/35">
+      <p className="mt-5 text-step-1 leading-relaxed text-ink-3">
         We use these details only to handle your warranty. They are not used for advertising and
         are never sent to any advertising platform.{' '}
         <a
           href={ROUTES.privacy}
-          className="underline underline-offset-2 transition-colors hover:text-white/60"
+          className="underline underline-offset-2 transition-colors hover:text-ink-3"
         >
           Privacy Policy
         </a>

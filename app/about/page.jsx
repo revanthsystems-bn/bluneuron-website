@@ -39,11 +39,11 @@ export default function AboutPage() {
         subtitle="We started BluNeuron because the home-projector market is full of inflated brightness claims — and we wanted to build the projector we couldn't find."
       />
 
-      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
-        <div className="section-container max-w-2xl">
+      <section className="border-b border-border-subtle bg-black section-y">
+        <div className="section-container max-w-prose-wide">
           <Reveal>
-            <h2 className="text-2xl font-bold tracking-tighter text-white">Why IRIZ</h2>
-            <p className="mt-4 text-sm leading-relaxed text-white/60">
+            <h2 className="h3">Why IRIZ</h2>
+            <p className="mt-4 text-step-2 leading-relaxed text-ink-3">
               Most budget projectors advertise brightness numbers that don't survive contact with a real room —
               inflated "LED lumens" figures that collapse the moment you turn a lamp on. The IRIZ is our answer:
               a projector rated in true ANSI lumens, with a built-in smart OS so you're not stuck buying a
@@ -55,11 +55,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black-soft section-y">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <Reveal className="mb-10 max-w-prose">
             <p className="eyebrow mb-3">What We Care About</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">Our approach</h2>
+            <h2 className="h2">Our approach</h2>
           </Reveal>
 
           <div className="bento-grid">
@@ -67,8 +67,8 @@ export default function AboutPage() {
               <Reveal key={v.title} delay={i * 0.06} y={20} className={`bento-tile p-6 lg:col-span-4 ${
                   i === VALUES.length - 1 ? 'sm:col-span-2 lg:col-span-4' : ''
                 }`}>
-                <h3 className="mb-2 text-base font-semibold text-white">{v.title}</h3>
-                <p className="text-sm leading-relaxed text-white/55">{v.body}</p>
+                <h3 className="mb-2 text-step-3 font-semibold text-white">{v.title}</h3>
+                <p className="text-step-2 leading-relaxed text-ink-3">{v.body}</p>
               </Reveal>
             ))}
           </div>
@@ -85,17 +85,17 @@ export default function AboutPage() {
         the company actually wants to read.
       */}
       {allKnown(COMPANY.legalName, COMPANY.registeredAddress) && (
-        <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+        <section className="border-b border-border-subtle bg-black section-y">
           <div className="section-container">
-            <Reveal className="max-w-[680px]">
-              <h2 className="text-2xl font-bold tracking-tighter text-white">The company</h2>
-              <p className="mt-4 text-sm leading-relaxed text-white/60">
+            <Reveal className="max-w-prose-wide">
+              <h2 className="h3">The company</h2>
+              <p className="mt-4 text-step-2 leading-relaxed text-ink-3">
                 {COMPANY.brandName} is a brand of{' '}
-                <span className="font-semibold text-white/85">{COMPANY.legalName}</span>, registered
+                <span className="font-semibold text-ink-2">{COMPANY.legalName}</span>, registered
                 in India at {COMPANY.registeredAddress}
                 {allKnown(COMPANY.gstin) && <> under GSTIN {COMPANY.gstin}</>}.
               </p>
-              <p className="mt-4 text-sm leading-relaxed text-white/60">
+              <p className="mt-4 text-step-2 leading-relaxed text-ink-3">
                 We sell through Amazon and Flipkart rather than running our own store, so every
                 order, payment and delivery is handled by them —{' '}
                 <a
@@ -111,10 +111,10 @@ export default function AboutPage() {
         </section>
       )}
 
-      <section className="bg-black py-16 text-center sm:py-20">
+      <section className="bg-black section-y text-center">
         <div className="section-container">
           <Reveal>
-            <p className="mx-auto max-w-md text-sm text-white/50">
+            <p className="mx-auto max-w-md text-step-2 text-ink-3">
               Questions about the company or the product? We&apos;d genuinely like to hear from you.
             </p>
             <a href={ROUTES.contact} className="btn-secondary mt-5 inline-flex">

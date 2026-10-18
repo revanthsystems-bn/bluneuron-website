@@ -48,7 +48,7 @@ export default function SpecsPage() {
       {/* `border-b` stays with this section, not with the one below it: it is
           the hairline above the closing "View Comparison" block, and that
           block is what follows whether or not the pending section renders. */}
-      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black section-y">
         <div className="section-container bento-grid">
           {SPEC_GROUPS.map((group, i) => {
             const span = GROUP_SPANS[i] ?? 'lg:col-span-6';
@@ -65,7 +65,7 @@ export default function SpecsPage() {
                 y={20}
                 className={`bento-tile p-6 sm:p-8 ${smSpan} ${span}`}
               >
-                <h2 className="mb-5 text-lg font-semibold text-white">{group.group}</h2>
+                <h2 className="mb-5 text-step-4 font-semibold text-white">{group.group}</h2>
                 <dl className={wide ? 'grid gap-x-10 sm:grid-cols-2' : 'divide-y divide-border-subtle'}>
                   {group.rows.map(([label, value]) => (
                     <div
@@ -76,8 +76,8 @@ export default function SpecsPage() {
                           : 'first:pt-0 last:pb-0'
                       }`}
                     >
-                      <dt className="text-sm text-white/50">{label}</dt>
-                      <dd className="text-right text-sm font-medium text-white">{value}</dd>
+                      <dt className="text-step-2 text-ink-3">{label}</dt>
+                      <dd className="text-right text-step-2 font-medium text-white">{value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -93,10 +93,10 @@ export default function SpecsPage() {
           this section's padding and bottom hairline behind as a blank band
           between the board above and the comparison block below. */}
       {SHOW_PENDING_SPECS && (
-        <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
+        <section className="border-b border-border-subtle bg-black-soft section-y">
           <div className="section-container bento-grid">
             <Reveal y={20} className="bento-tile p-6 sm:p-8 lg:col-span-7">
-              <h2 className="mb-5 text-lg font-semibold text-white">In the Box</h2>
+              <h2 className="mb-5 text-step-4 font-semibold text-white">In the Box</h2>
               {/* BOX_CONTENTS carries rows ({ icon, title, note }), not plain
                   strings — it is read off the printed carton now and the
                   homepage section renders it with icon tiles. This list stays
@@ -104,13 +104,13 @@ export default function SpecsPage() {
                   warranty card, not the showcase. The sub-line is appended
                   after an em dash rather than set on its own line, so a row
                   here stays one row. See BOX_CONTENTS in lib/iriz.js. */}
-              <ul className="space-y-2.5 text-sm text-white/70">
+              <ul className="space-y-2.5 text-step-2 text-ink-2">
                 {BOX_CONTENTS.map((item) => (
                   <li key={item.title} className="flex items-center gap-3">
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent-soft" aria-hidden="true" />
                     <span>
                       {item.title}
-                      {item.note && <span className="text-white/45">{' — ' + item.note}</span>}
+                      {item.note && <span className="text-ink-3">{' — ' + item.note}</span>}
                     </span>
                   </li>
                 ))}
@@ -118,9 +118,9 @@ export default function SpecsPage() {
             </Reveal>
 
             <Reveal delay={0.05} y={20} className="bento-tile p-6 sm:p-8 lg:col-span-5">
-              <h2 className="mb-5 text-lg font-semibold text-white">Warranty</h2>
-              <p className="text-sm text-white/70">{WARRANTY.summary}</p>
-              <p className="mt-4 inline-flex rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-300">
+              <h2 className="mb-5 text-step-4 font-semibold text-white">Warranty</h2>
+              <p className="text-step-2 text-ink-2">{WARRANTY.summary}</p>
+              <p className="mt-4 inline-flex rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-step-1 font-semibold text-amber-300">
                 {WARRANTY.note}
               </p>
             </Reveal>
@@ -128,10 +128,10 @@ export default function SpecsPage() {
         </section>
       )}
 
-      <section className="bg-black py-16 text-center sm:py-20">
+      <section className="bg-black section-y text-center">
         <div className="section-container">
           <Reveal>
-            <p className="text-sm text-white/50">
+            <p className="text-step-2 text-ink-3">
               See how these numbers stack up against typical budget projectors.
             </p>
             <a href="/compare" className="btn-secondary mt-5 inline-flex">

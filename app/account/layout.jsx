@@ -7,6 +7,8 @@ import DemoNotice from '@/components/account/DemoNotice';
 import { DEMO_MODE } from '@/lib/supabase/config';
 import { getServerUser } from '@/lib/supabase/server';
 import { ROUTES } from '@/lib/routes';
+import AccountsDisabled from '@/components/account/AccountsDisabled';
+import { ACCOUNTS_ENABLED } from '@/lib/site-config';
 
 /**
  * The account area's chrome: heading, section nav, guard — written once so
@@ -44,6 +46,28 @@ import { ROUTES } from '@/lib/routes';
  * it would hold even if this check were removed entirely.
  */
 export default async function AccountLayout({ children }) {
+  /*
+   * ACCOUNTS ARE OFF (ACCOUNTS_ENABLED, lib/site-config), so the whole
+   * area answers with one page instead of its children.
+   *
+   * Gating in the LAYOUT covers /account and all three sub-routes from a
+   * single place, and it short-circuits ABOVE the session check below —
+   * which matters: with accounts off there is no way to sign in, so the
+   * redirect to /sign-in would bounce a visitor to a page that is itself
+   * disabled. Nothing below this line runs.
+   */
+  if (!ACCOUNTS_ENABLED) {
+    return (
+      <PageShell>
+        <section className="bg-black section-y">
+          <div className="section-container">
+            <AccountsDisabled />
+          </div>
+        </section>
+      </PageShell>
+    );
+  }
+
   // Demo mode has no session to check and exists precisely so these screens
   // can be reviewed without a backend.
   if (!DEMO_MODE) {

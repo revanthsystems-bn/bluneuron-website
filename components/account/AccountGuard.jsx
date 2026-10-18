@@ -35,9 +35,9 @@ export default function AccountGuard({ children }) {
 
   if (!user) {
     return (
-      <div className="rounded-3xl border border-border-subtle bg-black-soft px-6 py-14 text-center">
-        <h2 className="text-lg font-semibold text-white">Sign in to see your account</h2>
-        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/50">
+      <div className="rounded-card border border-border-subtle bg-black-soft px-6 section-y text-center">
+        <h2 className="text-step-4 font-semibold text-white">Sign in to see your account</h2>
+        <p className="mx-auto mt-2 max-w-sm text-step-2 leading-relaxed text-ink-3">
           Your registered products, warranty dates and saved addresses live behind a sign-in.
         </p>
         <a href={ROUTES.signIn} className="btn-primary mt-7 justify-center">

@@ -67,12 +67,12 @@ export default function Showroom() {
           <p className="eyebrow mb-4">{HERO.eyebrow}</p>
         </Reveal>
         <Reveal amount={0.5} delay={0.08}>
-          <h1 className="mx-auto max-w-4xl text-5xl font-bold tracking-tighter text-white sm:text-7xl lg:text-8xl">
+          <h1 className="h1 mx-auto max-w-4xl">
             Step into the light.
           </h1>
         </Reveal>
         <Reveal amount={0.5} delay={0.16}>
-          <p className="mx-auto mt-6 max-w-xl text-base text-white/60 sm:text-lg">{HERO.body}</p>
+          <p className="mx-auto mt-6 max-w-prose text-step-3 text-ink-3 sm:text-step-4">{HERO.body}</p>
         </Reveal>
         <Reveal amount={0.5} delay={0.2} className="mt-8">
           <PriceTag size="lg" align="center" />
@@ -83,7 +83,7 @@ export default function Showroom() {
         <Reveal amount={0.5} delay={0.34} className="mt-5">
           <a
             href={HERO.ctaSecondary.href}
-            className="text-sm font-semibold text-white/60 underline-offset-4 hover:text-white hover:underline"
+            className="text-step-2 font-semibold text-ink-3 underline-offset-4 hover:text-white hover:underline"
           >
             {HERO.ctaSecondary.label} →
           </a>
@@ -93,9 +93,9 @@ export default function Showroom() {
       <Reveal
         amount={0.5}
         delay={0.4}
-        className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-white/60"
+        className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-ink-3"
       >
-        <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
+        <span className="text-step-0 uppercase tracking-[0.3em]">Scroll</span>
         <span className="h-8 w-px bg-gradient-to-b from-white/50 to-transparent" />
       </Reveal>
     </section>

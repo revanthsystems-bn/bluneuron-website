@@ -26,9 +26,9 @@ function Cell({ value }) {
     );
   }
   if (value === false) {
-    return <span className="text-white/50">—</span>;
+    return <span className="text-ink-3">—</span>;
   }
-  return <span className="text-white/75">{value}</span>;
+  return <span className="text-ink-2">{value}</span>;
 }
 
 export default function ComparisonTable({
@@ -39,25 +39,38 @@ export default function ComparisonTable({
   showViewMore = true,
 }) {
   return (
-    <section id="compare" className="border-b border-border-subtle bg-black py-20 scroll-mt-20">
+    <section id="compare" className="border-b border-border-subtle bg-black section-y scroll-mt-20">
       <div className="section-container">
         <Reveal className="mb-10">
           <p className="eyebrow mb-3">{eyebrow}</p>
-          <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">{heading}</h2>
+          <h2 className="h2">{heading}</h2>
         </Reveal>
 
         <Reveal delay={0.1} className="glass-panel overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[640px] border-collapse text-left text-step-2">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th className="p-5 font-medium text-white/50">&nbsp;</th>
+                {/* `scope` on every header, and a real (visually hidden)
+                    name on the corner cell.
+
+                    Without them a screen reader reads the body as a grid of
+                    bare values: "Yes", "1080p", "500" with nothing saying
+                    which column or which row they belong to. axe flagged it
+                    as td-has-header. `scope="col"` binds each header down
+                    its column, `scope="row"` binds the spec name across its
+                    row, and the corner cell — which was a literal &nbsp; —
+                    now says what the first column contains. */}
+                <th scope="col" className="p-5 font-medium text-ink-3">
+                  <span className="sr-only">Specification</span>
+                </th>
                 {columns.map((col) => (
                   <th
                     key={col.key}
-                    className={`p-5 font-semibold ${col.highlight ? 'text-white' : 'text-white/70'}`}
+                    scope="col"
+                    className={`p-5 font-semibold ${col.highlight ? 'text-white' : 'text-ink-2'}`}
                   >
                     {col.highlight && (
-                      <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-accent-soft">
+                      <span className="mb-1 block text-step-0 font-bold uppercase tracking-wide text-accent-soft">
                         Most Popular
                       </span>
                     )}
@@ -72,7 +85,12 @@ export default function ComparisonTable({
                   key={row.label}
                   className={`transition-colors duration-200 hover:bg-accent-soft/[0.06] ${i % 2 === 0 ? 'bg-white/[0.015]' : ''}`}
                 >
-                  <td className="border-t border-border-subtle p-5 text-white/50">{row.label}</td>
+                  <th
+                    scope="row"
+                    className="border-t border-border-subtle p-5 font-normal text-ink-3"
+                  >
+                    {row.label}
+                  </th>
                   {columns.map((col) => (
                     <td key={col.key} className="border-t border-border-subtle p-5">
                       <Cell value={row[col.key]} />
@@ -88,7 +106,7 @@ export default function ComparisonTable({
           <Reveal delay={0.15} className="mt-8 text-center">
             <a
               href="/compare"
-              className="text-sm font-semibold text-accent-soft underline-offset-4 hover:underline"
+              className="text-step-2 font-semibold text-accent-soft underline-offset-4 hover:underline"
             >
               See the full comparison →
             </a>

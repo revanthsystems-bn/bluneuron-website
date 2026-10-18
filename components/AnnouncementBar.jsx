@@ -17,7 +17,7 @@ export default function AnnouncementBar() {
     <div className="w-full border-b border-border-subtle bg-black py-2 text-center">
       {/* `px-4` so the sentence never touches the edge at 390px, where this
           line wraps to two rows. */}
-      <p className="px-4 text-xs font-medium tracking-wide text-white/70">{announcementText()}</p>
+      <p className="px-4 text-step-1 font-medium tracking-wide text-ink-2">{announcementText()}</p>
     </div>
   );
 }

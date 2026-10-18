@@ -49,7 +49,7 @@ export default function TrustBadges() {
     // lands here.
     <section
       id="why-bluneuron"
-      className="relative scroll-mt-20 overflow-hidden border-b border-border-subtle bg-black py-20 sm:py-24"
+      className="relative scroll-mt-20 overflow-hidden border-b border-border-subtle bg-black section-y"
     >
       <div
         className="pointer-events-none absolute inset-0"
@@ -60,9 +60,9 @@ export default function TrustBadges() {
       />
 
       <div className="section-container relative">
-        <Reveal className="mb-12 max-w-2xl">
+        <Reveal className="mb-12 max-w-prose-wide">
           <p className="eyebrow mb-3">Why Shop BluNeuron</p>
-          <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl md:text-5xl">
+          <h2 className="h2">
             Every promise here has a{' '}
             <span className="text-cyan-300">number</span> behind it.
           </h2>
@@ -86,7 +86,7 @@ export default function TrustBadges() {
                   />
                 )}
               </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
+              <span className="text-step-0 font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
                 Our best reason
               </span>
             </div>
@@ -114,22 +114,22 @@ export default function TrustBadges() {
                   value={feature.stat}
                   className="text-[6rem] font-semibold leading-[0.82] tracking-tighter text-white sm:text-[8rem]"
                 />
-                <span className="text-lg font-medium uppercase tracking-[0.15em] text-cyan-300">
+                <span className="text-step-4 font-medium uppercase tracking-[0.15em] text-cyan-300">
                   {feature.unit}
                 </span>
               </p>
             </div>
 
             <div className="relative">
-              <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              <h3 className="h2">
                 {feature.title}
               </h3>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-white/60 sm:text-base">
+              <p className="mt-3 max-w-md text-step-2 leading-relaxed text-ink-3 sm:text-step-3">
                 {feature.text}
               </p>
               <a
                 href="/legal/returns"
-                className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 underline-offset-4 transition-colors hover:text-cyan-200 hover:underline"
+                className="mt-5 inline-flex items-center gap-1.5 text-step-2 font-semibold text-cyan-300 underline-offset-4 transition-colors hover:text-cyan-200 hover:underline"
               >
                 Read the returns policy
                 <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5">
@@ -163,14 +163,14 @@ export default function TrustBadges() {
                   <p className="flex items-baseline gap-2">
                     <CountUp
                       value={b.stat}
-                      className="text-4xl font-semibold leading-none tracking-tighter text-white sm:text-5xl"
+                      className="h2"
                     />
-                    <span className="text-xs font-medium uppercase tracking-[0.15em] text-cyan-300/90">
+                    <span className="text-step-1 font-medium uppercase tracking-[0.15em] text-cyan-300/90">
                       {b.unit}
                     </span>
                   </p>
-                  <h3 className="mt-3 text-base font-semibold text-white">{b.title}</h3>
-                  <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-white/55">{b.text}</p>
+                  <h3 className="mt-3 text-step-3 font-semibold text-white">{b.title}</h3>
+                  <p className="mt-1.5 max-w-sm text-step-2 leading-relaxed text-ink-3">{b.text}</p>
                 </div>
               </Reveal>
             );

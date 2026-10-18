@@ -74,11 +74,11 @@ export default function TechSpecs({
   heading = 'Engineered for real rooms, not spec sheets.',
 }) {
   return (
-    <section id="specs" className="border-b border-border-subtle bg-black-soft py-20 scroll-mt-20">
+    <section id="specs" className="border-b border-border-subtle bg-black-soft section-y scroll-mt-20">
       <div className="section-container">
-        <Reveal className="max-w-lg">
+        <Reveal className="max-w-prose">
           <p className="eyebrow mb-3">{eyebrow}</p>
-          <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">{heading}</h2>
+          <h2 className="h2">{heading}</h2>
         </Reveal>
 
         {/* TOP ROW — the two boards. `lg:grid-cols-[1.3fr_1fr]` rather than
@@ -134,11 +134,11 @@ export default function TechSpecs({
               <div className="mt-auto pt-8">
                 <p className="flex items-baseline gap-2.5">
                   <CountUp value={stat.value} className="stat-number" />
-                  <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/40">
+                  <span className="text-step-1 font-medium uppercase tracking-[0.14em] text-ink-3">
                     {stat.suffix}
                   </span>
                 </p>
-                <p className="mt-3 text-sm text-white/55">{stat.line}</p>
+                <p className="mt-3 text-step-2 text-ink-3">{stat.line}</p>
               </div>
             </Reveal>
           ))}
@@ -150,10 +150,10 @@ export default function TechSpecs({
           >
             <p className="eyebrow">Everything else</p>
             <div className="mt-auto pt-8">
-              <p className="text-lg font-semibold tracking-tight text-white">Want the full sheet?</p>
+              <p className="text-step-4 font-semibold tracking-tight text-white">Want the full sheet?</p>
               <a
                 href="/specs"
-                className="mt-3 inline-block text-sm font-semibold text-accent-soft underline-offset-4 hover:underline"
+                className="mt-3 inline-block text-step-2 font-semibold text-accent-soft underline-offset-4 hover:underline"
               >
                 See full specs →
               </a>

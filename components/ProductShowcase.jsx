@@ -118,12 +118,12 @@ export default function ProductShowcase() {
   return (
     <section
       id="product-shot"
-      className="border-b border-border-subtle bg-black-soft py-20 scroll-mt-20"
+      className="border-b border-border-subtle bg-black-soft section-y scroll-mt-20"
     >
       <div className="section-container">
         <Reveal className="mb-10 text-center lg:mb-14">
           <p className="eyebrow mb-3">In the box</p>
-          <h2 className="mx-auto max-w-xl text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+          <h2 className="h2 mx-auto max-w-prose">
             Everything you need, in one box.
           </h2>
         </Reveal>
@@ -140,7 +140,7 @@ export default function ProductShowcase() {
                 without it the image's own square corners sit proudly outside
                 the card's rounded ones. The aspect ratio is the photo's, so
                 the box below is exactly the shape of what goes in it. */}
-            <div className="relative aspect-[603/588] overflow-hidden rounded-[22px] border border-white/10 shadow-[0_24px_70px_-28px_rgba(0,0,0,0.9)]">
+            <div className="relative aspect-[603/588] overflow-hidden rounded-card border border-white/10 shadow-[0_24px_70px_-28px_rgba(0,0,0,0.9)]">
               <Image
                 src={BOX_PHOTO.src}
                 alt={BOX_PHOTO.alt}
@@ -165,7 +165,7 @@ export default function ProductShowcase() {
                 <li key={item.title} className="flex items-center gap-4 py-4">
                   <span
                     aria-hidden="true"
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-accent-soft"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-ctl border border-white/10 bg-white/[0.04] text-accent-soft"
                   >
                     <BoxIcon name={item.icon} />
                   </span>
@@ -173,16 +173,16 @@ export default function ProductShowcase() {
                       of pushing the row wider than the column — which is what
                       would put a horizontal scrollbar on a 390px screen. */}
                   <span className="min-w-0">
-                    <span className="block text-sm font-semibold text-white">{item.title}</span>
+                    <span className="block text-step-2 font-semibold text-white">{item.title}</span>
                     {item.note && (
-                      <span className="mt-0.5 block text-xs text-white/45">{item.note}</span>
+                      <span className="mt-0.5 block text-step-1 text-ink-3">{item.note}</span>
                     )}
                   </span>
                 </li>
               ))}
             </ul>
 
-            <p className="mt-5 text-xs text-white/40">{BOX_SUMMARY}</p>
+            <p className="mt-5 text-step-1 text-ink-3">{BOX_SUMMARY}</p>
           </Reveal>
         </div>
       </div>

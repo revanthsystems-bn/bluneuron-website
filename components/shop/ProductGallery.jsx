@@ -54,7 +54,7 @@ export default function ProductGallery({ shots }) {
           square matches the thumbnails and the rest of the site's product
           frames. */}
       <div
-        className={`relative aspect-[3/2] max-h-[42svh] w-full overflow-hidden rounded-3xl border border-border-subtle sm:aspect-square sm:max-h-none ${
+        className={`relative aspect-[3/2] max-h-[42svh] w-full overflow-hidden rounded-card border border-border-subtle sm:aspect-square sm:max-h-none ${
           current.fade ? 'product-glow bg-black' : 'bg-black-soft'
         }`}
       >
@@ -79,7 +79,7 @@ export default function ProductGallery({ shots }) {
           to two rows inside a 390px viewport, and those two rows were enough
           to push the price and "Add to cart" below the fold — which is the
           whole thing the gallery height cap was meant to prevent. A single
-          row that scrolls keeps the buy panel up; `-mx-6 px-6` lets it bleed
+          row that scrolls keeps the buy panel up; `.bleed-x` lets it bleed
           to the screen edge inside the padded container so the cut-off
           thumbnail is visible, which is what tells a thumb there is more.
 
@@ -91,7 +91,7 @@ export default function ProductGallery({ shots }) {
           are 64 or 80 CSS pixels square, stated right here — so giving the
           image real `width`/`height` is both the fix and the more correct
           spelling. */}
-      <ul className="-mx-6 mt-4 flex gap-3 overflow-x-auto px-6 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
+      <ul className="bleed-x mt-4 flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
         {shots.map((shot, i) => (
           <li key={shot.src} className="shrink-0">
             <button
@@ -99,7 +99,7 @@ export default function ProductGallery({ shots }) {
               onClick={() => setActive(i)}
               aria-pressed={i === active}
               aria-label={`Show image ${i + 1}: ${shot.label}`}
-              className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border p-1.5 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft sm:h-20 sm:w-20 ${
+              className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-ctl border p-1.5 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft sm:h-20 sm:w-20 ${
                 i === active
                   ? 'border-accent/60 bg-white/[0.06]'
                   : 'border-border-subtle bg-black-soft hover:border-white/20'

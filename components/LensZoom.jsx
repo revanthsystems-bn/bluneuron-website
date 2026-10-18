@@ -147,7 +147,7 @@ export default function LensZoom() {
           className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
         >
           <p className="eyebrow mb-4">Through the lens</p>
-          <h2 className="max-w-2xl text-3xl font-bold tracking-tighter text-white sm:text-5xl">
+          <h2 className="h2 max-w-prose-wide">
             Native 1080p, projected up to 200 inches.
           </h2>
         </motion.div>
@@ -166,7 +166,7 @@ export default function LensZoom() {
           className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
         >
           <p className="eyebrow mb-4 text-black/60">Under the Hood</p>
-          <h2 className="max-w-2xl text-3xl font-bold tracking-tighter text-black sm:text-5xl">
+          <h2 className="h2 max-w-prose-wide text-black">
             Engineered for real rooms, not spec sheets.
           </h2>
         </motion.div>

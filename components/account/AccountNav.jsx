@@ -13,7 +13,7 @@ import { ACCOUNT_NAV } from '@/lib/routes';
  * a burger. A select hides where you are until you open it, and these four
  * labels are the entire map of the area.
  *
- * `-mx-6 px-6` on the scroller is the trick that lets the row bleed to the
+ * `.bleed-x` on the scroller is the trick that lets the row bleed to the
  * screen edge inside a padded container, so the last pill is visibly cut off
  * rather than ending flush — which is what tells a thumb there is more to
  * the right. `[scrollbar-width:none]` hides the bar on the platforms that
@@ -25,7 +25,7 @@ export default function AccountNav() {
 
   return (
     <nav aria-label="Account sections">
-      <ul className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 [scrollbar-width:none] lg:mx-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:px-0">
+      <ul className="bleed-x flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:mx-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:px-0">
         {ACCOUNT_NAV.map((item) => {
           const current = isCurrent(item);
           return (
@@ -33,10 +33,10 @@ export default function AccountNav() {
               <a
                 href={item.href}
                 aria-current={current ? 'page' : undefined}
-                className={`block whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium transition-colors lg:rounded-xl lg:whitespace-normal ${
+                className={`block whitespace-nowrap rounded-full px-4 py-2.5 text-step-2 font-medium transition-colors lg:rounded-ctl lg:whitespace-normal ${
                   current
                     ? 'bg-white/10 text-white'
-                    : 'text-white/55 hover:bg-white/5 hover:text-white'
+                    : 'text-ink-3 hover:bg-white/5 hover:text-white'
                 }`}
               >
                 {item.label}

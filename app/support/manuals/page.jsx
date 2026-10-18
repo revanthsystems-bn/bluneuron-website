@@ -41,9 +41,9 @@ export default function ManualsPage() {
         subtitle="Everything that ships in the box, as a document — and the setup walkthrough if you would rather just follow along."
       />
 
-      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black section-y">
         <div className="section-container">
-          <DraftBanner path={ROUTES.manuals} className="mb-10 max-w-[680px]" />
+          <DraftBanner path={ROUTES.manuals} className="mb-10 max-w-prose-wide" />
 
           <div className="bento-grid">
             {MANUALS.map((doc, i) => {
@@ -56,28 +56,28 @@ export default function ManualsPage() {
                   y={20}
                   className="bento-tile p-6 lg:col-span-4"
                 >
-                  <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft">
+                  <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-ctl border border-white/10 bg-white/[0.06] text-accent-soft">
                     <FileText className="h-[18px] w-[18px]" aria-hidden="true" />
                   </span>
 
-                  <h3 className="text-base font-semibold text-white">{doc.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/55">{doc.description}</p>
+                  <h3 className="text-step-3 font-semibold text-white">{doc.title}</h3>
+                  <p className="mt-2 text-step-2 leading-relaxed text-ink-3">{doc.description}</p>
 
                   <div className="mt-auto pt-5">
                     {pending ? (
-                      <p className="text-xs font-medium text-amber-300/80">
+                      <p className="text-step-1 font-medium text-amber-300/80">
                         PDF {TBD} — not available for download yet.
                       </p>
                     ) : (
                       <a
                         href={doc.file}
                         download
-                        className="inline-flex items-center gap-2 text-sm font-medium text-white transition-colors hover:text-accent-soft"
+                        className="inline-flex items-center gap-2 text-step-2 font-medium text-white transition-colors hover:text-accent-soft"
                       >
                         <Download className="h-4 w-4" aria-hidden="true" />
                         Download PDF
                         {!isTBD(doc.size) && (
-                          <span className="text-white/40">({doc.size})</span>
+                          <span className="text-ink-3">({doc.size})</span>
                         )}
                       </a>
                     )}
@@ -89,11 +89,11 @@ export default function ManualsPage() {
         </div>
       </section>
 
-      <section className="bg-black-soft py-16 sm:py-20">
+      <section className="bg-black-soft section-y">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <Reveal className="mb-10 max-w-prose">
             <p className="eyebrow mb-3">Getting started</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+            <h2 className="h2">
               Setup in five steps
             </h2>
           </Reveal>
@@ -111,12 +111,12 @@ export default function ManualsPage() {
                   i === SETUP_STEPS.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
                 }`}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-step-2 font-bold text-white">
                   {i + 1}
                 </span>
                 <div>
-                  <h3 className="mb-1.5 text-sm font-semibold text-white">{step.title}</h3>
-                  <p className="text-sm leading-relaxed text-white/55">{step.body}</p>
+                  <h3 className="mb-1.5 text-step-2 font-semibold text-white">{step.title}</h3>
+                  <p className="text-step-2 leading-relaxed text-ink-3">{step.body}</p>
                 </div>
               </Reveal>
             ))}

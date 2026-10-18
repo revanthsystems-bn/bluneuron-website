@@ -63,7 +63,7 @@ export const metadata = pageMetadata({
 /** Section heading. One level below the PageHeading h1. */
 function H2({ children }) {
   return (
-    <h2 className="mb-3 mt-10 text-xl font-semibold tracking-tight text-white first:mt-0">
+    <h2 className="mb-3 mt-10 text-step-4 font-semibold tracking-tight text-white first:mt-0">
       {children}
     </h2>
   );
@@ -73,7 +73,7 @@ function Mail({ address = CONTACT_EMAIL }) {
   return (
     <a
       href={`mailto:${address}`}
-      className="text-white underline underline-offset-2 transition-colors hover:text-white/70"
+      className="text-white underline underline-offset-2 transition-colors hover:text-ink-2"
     >
       {address}
     </a>
@@ -84,7 +84,7 @@ function Ext({ href, children }) {
   return (
     <a
       href={href}
-      className="text-white underline underline-offset-2 transition-colors hover:text-white/70"
+      className="text-white underline underline-offset-2 transition-colors hover:text-ink-2"
       rel="noopener noreferrer"
       target="_blank"
     >
@@ -102,11 +102,11 @@ export default function PrivacyPage() {
         subtitle={`Last updated: ${PRIVACY_LAST_UPDATED}`}
       />
 
-      <section className="bg-black py-16 sm:py-20">
+      <section className="bg-black section-y">
         <div className="section-container">
-          {/* `max-w-[680px]` on the prose itself, not on the container, so the
+          {/* `max-w-prose-wide` on the prose itself, not on the container, so the
               page keeps the same left gutter as every other section. */}
-          <Reveal className="max-w-[680px] text-base leading-relaxed text-white/70">
+          <Reveal className="max-w-prose-wide text-step-3 leading-relaxed text-ink-2">
             <p>
               {COMPANY.brandName} (&ldquo;we&rdquo;, &ldquo;us&rdquo;) is a brand of{' '}
               {COMPANY.legalName}, which makes the IRIZ projector. This policy explains what
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
             </p>
 
             <H2>What we collect</H2>
-            <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
+            <ul className="list-disc space-y-2 pl-5 marker:text-ink-3">
               <li>
                 <strong className="font-semibold text-white">Launch-list signup:</strong> your email
                 address, your name if you give it, and your mobile number if you choose to add one.
@@ -172,7 +172,7 @@ export default function PrivacyPage() {
             </p>
 
             <H2>How we use it</H2>
-            <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
+            <ul className="list-disc space-y-2 pl-5 marker:text-ink-3">
               <li>To answer your message, and to reply to you about a support request.</li>
               <li>
                 To register a unit&rsquo;s warranty, to assess a claim against it, and to arrange
@@ -190,7 +190,7 @@ export default function PrivacyPage() {
             <p className="mt-4">We do not sell your personal information.</p>
 
             <H2>Services we use</H2>
-            <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
+            <ul className="list-disc space-y-2 pl-5 marker:text-ink-3">
               <li>
                 <strong className="font-semibold text-white">Web3Forms:</strong> delivers every form
                 on this site — the signup, the warranty forms and the contact form — to our inbox.
@@ -248,7 +248,7 @@ export default function PrivacyPage() {
             </p>
 
             <H2>How long we keep it</H2>
-            <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
+            <ul className="list-disc space-y-2 pl-5 marker:text-ink-3">
               <li>
                 <strong className="font-semibold text-white">Warranty and claim records:</strong> for
                 the length of the warranty and a reasonable period after it, because a later claim

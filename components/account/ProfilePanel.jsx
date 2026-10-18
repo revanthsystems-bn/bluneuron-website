@@ -100,7 +100,7 @@ export default function ProfilePanel() {
     router.push(ROUTES.home);
   };
 
-  if (loading && !person) return <p className="text-sm text-white/40">Loading…</p>;
+  if (loading && !person) return <p className="text-step-2 text-ink-3">Loading…</p>;
 
   const fields = [
     { label: 'Name', value: name || 'Not set' },
@@ -110,16 +110,16 @@ export default function ProfilePanel() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border border-border-subtle bg-black-soft p-6 sm:p-8">
+      <section className="rounded-card border border-border-subtle bg-black-soft p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
+          <h2 className="text-step-2 font-semibold uppercase tracking-[0.18em] text-ink-2">
             Profile
           </h2>
           <button
             type="button"
             onClick={() => setEditing((v) => !v)}
             disabled={DEMO_MODE || !user}
-            className="btn-secondary px-5 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-45"
+            className="btn-secondary px-5 py-2 text-step-1 disabled:cursor-not-allowed disabled:opacity-45"
           >
             {editing ? 'Cancel' : 'Edit'}
           </button>
@@ -128,18 +128,18 @@ export default function ProfilePanel() {
         {editing ? (
           <form onSubmit={save} className="mt-6 grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="profile-name" className="mb-1.5 block text-xs font-medium text-white/60">
+              <label htmlFor="profile-name" className="mb-1.5 block text-step-1 font-medium text-ink-3">
                 Name
               </label>
               <input
                 id="profile-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white outline-none focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                className="w-full rounded-ctl border border-border-subtle bg-black px-3 py-2.5 text-step-2 text-white outline-none focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
               />
             </div>
             <div>
-              <label htmlFor="profile-phone" className="mb-1.5 block text-xs font-medium text-white/60">
+              <label htmlFor="profile-phone" className="mb-1.5 block text-step-1 font-medium text-ink-3">
                 Mobile
               </label>
               <input
@@ -147,7 +147,7 @@ export default function ProfilePanel() {
                 inputMode="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white outline-none focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                className="w-full rounded-ctl border border-border-subtle bg-black px-3 py-2.5 text-step-2 text-white outline-none focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
               />
             </div>
             <div className="sm:col-span-2">
@@ -160,38 +160,38 @@ export default function ProfilePanel() {
           <dl className="mt-6 divide-y divide-border-subtle">
             {fields.map((field) => (
               <div key={field.label} className="flex flex-wrap gap-x-6 gap-y-1 py-4 first:pt-0 last:pb-0">
-                <dt className="w-28 shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-white/40">
+                <dt className="w-28 shrink-0 text-step-1 font-semibold uppercase tracking-[0.16em] text-ink-3">
                   {field.label}
                 </dt>
-                <dd className="min-w-0 break-words text-sm text-white/80">{field.value}</dd>
+                <dd className="min-w-0 break-words text-step-2 text-ink-2">{field.value}</dd>
               </div>
             ))}
           </dl>
         )}
 
-        <p aria-live="polite" className="mt-3 text-xs text-emerald-300">
+        <p aria-live="polite" className="mt-3 text-step-1 text-emerald-300">
           {status}
         </p>
         {error && (
-          <p role="alert" className="mt-3 text-xs text-red-300">
+          <p role="alert" className="mt-3 text-step-1 text-red-300">
             {error}
           </p>
         )}
 
-        <p className="mt-6 text-xs leading-relaxed text-white/40">
+        <p className="mt-6 text-step-1 leading-relaxed text-ink-3">
           We hold your name, email and mobile number so a warranty claim can be matched to a unit
           and answered. Your email address is your sign-in and cannot be changed here — write to{' '}
           {SUPPORT.email} to move an account to a new address. What we store and how to have it
           removed is in our{' '}
-          <a href={ROUTES.privacy} className="underline underline-offset-2 hover:text-white/70">
+          <a href={ROUTES.privacy} className="underline underline-offset-2 hover:text-ink-2">
             privacy policy
           </a>
           .
         </p>
       </section>
 
-      <section className="rounded-3xl border border-border-subtle bg-black-soft p-6 sm:p-8">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">Account</h2>
+      <section className="rounded-card border border-border-subtle bg-black-soft p-6 sm:p-8">
+        <h2 className="text-step-2 font-semibold uppercase tracking-[0.18em] text-ink-2">Account</h2>
 
         <div className="mt-6">
           <button
@@ -208,19 +208,19 @@ export default function ProfilePanel() {
         </div>
 
         <div className="mt-8 border-t border-red-400/15 pt-6">
-          <h3 className="text-sm font-semibold text-red-300">Delete my account and data</h3>
-          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+          <h3 className="text-step-2 font-semibold text-red-300">Delete my account and data</h3>
+          <p className="mt-2 max-w-prose text-step-1 leading-relaxed text-ink-3">
             Permanently removes your profile, saved addresses, registered products and claim
             history. Your warranty itself is not affected — it runs from the invoice date and
             belongs to the unit — but you would need your invoice and serial number again to make
             a claim.
           </p>
-          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+          <p className="mt-2 max-w-prose text-step-1 leading-relaxed text-ink-3">
             Your sign-in record (your email address and nothing else) is removed separately by us:
             email {SUPPORT.email} from that address and we will erase it.
           </p>
 
-          <label htmlFor="delete-confirm" className="mt-5 block text-xs font-medium text-white/60">
+          <label htmlFor="delete-confirm" className="mt-5 block text-step-1 font-medium text-ink-3">
             Type DELETE to confirm
           </label>
           <input
@@ -228,17 +228,17 @@ export default function ProfilePanel() {
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
             disabled={DEMO_MODE || !user}
-            className="mt-1.5 w-full max-w-xs rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white outline-none focus:border-red-400/40 disabled:opacity-45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
+            className="mt-1.5 w-full max-w-xs rounded-ctl border border-border-subtle bg-black px-3 py-2.5 text-step-2 text-white outline-none focus:border-red-400/40 disabled:opacity-45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
           />
 
           <button
             type="button"
             onClick={deleteEverything}
             disabled={DEMO_MODE || !user || confirmText !== 'DELETE' || busy}
-            className="mt-4 rounded-full border border-red-400/40 px-5 py-2.5 text-xs font-semibold text-red-300 transition-colors hover:bg-red-400/10 disabled:cursor-not-allowed disabled:border-red-400/20 disabled:text-red-300/40 disabled:hover:bg-transparent"
+            className="mt-4 rounded-full border border-red-400/40 px-5 py-2.5 text-step-1 font-semibold text-red-300 transition-colors hover:bg-red-400/10 disabled:cursor-not-allowed disabled:border-red-400/20 disabled:text-red-300/40 disabled:hover:bg-transparent"
           >
             {busy ? 'Deleting…' : 'Delete my data'}
-            {DEMO_MODE && <span className="ml-2 font-normal text-white/35">(not active in demo)</span>}
+            {DEMO_MODE && <span className="ml-2 font-normal text-ink-3">(not active in demo)</span>}
           </button>
         </div>
       </section>

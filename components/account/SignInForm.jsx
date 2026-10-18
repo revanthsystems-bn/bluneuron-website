@@ -83,9 +83,9 @@ export default function SignInForm() {
 
   return (
     <div className="mx-auto w-full max-w-md">
-      <div className="rounded-3xl border border-border-subtle bg-black-soft p-7 sm:p-9">
+      <div className="rounded-card border border-border-subtle bg-black-soft p-7 sm:p-9">
         {isDemo && (
-          <p className="mb-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-xs leading-relaxed text-amber-200/80">
+          <p className="mb-6 rounded-ctl border border-amber-400/30 bg-amber-400/10 p-4 text-step-1 leading-relaxed text-amber-200/80">
             <span className="font-semibold text-amber-300">Demo mode.</span> No Supabase project
             is configured for this build, so no email is sent and any six-digit code is accepted.
             This exists so the account screens can be reviewed.
@@ -94,7 +94,7 @@ export default function SignInForm() {
 
         {step === 'email' ? (
           <form onSubmit={handleSend} noValidate>
-            <label htmlFor="signin-email" className="mb-2 block text-sm font-medium text-white/80">
+            <label htmlFor="signin-email" className="mb-2 block text-step-2 font-medium text-ink-2">
               Email address
             </label>
             <input
@@ -106,7 +106,7 @@ export default function SignInForm() {
               aria-invalid={Boolean(error)}
               aria-describedby={error ? 'signin-error' : undefined}
               placeholder="you@example.com"
-              className="w-full rounded-xl border border-border-subtle bg-black px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+              className="w-full rounded-ctl border border-border-subtle bg-black px-4 py-3 text-step-2 text-white outline-none transition-colors placeholder:text-ink-3 focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
             />
             <button
               type="submit"
@@ -118,11 +118,11 @@ export default function SignInForm() {
           </form>
         ) : (
           <form onSubmit={handleVerify} noValidate>
-            <label htmlFor="signin-code" className="mb-2 block text-sm font-medium text-white/80">
+            <label htmlFor="signin-code" className="mb-2 block text-step-2 font-medium text-ink-2">
               Six-digit code
             </label>
-            <p className="mb-3 text-xs leading-relaxed text-white/45">
-              Sent to <span className="text-white/70">{email}</span>.{' '}
+            <p className="mb-3 text-step-1 leading-relaxed text-ink-3">
+              Sent to <span className="text-ink-2">{email}</span>.{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -130,7 +130,7 @@ export default function SignInForm() {
                   setCode('');
                   setError('');
                 }}
-                className="underline underline-offset-2 transition-colors hover:text-white/80"
+                className="underline underline-offset-2 transition-colors hover:text-ink-2"
               >
                 Use a different address
               </button>
@@ -151,7 +151,7 @@ export default function SignInForm() {
               aria-invalid={Boolean(error)}
               aria-describedby={error ? 'signin-error' : undefined}
               placeholder="000000"
-              className="w-full rounded-xl border border-border-subtle bg-black px-4 py-3 text-center text-lg font-semibold tracking-[0.4em] text-white outline-none transition-colors placeholder:tracking-[0.4em] placeholder:text-white/20 focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+              className="w-full rounded-ctl border border-border-subtle bg-black px-4 py-3 text-center text-step-4 font-semibold tracking-[0.4em] text-white outline-none transition-colors placeholder:tracking-[0.4em] placeholder:text-ink-3 focus:border-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
             />
             <button
               type="submit"
@@ -166,14 +166,14 @@ export default function SignInForm() {
         {/* The error sits under the field it belongs to AND is a live region,
             so it is both findable by eye and announced when it appears. */}
         {error && (
-          <p id="signin-error" role="alert" className="mt-3 text-xs text-red-300">
+          <p id="signin-error" role="alert" className="mt-3 text-step-1 text-red-300">
             {error}
           </p>
         )}
 
-        <p className="mt-7 text-xs leading-relaxed text-white/40">
+        <p className="mt-7 text-step-1 leading-relaxed text-ink-3">
           Signing in creates a BluNeuron account for warranty registration and support. See our{' '}
-          <a href={ROUTES.privacy} className="underline underline-offset-2 hover:text-white/70">
+          <a href={ROUTES.privacy} className="underline underline-offset-2 hover:text-ink-2">
             privacy policy
           </a>
           .

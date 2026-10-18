@@ -22,12 +22,12 @@ export default function FaqAccordion({ items }) {
                 aria-expanded={open}
                 aria-controls={panelId}
                 onClick={() => setOpenIndex(open ? null : i)}
-                className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-accent-soft sm:px-8"
+                className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left text-step-2 font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-accent-soft sm:px-8"
               >
                 {item.q}
                 <span
                   aria-hidden="true"
-                  className={`shrink-0 text-xl text-white/40 transition-transform duration-300 ${open ? 'rotate-45' : ''}`}
+                  className={`shrink-0 text-step-4 text-ink-3 transition-transform duration-300 ${open ? 'rotate-45' : ''}`}
                 >
                   +
                 </span>
@@ -38,7 +38,7 @@ export default function FaqAccordion({ items }) {
               role="region"
               aria-labelledby={buttonId}
               hidden={!open}
-              className="px-6 pb-5 text-sm leading-relaxed text-white/60 sm:px-8"
+              className="px-6 pb-5 text-step-2 leading-relaxed text-ink-3 sm:px-8"
             >
               {item.a}
             </div>

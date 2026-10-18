@@ -33,7 +33,7 @@
  * changes.
  */
 export const FIELD_CLASS =
-  'w-full rounded-xl border border-border bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition-colors [color-scheme:dark] focus:border-white/30 focus-visible:ring-2 focus-visible:ring-accent-soft';
+  'w-full rounded-ctl border border-border bg-white/[0.04] px-4 py-3 text-step-2 text-white placeholder-white/30 outline-none transition-colors [color-scheme:dark] focus:border-white/30 focus-visible:ring-2 focus-visible:ring-accent-soft';
 
 export const INVALID_CLASS = 'border-red-400/60';
 
@@ -52,7 +52,7 @@ export const INVALID_CLASS = 'border-red-400/60';
 export function Field({ label, htmlFor, hint, error, errorId, children }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-medium text-white/50">
+      <label htmlFor={htmlFor} className="mb-1.5 block text-step-1 font-medium text-ink-3">
         {label}{' '}
         <span className="text-accent-soft" aria-hidden="true">
           *
@@ -60,11 +60,11 @@ export function Field({ label, htmlFor, hint, error, errorId, children }) {
       </label>
       {children}
       {error ? (
-        <p id={errorId} className="mt-1.5 text-xs font-medium text-red-400">
+        <p id={errorId} className="mt-1.5 text-step-1 font-medium text-red-400">
           {error}
         </p>
       ) : (
-        hint && <p className="mt-1.5 text-xs text-white/35">{hint}</p>
+        hint && <p className="mt-1.5 text-step-1 text-ink-3">{hint}</p>
       )}
     </div>
   );
@@ -83,12 +83,12 @@ export function Field({ label, htmlFor, hint, error, errorId, children }) {
 export function PhonePrefix({ children, invalid }) {
   return (
     <div
-      className={`flex items-stretch overflow-hidden rounded-xl border bg-white/[0.04] transition-colors focus-within:border-white/30 ${
+      className={`flex items-stretch overflow-hidden rounded-ctl border bg-white/[0.04] transition-colors focus-within:border-white/30 ${
         invalid ? INVALID_CLASS : 'border-border'
       }`}
     >
       <span
-        className="flex select-none items-center border-r border-border px-3 text-sm text-white/45"
+        className="flex select-none items-center border-r border-border px-3 text-step-2 text-ink-3"
         aria-hidden="true"
       >
         +91
@@ -100,7 +100,7 @@ export function PhonePrefix({ children, invalid }) {
 
 /** The input class for a control sitting inside <PhonePrefix>. */
 export const PREFIXED_FIELD_CLASS =
-  'w-full bg-transparent px-4 py-3 text-sm text-white placeholder-white/30 outline-none [color-scheme:dark]';
+  'w-full bg-transparent px-4 py-3 text-step-2 text-white placeholder-white/30 outline-none [color-scheme:dark]';
 
 /**
  * The error summary. Focusable by script (`tabIndex={-1}`) without adding a
@@ -113,13 +113,13 @@ export function ErrorSummary({ summaryRef, formError, fieldErrors, labels, idFor
       ref={summaryRef}
       role="alert"
       tabIndex={-1}
-      className="mb-6 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
+      className="mb-6 rounded-ctl border border-red-400/30 bg-red-400/10 p-4 outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
     >
-      <p className="text-sm font-semibold text-red-300">
+      <p className="text-step-2 font-semibold text-red-300">
         {formError || 'There is a problem with this form.'}
       </p>
       {fieldErrors.length > 0 && (
-        <ul className="mt-2 space-y-1 text-sm text-red-200/80">
+        <ul className="mt-2 space-y-1 text-step-2 text-red-200/80">
           {fieldErrors.map(([key, message]) => (
             <li key={key}>
               <a href={`#${idFor(key)}`} className="underline underline-offset-2">
@@ -159,10 +159,10 @@ export function ConsentField({ id, errorId, checked, onChange, error, disabled, 
             error ? INVALID_CLASS : 'border-border'
           }`}
         />
-        <span className="text-xs leading-relaxed text-white/50">{children}</span>
+        <span className="text-step-1 leading-relaxed text-ink-3">{children}</span>
       </label>
       {error && (
-        <p id={errorId} className="mt-1.5 text-xs font-medium text-red-400">
+        <p id={errorId} className="mt-1.5 text-step-1 font-medium text-red-400">
           {error}
         </p>
       )}

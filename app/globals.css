@@ -3,17 +3,137 @@
 @tailwind utilities;
 
 @layer base {
+  /* ================================================================== *
+   * DESIGN TOKENS — the single definition of every value on this site.
+   *
+   * tailwind.config.js maps these into utility classes (`text-ink-3`,
+   * `rounded-card`, `duration-slow`). They are declared HERE rather than
+   * as literals in that file because the hero scrims, the frosted header
+   * and the motion rules are hand-written CSS that Tailwind cannot
+   * express — before this they carried their own copies of the same
+   * numbers, and the copies had drifted.
+   *
+   * Read tailwind.config.js alongside this block; neither half is the
+   * whole system.
+   * ================================================================== */
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    /* ---- Type ---------------------------------------------------- */
+    /* Inter Tight, loaded by next/font in app/layout.jsx. It used to
+       name 'Inter', which was never loaded — so every paragraph on the
+       site rendered in whichever system-ui the visitor's OS supplied
+       (Segoe UI, SF, Roboto). The display face and the body face are now
+       one family at two optical roles, which is why --font-display is
+       an alias rather than a second font. */
+    --font-sans: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
+    --font-display: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
+
+    /* ---- Surfaces ------------------------------------------------ *
+     * Declared as SPACE-SEPARATED RGB CHANNELS, not hex. Tailwind
+     * composes its opacity modifiers as `rgb(var(--x) / <alpha-value>)`,
+     * so `bg-black-surface/60` only works if the variable is channels.
+     * A hex here builds, then fails at the first `/NN` with
+     * "The bg-black-surface/60 class does not exist".
+     *
+     * `--bg` keeps a hex because nothing takes an alpha of it. */
+    --bg: #000000;
+    --bg-obsidian: 3 3 3;
+    --bg-soft: 10 10 10;
+    --bg-surface: 18 18 18;
+    --bg-elevated: 26 26 26;
+
+    /* ---- Text ---------------------------------------------------- *
+     * Three steps, closed. Measured on #000:
+     *   ink   21:1    headings, buttons, emphasis
+     *   ink-2 12.4:1  body copy
+     *   ink-3 6.9:1   meta, captions, labels  <- AA at every size
+     * The old ramp ran from white/30 to white/85 and four of its steps
+     * failed AA; white/40 at 12px measured 3.66:1 in 72 places. */
+    --ink: #ffffff;
+    --ink-2: rgba(255, 255, 255, 0.78);
+    --ink-3: rgba(255, 255, 255, 0.58);
+
+    /* ---- Lines --------------------------------------------------- */
+    --line-subtle: rgba(255, 255, 255, 0.08);
+    --line: rgba(255, 255, 255, 0.12);
+    --line-strong: rgba(255, 255, 255, 0.2);
+
+    /* ---- Accent -------------------------------------------------- *
+     * Channels, for the same reason as the surfaces above:
+     * `border-accent-soft/60` and `bg-accent/10` are both in use. */
+    --accent: 59 130 246;
+    --accent-soft: 96 165 250;
+
+    /* ---- Radius -------------------------------------------------- */
+    --r-ctl: 14px;
+    --r-card: 22px;
+    --r-sheet: 28px;
+
+    /* ---- Widths -------------------------------------------------- */
+    --w-prose: 640px;
+    --w-prose-wide: 760px;
+    --w-content: 1200px;
+    --w-container: 1440px;
+
+    /* ---- Section rhythm ------------------------------------------ *
+     * One responsive value, consumed by `.section-y` and by Tailwind's
+     * `py-sec-y`. The old site used a flat 80px at EVERY breakpoint,
+     * which is heavy at 390 and tight at 1440. */
+    --sec-y: 4rem;   /* 64 */
+    --sec-x: 1.25rem; /* 20 */
+
+    /* ---- Motion -------------------------------------------------- *
+     * Four speeds and one curve. `--ease-brand` decelerates: quick off
+     * the mark, settling softly, which reads as responsive on a hover
+     * and as calm on a scroll reveal using the same function. */
+    --dur-fast: 120ms;
+    --dur-base: 200ms;
+    --dur-slow: 320ms;
+    --dur-reveal: 560ms;
+    --ease-brand: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+    /* ---- Elevation ----------------------------------------------- */
+    --shadow-sheet: 0 -24px 64px -16px rgba(0, 0, 0, 0.8);
+    --shadow-dialog: 0 40px 100px -24px rgba(0, 0, 0, 0.9);
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --sec-y: 6rem;    /* 96 */
+      --sec-x: 2.5rem;  /* 40 */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --sec-y: 8rem;    /* 128 */
+      --sec-x: 4rem;    /* 64 */
+    }
+  }
+
+  /* Every non-essential animation on the site resolves to one of the
+     four durations above, so switching them off is one rule rather than
+     a per-component audit. Components still carry their own
+     prefers-reduced-motion branches where the FINAL STATE differs
+     (a parallax that must sit at its midpoint, not its start). */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --dur-fast: 0.01ms;
+      --dur-base: 0.01ms;
+      --dur-slow: 0.01ms;
+      --dur-reveal: 0.01ms;
+    }
   }
 
   html {
     scroll-behavior: smooth;
+    /* The masthead is fixed, so an anchor jump would otherwise land with
+       the target's first line underneath it. */
+    scroll-padding-top: 5.5rem;
   }
 
   body {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--bg);
+    color: var(--ink);
   }
 
   /*
@@ -63,11 +183,86 @@
   }
 
   .section-container {
-    @apply mx-auto w-full max-w-container-xl px-6 md:px-10 lg:px-16;
+    @apply mx-auto w-full max-w-container-xl;
+    padding-left: var(--sec-x);
+    padding-right: var(--sec-x);
+  }
+
+  /*
+   * SECTION RHYTHM. One class, one responsive value (--sec-y: 64 / 96 /
+   * 128). Every section on the site used a flat `py-20` at every
+   * breakpoint, which is heavy on a 390px phone and tight on a 1440px
+   * display — the same 80px doing two jobs it is wrong for.
+   */
+  .section-y {
+    padding-top: var(--sec-y);
+    padding-bottom: var(--sec-y);
+  }
+
+  /*
+   * EDGE-TO-EDGE INSIDE A PADDED CONTAINER.
+   *
+   * For a horizontally scrolling row that should start at the screen edge
+   * rather than at the container's gutter. The negative margin and the
+   * padding BOTH read `--sec-x`, so they cancel exactly — the row ends up
+   * precisely as wide as the container and adds nothing to the document.
+   *
+   * This replaces hand-written `-mx-6 px-6` pairs. Those matched the old
+   * flat `px-6` gutter and silently stopped matching when the gutter
+   * became responsive: at 390 the margin was pulling 24px against a 20px
+   * padding, which pushed the row 4px past the viewport on each side and
+   * gave /shop/iriz a 51px horizontal scroll.
+   */
+  .bleed-x {
+    margin-left: calc(var(--sec-x) * -1);
+    margin-right: calc(var(--sec-x) * -1);
+    padding-left: var(--sec-x);
+    padding-right: var(--sec-x);
+  }
+
+  /* ================================================================ *
+   * BUTTONS — primary, secondary, ghost.
+   *
+   * All three share geometry, motion and focus treatment; only the
+   * surface differs. `min-height: 2.75rem` is the 44px touch floor, and
+   * it is on the SHARED rule so a button cannot be made too small by
+   * overriding padding alone — which is how the old masthead icons
+   * ended up at 38px.
+   *
+   * Hover lift is transform-only (compositor), never margin or height.
+   * ================================================================ */
+  .btn-primary,
+  .btn-primary-ink,
+  .btn-secondary,
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full text-step-2 font-semibold;
+    min-height: 2.75rem;
+    padding: 0.75rem 1.75rem;
+    transition:
+      transform var(--dur-base) var(--ease-brand),
+      background-color var(--dur-base) var(--ease-brand),
+      border-color var(--dur-base) var(--ease-brand),
+      box-shadow var(--dur-base) var(--ease-brand),
+      opacity var(--dur-base) var(--ease-brand);
+  }
+
+  .btn-primary:active,
+  .btn-primary-ink:active,
+  .btn-secondary:active,
+  .btn-ghost:active {
+    transform: scale(0.97);
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-[0_8px_24px_-8px_rgba(255,255,255,0.35)] active:translate-y-0 active:scale-[0.97];
+    @apply bg-white text-black;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      @apply bg-white/85;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -8px rgba(255, 255, 255, 0.35);
+    }
   }
 
   /*
@@ -78,15 +273,100 @@
    * the handover read as a colour transition rather than a different button.
    */
   .btn-primary-ink {
-    @apply inline-flex items-center justify-center rounded-full bg-black-obsidian px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black-obsidian/85 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)] active:translate-y-0 active:scale-[0.97];
+    @apply bg-black-obsidian text-white;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary-ink:hover {
+      @apply bg-black-obsidian/85;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.45);
+    }
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-border-strong bg-white/[0.03] px-7 py-3 text-sm font-semibold text-white backdrop-blur-glass transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-soft/60 hover:bg-white/10 active:translate-y-0 active:scale-[0.97];
+    @apply border border-border-strong bg-white/[0.03] text-white backdrop-blur-glass;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-secondary:hover {
+      @apply border-accent-soft/60 bg-white/10;
+      transform: translateY(-2px);
+    }
+  }
+
+  /* The third tone: no surface at all until it is touched. For tertiary
+     actions that must not compete with the two above — "Not now", a
+     sheet's dismiss, a sort control. */
+  .btn-ghost {
+    @apply border border-transparent bg-transparent text-ink-2;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-ghost:hover {
+      @apply border-border bg-white/[0.06] text-ink;
+    }
+  }
+
+  .btn-primary:disabled,
+  .btn-secondary:disabled,
+  .btn-ghost:disabled {
+    @apply pointer-events-none opacity-45;
+  }
+
+  /* ================================================================ *
+   * FOCUS. One visible ring, on every interactive control, keyboard
+   * only. `:focus-visible` rather than `:focus` so a mouse press does
+   * not light it up; `outline` rather than a box-shadow so it is not
+   * clipped by an ancestor's overflow and survives forced-colors mode.
+   * 2px at --accent-soft measures 3.6:1 against this site's darkest
+   * and lightest surfaces alike.
+   * ================================================================ */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid rgb(var(--accent-soft));
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.2em] text-white/50;
+    @apply text-step-0 font-semibold uppercase text-ink-3;
+  }
+
+  /* ================================================================ *
+   * HEADINGS. Three classes, each a single fluid clamp.
+   *
+   * These replace seventeen hand-rolled recipes of the shape
+   * `text-3xl font-bold tracking-tighter text-white sm:text-4xl
+   * md:text-5xl` — eight of which were doing the same job at slightly
+   * different sizes, which is most of what made the site read as a
+   * template. A clamp also removes the breakpoint STEP: the old pairs
+   * jumped 30px -> 36px at exactly 640px, visibly, mid-resize.
+   *
+   * Weight and tracking are part of the class on purpose. They are not
+   * decisions a call site should be able to make differently.
+   * ================================================================ */
+  .h1 {
+    @apply text-step-7 font-bold text-ink;
+  }
+
+  .h2 {
+    font-size: clamp(1.875rem, 4.2vw, 2.75rem); /* 30 -> 44 */
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    @apply font-bold text-ink;
+  }
+
+  .h3 {
+    font-size: clamp(1.375rem, 2.6vw, 1.75rem); /* 22 -> 28 */
+    line-height: 1.22;
+    letter-spacing: -0.022em;
+    @apply font-semibold text-ink;
   }
 
   /* Fine film-grain overlay for depth behind hero-weight sections. */
@@ -347,27 +627,49 @@
    * it could not reach 4.5 over this footage without a much darker
    * plate, and darkening the picture is the thing being undone here.
    * ---------------------------------------------------------------- */
+  /*
+   * THE PLATE IS WHAT MAKES THE HERO COPY READABLE, and it is sized from
+   * a contrast requirement rather than by eye.
+   *
+   * The loop is a white-studio shot, so the brightest frames put the text
+   * on near-white. For white text to clear AA (4.5:1) the backdrop has to
+   * sit at or below ~#737373, which over a 255 frame needs alpha >= 0.55.
+   * 0.68 is that with margin, and measures 7.7:1 against the loop's
+   * brightest frame; the tagline at --ink-2 over the same ground measures
+   * 5.45:1. scripts/ui/hero-contrast.mjs is what checks this — it hides
+   * the text, photographs the backdrop and reports the worst pixel.
+   *
+   * IT WAS 0.48 WITH A 24%/76% MASK, and that failed badly at desktop
+   * widths: measured on the live build, the eyebrow at 1440 came out at
+   * 1.29:1 and the wordmark at 1.42:1. The alpha was part of it, but the
+   * mask was the bigger half — the copy block is much taller at 1440 (a
+   * 108px wordmark plus three more lines), so the 24% top fade began
+   * ABOVE the eyebrow and the plate was nearly transparent exactly where
+   * the text was. The solid band now runs 10% to 90%, which keeps the
+   * fade outside the copy at every height, and the falloff still hides
+   * the plate's own edges.
+   */
   .hero-text-plate {
     background: linear-gradient(
       to right,
-      rgba(3, 3, 3, 0.48) 0%,
-      rgba(3, 3, 3, 0.47) 52%,
-      rgba(3, 3, 3, 0.31) 68%,
-      rgba(3, 3, 3, 0.12) 82%,
-      rgba(3, 3, 3, 0) 94%
+      rgba(3, 3, 3, 0.68) 0%,
+      rgba(3, 3, 3, 0.66) 58%,
+      rgba(3, 3, 3, 0.46) 74%,
+      rgba(3, 3, 3, 0.18) 88%,
+      rgba(3, 3, 3, 0) 97%
     );
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent 0%,
-      black 24%,
-      black 76%,
+      black 10%,
+      black 90%,
       transparent 100%
     );
     mask-image: linear-gradient(
       to bottom,
       transparent 0%,
-      black 24%,
-      black 76%,
+      black 10%,
+      black 90%,
       transparent 100%
     );
   }
@@ -1490,29 +1792,25 @@
    * same chain `.type-display` falls back to, so a failed font load
    * degrades to the old wordmark rather than to Times.
    * ================================================================ */
-  /* .font-iriz {
+  .font-iriz {
     font-family: var(--font-iriz), var(--font-display), var(--font-sans);
     font-weight: 400;
+    text-transform: none;
+
+    /* Tracking and leading are RESTATED, not inherited, and the three
+       lines above explain why each is needed. They were lost for a while
+       to a duplicated copy of this rule that omitted them: the wordmark
+       then inherited `.type-display`'s -0.045em and 0.88, which closed up
+       Zen Dots' square counters and clipped its tall caps against the
+       tagline — exactly the two faults this block was written to fix. */
     letter-spacing: 0.02em;
     line-height: 1.05;
-  } */
-  /* Check for missing closing braces like this */
-  @layer utilities {
-    .font-iriz {
-      font-family: var(--font-iriz), system-ui, sans-serif;
-      font-weight: 400;
-      text-transform: none !important;
-      /* The wordmark alone is 1.3x `.type-display`'s ramp — every term of
-         that clamp scaled: 1.875->2.4rem, 5.75->7.5vw, 5.75->7.5rem. It is
-         set HERE and not on `.type-display` because this class dresses
-         exactly one element on the site (the hero h1), so the display ramp
-         that every other heading shares is untouched.
 
-         Leading and tracking are deliberately NOT restated: both are
-         relative (unitless 0.88 and -0.045em, inherited from
-         `.type-display`), so they scale with the font-size on their own and
-         stay proportional at every step of the clamp. */
-      font-size: clamp(2.4rem, 7.5vw, 7.5rem);
-    }
-  } /* <--- Check if this outer bracket or an inner one is missing */
+    /* The wordmark alone is 1.3x `.type-display`'s ramp — every term of
+       that clamp scaled: 1.875->2.4rem, 5.75->7.5vw, 5.75->7.5rem. It is
+       set HERE and not on `.type-display` because this class dresses
+       exactly one element on the site (the hero h1), so the display ramp
+       that every other heading shares is untouched. */
+    font-size: clamp(2.4rem, 7.5vw, 7.5rem);
+  }
 }

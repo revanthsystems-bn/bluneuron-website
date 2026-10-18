@@ -27,6 +27,9 @@ const NotifyContext = createContext(null);
 const DISMISSED_KEY = 'bluneuron-iriz-popup-dismissed';
 const AUTO_OPEN_DELAY_MS = 8000;
 
+/** How often to re-check when the invitation lands while a modal is open. */
+const RETRY_WHILE_BUSY_MS = 2000;
+
 export function useNotify() {
   const ctx = useContext(NotifyContext);
   if (!ctx) throw new Error('useNotify must be used inside <NotifyProvider>');
@@ -89,8 +92,40 @@ export default function NotifyProvider({ children }) {
     } catch {
       // storage unavailable — treat as not dismissed and still invite
     }
-    const t = setTimeout(() => openNotify(NOTIFY_SOURCES.timedInvitation), AUTO_OPEN_DELAY_MS);
-    return () => clearTimeout(t);
+    /*
+     * NEVER OPEN ON TOP OF ANOTHER MODAL.
+     *
+     * The invitation fires on a timer, so it has no idea what the visitor
+     * is doing when it lands. Since the buy sheet arrived (components/buy)
+     * there is a surface it can collide with: press Buy at 7.9 seconds and
+     * the newsletter modal opens over the top of it a tenth of a second
+     * later — two dialogs, two focus traps, and Escape dismissing whichever
+     * one happens to have bound its listener last.
+     *
+     * Choosing where to buy beats asking for an email address, so the
+     * invitation WAITS rather than cancelling: the visitor still gets it,
+     * just not over the thing they opened. Re-checking on an interval
+     * rather than subscribing to the other provider keeps the two from
+     * knowing about each other at all — any future modal is covered by the
+     * same test, with no registration step to forget.
+     */
+    const anotherModalOpen = () =>
+      document.querySelector('[role="dialog"][aria-modal="true"]') !== null;
+
+    let retry;
+    const invite = () => {
+      if (anotherModalOpen()) {
+        retry = setTimeout(invite, RETRY_WHILE_BUSY_MS);
+        return;
+      }
+      openNotify(NOTIFY_SOURCES.timedInvitation);
+    };
+
+    const t = setTimeout(invite, AUTO_OPEN_DELAY_MS);
+    return () => {
+      clearTimeout(t);
+      clearTimeout(retry);
+    };
   }, [openNotify, pathname]);
 
   // NO scroll lock or Esc handler here any more. Both used to live in this

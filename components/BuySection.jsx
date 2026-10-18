@@ -34,7 +34,7 @@ export default function BuySection() {
   return (
     <section
       id={BUY_ANCHOR}
-      className="relative scroll-mt-20 overflow-hidden border-b border-border-subtle bg-black py-20"
+      className="relative scroll-mt-20 overflow-hidden border-b border-border-subtle bg-black section-y"
     >
       <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
       <div className="pointer-events-none absolute inset-0 bg-noise" />
@@ -54,7 +54,7 @@ export default function BuySection() {
               short of the artwork and leaves a hard white edge showing through
               at the corners. The aspect ratio is declared, so nothing reflows
               when it decodes. */}
-          <Reveal className="product-glow relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl">
+          <Reveal className="product-glow relative mx-auto aspect-square w-full max-w-prose overflow-hidden rounded-card">
             <Image
               src={MEDIA.product.heroClean}
               alt={`${BRAND.fullName} projector`}
@@ -64,34 +64,34 @@ export default function BuySection() {
             />
           </Reveal>
 
-          <Reveal delay={0.08} className="max-w-xl">
+          <Reveal delay={0.08} className="max-w-prose">
             <p className="bento-chip">Available now</p>
 
-            <h2 className="mt-5 text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+            <h2 className="h2 mt-5">
               {BRAND.fullName}
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-white/60 sm:text-base">{HERO.body}</p>
+            <p className="mt-3 text-step-2 leading-relaxed text-ink-3 sm:text-step-3">{HERO.body}</p>
 
             {/* Price and tax line as one block: the note is part of the price,
                 not a footnote, so it must never be separated from it by a
                 responsive wrap. */}
             <div className="mt-7">
-              <p className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+              <p className="h2">
                 {formatInr(MARKETPLACE.priceInr)}
               </p>
-              <p className="mt-1.5 text-xs text-white/50">{MARKETPLACE.priceNote}</p>
+              <p className="mt-1.5 text-step-1 text-ink-3">{MARKETPLACE.priceNote}</p>
             </div>
 
             <div className="mt-8">
               <MarketplaceButtons />
             </div>
 
-            <p className="mt-6 text-xs leading-relaxed text-white/40">
+            <p className="mt-6 text-step-1 leading-relaxed text-ink-3">
               Prices on Amazon and Flipkart move with their own offers — the price shown on the
               listing is the one that applies to your order.{' '}
               <a
                 href={ROUTES.whereToBuy}
-                className="underline underline-offset-2 transition-colors hover:text-white/70"
+                className="underline underline-offset-2 transition-colors hover:text-ink-2"
               >
                 More on where to buy
               </a>

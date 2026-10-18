@@ -177,22 +177,22 @@ export default function ClaimForm() {
   if (status === 'success' && filed) {
     return (
       <div className="glass-panel p-6 sm:p-8" role="status">
-        <p className="text-base font-semibold text-accent-soft">Your claim is in.</p>
-        <p className="mt-2.5 text-sm leading-relaxed text-white/60">
+        <p className="text-step-3 font-semibold text-accent-soft">Your claim is in.</p>
+        <p className="mt-2.5 text-step-2 leading-relaxed text-ink-3">
           We have the details and will come back to you on the email address you gave. Quote the
           reference below in any follow-up.
         </p>
 
-        <dl className="mt-6 divide-y divide-border-subtle border-y border-border-subtle text-sm">
+        <dl className="mt-6 divide-y divide-border-subtle border-y border-border-subtle text-step-2">
           <Row label="Claim reference">
-            <span className="font-mono text-sm text-white">{filed.claimRef}</span>
+            <span className="font-mono text-step-2 text-white">{filed.claimRef}</span>
           </Row>
           <Row label="Product">{PRODUCT_LABEL}</Row>
           <Row label="Reported">{filed.issueType}</Row>
         </dl>
 
-        <p className="mt-5 rounded-2xl border border-border-subtle bg-white/[0.03] p-4 text-xs leading-relaxed text-white/55">
-          <strong className="font-semibold text-white/85">Keep your invoice to hand.</strong> It is
+        <p className="mt-5 rounded-ctl border border-border-subtle bg-white/[0.03] p-4 text-step-1 leading-relaxed text-ink-3">
+          <strong className="font-semibold text-ink-2">Keep your invoice to hand.</strong> It is
           the proof of purchase date the claim is assessed against.
         </p>
 
@@ -248,7 +248,7 @@ export default function ClaimForm() {
 
       <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
         <fieldset className="min-w-0 space-y-5" disabled={busy}>
-          <legend className="mb-1 hidden text-sm font-semibold text-white md:block">
+          <legend className="mb-1 hidden text-step-2 font-semibold text-white md:block">
             Your details
           </legend>
 
@@ -275,7 +275,7 @@ export default function ClaimForm() {
         </fieldset>
 
         <fieldset className="min-w-0 space-y-5" disabled={busy}>
-          <legend className="mb-1 hidden text-sm font-semibold text-white md:block">
+          <legend className="mb-1 hidden text-step-2 font-semibold text-white md:block">
             The unit
           </legend>
 
@@ -317,8 +317,8 @@ export default function ClaimForm() {
           </Field>
           {!errors.description && (
             <p
-              className={`mt-1.5 text-xs ${
-                described >= CLAIM_DESCRIPTION_MIN ? 'text-white/35' : 'text-white/45'
+              className={`mt-1.5 text-step-1 ${
+                described >= CLAIM_DESCRIPTION_MIN ? 'text-ink-3' : 'text-ink-3'
               }`}
               aria-live="polite"
             >
@@ -345,7 +345,7 @@ export default function ClaimForm() {
           described in the{' '}
           <a
             href="/legal/privacy"
-            className="underline underline-offset-2 transition-colors hover:text-white/80"
+            className="underline underline-offset-2 transition-colors hover:text-ink-2"
           >
             Privacy Policy
           </a>
@@ -363,12 +363,12 @@ export default function ClaimForm() {
         {busy ? 'Submitting…' : 'Submit claim'}
       </Magnetic>
 
-      <p className="mt-5 text-xs leading-relaxed text-white/35">
+      <p className="mt-5 text-step-1 leading-relaxed text-ink-3">
         We use these details only to handle your claim. They are not used for advertising and are
         never sent to any advertising platform. Trouble submitting? Email{' '}
         <a
           href={`mailto:${SUPPORT.email}`}
-          className="underline underline-offset-2 transition-colors hover:text-white/60"
+          className="underline underline-offset-2 transition-colors hover:text-ink-3"
         >
           {SUPPORT.email}
         </a>
@@ -382,8 +382,8 @@ export default function ClaimForm() {
 function Row({ label, children }) {
   return (
     <div className="flex items-baseline justify-between gap-4 py-2.5">
-      <dt className="shrink-0 text-xs text-white/45">{label}</dt>
-      <dd className="text-right text-sm font-medium text-white/85">{children}</dd>
+      <dt className="shrink-0 text-step-1 text-ink-3">{label}</dt>
+      <dd className="text-right text-step-2 font-medium text-ink-2">{children}</dd>
     </div>
   );
 }
