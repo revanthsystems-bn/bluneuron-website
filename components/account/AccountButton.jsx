@@ -18,8 +18,10 @@ import { ACCOUNTS_ENABLED } from '@/lib/site-config';
  * shape depending on how someone signed in. Initials on the accent ring are
  * the same size and weight whichever way they arrived.
  *
- * `ink` is the light-hero test (lib/heroTheme.js) — over the white hero the
- * icon has to be dark. Same prop, same meaning, as CartButton.
+ * The `ink` prop is GONE, with the light-hero test it existed for
+ * (components/Header has the note). The masthead is light-on-dark in every
+ * state now, so there is one icon colour. Same change, same reason, as
+ * CartButton.
  */
 /**
  * The gate. No hooks of its own, so the early return cannot reorder the
@@ -32,14 +34,10 @@ export default function AccountButton(props) {
   return <AccountButtonControl {...props} />;
 }
 
-function AccountButtonControl({ className = '', ink = false }) {
+function AccountButtonControl({ className = '' }) {
   const { user, hydrated } = useAccount();
 
-  const base = `relative flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
-    ink
-      ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
-      : 'text-ink-2 hover:bg-white/5 hover:text-white'
-  } ${className}`;
+  const base = `relative flex h-11 w-11 items-center justify-center rounded-full text-ink-2 transition-colors duration-500 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${className}`;
 
   // Before hydration we do not know whether anyone is signed in. Render the
   // signed-OUT control rather than a spinner or nothing: it is the same size

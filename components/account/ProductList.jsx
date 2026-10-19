@@ -99,7 +99,13 @@ export default function ProductList() {
               >
                 <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-ctl border border-border-subtle bg-black">
-                    <Image src={product.image} alt="" fill sizes="80px" className="object-cover" />
+                    <Image
+                      src={product.image}
+                      alt=""
+                      fill
+                      sizes="160px"
+                      className="product-fade-tight object-contain p-1.5"
+                    />
                   </div>
 
                   <div className="min-w-0 flex-1">

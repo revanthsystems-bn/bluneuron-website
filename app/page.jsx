@@ -12,7 +12,6 @@ import BuySection from '@/components/BuySection';
 import Footer from '@/components/Footer';
 import StickyBuyBar from '@/components/StickyBuyBar';
 import { COMMERCE_ENABLED } from '@/lib/launch';
-import { resolveHeroTheme } from '@/lib/heroTheme';
 import { ROUTES } from '@/lib/routes';
 import { SHOW_BUY } from '@/lib/site-config';
 import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
@@ -71,19 +70,20 @@ export const metadata = pageMetadata({
  */
 
 /**
- * `searchParams` is a Promise in Next 16 and is a request-time API, so reading
- * it here opts this page into DYNAMIC RENDERING — the homepage is server-
- * rendered per request instead of being prerendered at build.
+ * STATIC AGAIN.
  *
- * That cost is accepted deliberately and temporarily: `?hero=light` exists so
- * both hero treatments can be opened side by side without a rebuild, which is
- * the entire point of the test. When the test is settled, delete the
- * `searchParams` prop and read `HERO_THEME` directly — the page goes back to
- * static with no other change. See lib/heroTheme.js.
+ * This page used to take `searchParams` — a request-time API in Next 16 — to
+ * read `?hero=light` for the light-hero test. Reading it opted the homepage
+ * into DYNAMIC RENDERING: the site's most-visited page was server-rendered on
+ * every single request, for a query parameter that existed so two hero
+ * treatments could be compared without a rebuild.
+ *
+ * The test is settled and gone (see components/Hero), so the prop went with
+ * it and the page is prerendered at build time again. That is worth more than
+ * it sounds: it removes a server render from the critical path of the page
+ * whose LCP this pass is trying to fix.
  */
-export default async function Home({ searchParams }) {
-  const heroTheme = resolveHeroTheme((await searchParams)?.hero);
-
+export default function Home() {
   return (
     <>
       {/* Organization, and only Organization: it describes the site as a
@@ -97,9 +97,9 @@ export default async function Home({ searchParams }) {
       {/* No AnnouncementBar here: the cinematic hero has to be the first
           visible thing on the page, and its eyebrow + tagline already carry
           the line the bar was running. The header floats over the video. */}
-      <Header overlay heroTheme={heroTheme} />
+      <Header overlay />
       <main>
-        <Hero theme={heroTheme} />
+        <Hero />
         <StickyBuyBar />
         {/* Every one of the four trust tiles is a commerce promise — a 30-day
             return, 24h dispatch, encrypted checkout, and the concierge that
@@ -109,13 +109,15 @@ export default async function Home({ searchParams }) {
             being reworded down to one surviving claim. See lib/launch.js. */}
         {COMMERCE_ENABLED && <TrustBadges />}
         <Highlights />
-        {/* ThrowRange follows Highlights directly. The WebGL ring tunnel
+        {/* ThrowRange follows Highlights directly. A WebGL ring tunnel
             (components/LensZoom) used to sit between them restating "Native
             1080p, projected up to 200 inches" over a spinning graphic — a
-            claim this page already makes in Highlights ("Go big and go
-            home"), in the dial below, and in TechSpecs' Resolution and Throw
-            Ratio rows. The later build of this site dropped the section
-            rather than re-skinning it; the component is left on disk. */}
+            claim this page already makes in Highlights, in the dial below,
+            and in TechSpecs' Resolution and Throw Ratio rows. The section was
+            dropped long ago and the component has now been deleted with it,
+            along with `three` and `@react-three/*`: it was the only thing in
+            the repository importing any of them, and an unmounted component
+            still pulls its dependencies into the install. */}
         <ThrowRange />
         <TechSpecs />
         <ProductShowcase />

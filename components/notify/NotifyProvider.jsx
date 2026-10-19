@@ -2,8 +2,17 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import NewsletterPopup from '../NewsletterPopup';
+import dynamic from 'next/dynamic';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
+import { NOTIFY_AUTO_OPEN } from '@/lib/site-config';
+
+/**
+ * Deferred for the same reason as the buy sheet: this provider is mounted in
+ * the root layout, and a static import put the modal's markup, framer-motion
+ * and its form code into every page's JavaScript for a dialog that — with
+ * NOTIFY_AUTO_OPEN off — now opens only when someone asks for it.
+ */
+const NewsletterPopup = dynamic(() => import('../NewsletterPopup'), { ssr: false });
 
 /**
  * Pre-launch, every CTA on the site means the same thing: "put me on the
@@ -39,10 +48,14 @@ export function useNotify() {
 export default function NotifyProvider({ children }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // Latched, so the chunk is requested once and only on a page where the
+  // modal is actually used. See BuyProvider for the same pattern.
+  const [everOpened, setEverOpened] = useState(false);
   const [source, setSource] = useState(NOTIFY_SOURCES.timedInvitation);
 
   const openNotify = useCallback((from = NOTIFY_SOURCES.timedInvitation) => {
     setSource(from);
+    setEverOpened(true);
     setOpen(true);
   }, []);
 
@@ -66,8 +79,20 @@ export default function NotifyProvider({ children }) {
   }, []);
 
   /**
-   * THE UNPROMPTED INVITATION IS HOMEPAGE-ONLY.
+   * THE UNPROMPTED INVITATION IS OFF, AND HOMEPAGE-ONLY WHEN ON.
    *
+   * NOTIFY_AUTO_OPEN (lib/site-config.js) is the outer gate and is `false`
+   * while the product is on sale: a launch-list modal that opens itself over
+   * a live buy flow interrupts the decision it is standing in front of. The
+   * flag is checked FIRST so that none of the machinery below — the timer,
+   * the storage read, the busy-modal retry — ever starts; a disabled feature
+   * that still schedules work is a disabled feature that can still surprise
+   * you.
+   *
+   * Everything below is unchanged and comes back exactly as it was the
+   * moment the flag flips.
+   *
+   * THE INVITATION IS ALSO HOMEPAGE-ONLY, independently of that gate.
    * It used to fire on every route after a delay, which put a launch-list
    * modal over the product page, the basket, the sign-in form and the
    * account area — i.e. over every screen where the visitor is already doing
@@ -85,6 +110,7 @@ export default function NotifyProvider({ children }) {
    * who asks for the modal must always get it.
    */
   useEffect(() => {
+    if (!NOTIFY_AUTO_OPEN) return undefined;
     if (pathname !== '/') return undefined;
 
     try {
@@ -142,12 +168,14 @@ export default function NotifyProvider({ children }) {
   return (
     <NotifyContext.Provider value={value}>
       {children}
-      <NewsletterPopup
-        open={open}
-        source={source}
-        onClose={closeNotify}
-        onSubscribed={markSubscribed}
-      />
+      {everOpened && (
+        <NewsletterPopup
+          open={open}
+          source={source}
+          onClose={closeNotify}
+          onSubscribed={markSubscribed}
+        />
+      )}
     </NotifyContext.Provider>
   );
 }

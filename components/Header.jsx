@@ -42,26 +42,27 @@ import { NOTIFY_SOURCES } from '@/lib/web3forms';
  * measured, see app/globals.css.
  *
  * ---------------------------------------------------------------------
- * `heroTheme` is the light-hero test (lib/heroTheme.js). With 'light', the
- * masthead has to be dark ink while it floats over the white hero, and go
- * back to its normal light-on-dark the moment the page reaches the dark
- * sections below.
+ * THE `ink` / LIGHT-HERO TEST IS GONE, along with lib/heroTheme.js.
  *
- * TWO INDEPENDENT FLAGS, not one:
+ * It existed for one reason: the hero backdrop was bright white studio
+ * footage, and dark ink over white footage was a real alternative worth
+ * testing. The hero is now a product on a DARK stage (components/HeroBackdrop
+ * has the reasoning), so dark ink over it fails AA by construction — the test
+ * could only ever have shipped an unreadable masthead, and `?hero=light` was
+ * a reachable URL that did exactly that.
+ *
+ * Removing it also took `searchParams` out of app/page.jsx, which is what put
+ * the homepage back to being STATICALLY PRERENDERED instead of server-rendered
+ * on every request.
+ *
+ * TWO INDEPENDENT FLAGS, still not one:
  *
  *   `scrolled`  (> 24px)  — the existing height/background shrink.
  *   `pastHero`            — whether the masthead has cleared the hero.
  *
- * Both hero themes now switch their over-hero treatment on `pastHero`, not on
- * `scrolled`: `ink` for the light test, `frosted` for the bright dark hero.
- * Keying the frost to `scrolled` would drop the full black glass bar onto the
- * video 24px into a 100svh section.
- *
- * They used to be one flag, because with a dark hero "scrolled at all" and
- * "over something dark" were the same thing. Over a LIGHT hero they are not:
- * scrolling 25px inside the hero would otherwise drop a black glass bar onto
- * white footage. So in ink mode the background stays transparent until
- * `pastHero`, and only then does the dark glass fade in.
+ * `frosted` switches on `pastHero`, not on `scrolled`. Keying it to `scrolled`
+ * would drop the full black glass bar onto the hero 24px into a 100svh
+ * section.
  *
  * `pastHero` is an IntersectionObserver on the hero's own box rather than a
  * scrollY threshold against `innerHeight` — the hero is `min-h-svh`, so its
@@ -77,7 +78,7 @@ import { NOTIFY_SOURCES } from '@/lib/web3forms';
  * them. Nothing is conditionally mounted — a mount/unmount swap is exactly
  * what would make it flip hard.
  */
-export default function Header({ overlay = false, heroTheme = 'dark' }) {
+export default function Header({ overlay = false }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(!overlay);
@@ -100,11 +101,8 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 300, damping: 40 });
 
-  // Ink mode: floating over a LIGHT hero that has not scrolled away yet.
-  const ink = overlay && heroTheme === 'light' && !pastHero;
-  // Frosted mode: the same moment on the BRIGHT dark hero. Mutually exclusive
-  // with `ink` by construction — they test opposite values of `heroTheme`.
-  const frosted = overlay && heroTheme !== 'light' && !pastHero;
+  // Frosted mode: floating over the hero, which has not scrolled away yet.
+  const frosted = overlay && !pastHero;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -129,10 +127,10 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
     return () => observer.disconnect();
   }, [overlay]);
 
-  // Background: transparent only in ink mode, where the hero itself is white
-  // and the bar is dark-on-light. Over the bright dark hero the frost carries
-  // it; past either hero, the normal black glass.
-  const transparent = ink;
+  // Over the hero the frost carries the bar; past it, the normal black
+  // glass. There is no longer a state in which the masthead is fully
+  // transparent — that was the light-hero test's, and it is gone.
+  const transparent = false;
 
   /**
    * THE MASTHEAD CTA — one function, two call sites (the bar and the open
@@ -229,42 +227,24 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
         >
-          {/* TWO wordmark files, stacked and cross-faded on opacity.
-              Not a CSS filter on the one asset: the mark is white glyphs plus
-              one BRAND-BLUE word (rgb(2,109,254)), and `invert()` turns that
-              blue orange while `brightness(0)` throws it away entirely.
-              `wordmark-ink.png` is the same art with only the white
-              recoloured to #030303, so the blue survives the handover.
+          {/* ONE wordmark file now. There used to be two — white and ink —
+              stacked and cross-faded, because the light-hero test needed a
+              dark mark while the masthead floated over white footage. With
+              that test gone the masthead is light-on-dark everywhere, and the
+              second copy was a second request and a second DOM node for a
+              state that can no longer occur. `wordmark-ink.png` is left in
+              public/brand/ for whoever needs it next.
 
-              Stacked rather than swapped so the transition interpolates —
-              swapping `src` would pop. The second copy is absolutely
-              positioned and `aria-hidden`, so the accessibility tree still
-              sees exactly one wordmark. */}
-          <span className="relative inline-flex h-5">
-            {/* `priority`, so the mark is preloaded and painted with the first
-                frame rather than lazily after it. Over a bright hero a missing
-                logo is not a subtle regression — there is no dark bar left for
-                the gap to hide in. (It replaces a `preload` prop that was not
-                a next/image prop at all and did nothing but reach the DOM.)
-                Only the white copy gets it; the ink copy is for the light test
-                and is never the first thing painted. */}
-            <Image
-              src="/brand/wordmark-white.png"
-              alt="BluNeuron"
-              width={1715}
-              height={327}
-              priority
-              className={`h-5 w-auto transition-opacity duration-500 ${ink ? 'opacity-0' : 'opacity-100'}`}
-            />
-            <Image
-              src="/brand/wordmark-ink.png"
-              alt=""
-              aria-hidden="true"
-              width={1715}
-              height={327}
-              className={`absolute inset-0 h-5 w-auto transition-opacity duration-500 ${ink ? 'opacity-100' : 'opacity-0'}`}
-            />
-          </span>
+              `priority`, so the mark is preloaded and painted with the first
+              frame rather than lazily after it. */}
+          <Image
+            src="/brand/wordmark-white.png"
+            alt="BluNeuron"
+            width={1715}
+            height={327}
+            priority
+            className="h-5 w-auto"
+          />
         </motion.a>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
@@ -280,15 +260,11 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
                 // this is what actually announces "you are here".
                 aria-current={current ? 'page' : undefined}
                 className={`rounded-full px-4 py-2 text-step-2 font-medium transition-colors duration-500 ${
-                  ink
-                    ? current
-                      ? 'bg-black/[0.06] text-black-obsidian'
-                      : 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
-                    : current
-                      ? 'bg-white/10 text-white'
-                      : frosted
-                        ? 'text-white hover:bg-white/10'
-                        : 'text-ink-2 hover:bg-white/5 hover:text-white'
+                  current
+                    ? 'bg-white/10 text-white'
+                    : frosted
+                      ? 'text-white hover:bg-white/10'
+                      : 'text-ink-2 hover:bg-white/5 hover:text-white'
                 }`}
               >
                 {item.label}
@@ -303,21 +279,17 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
             own padding, and a wider gap reads as two unrelated controls
             instead of one account/cart pair. */}
         <div className="flex items-center gap-1 sm:gap-2">
-          <AccountButton ink={ink} />
-          <CartButton ink={ink} />
-          {renderCta(
-            `ml-1 hidden px-5 py-2.5 text-step-1 sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
-          )}
+          <AccountButton />
+          <CartButton />
+          {renderCta('ml-1 hidden px-5 py-2.5 text-step-1 sm:inline-flex btn-primary')}
           <button
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
             className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-500 lg:hidden ${
-              ink
-                ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
-                : frosted
-                  ? 'text-white hover:bg-white/10'
-                  : 'text-ink-2 hover:bg-white/5 hover:text-white'
+              frosted
+                ? 'text-white hover:bg-white/10'
+                : 'text-ink-2 hover:bg-white/5 hover:text-white'
             }`}
             onClick={() => setMobileOpen((v) => !v)}
           >
@@ -332,16 +304,11 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
         </div>
       </div>
 
-      {/* The open mobile panel is a solid sheet, so in ink mode it has to go
-          white — a black sheet under ink links would be unreadable, and
-          keeping the links white on it would leave the bar above them dark. */}
+      {/* The open mobile panel is a solid sheet. It used to flip to white in
+          ink mode, over the light hero; with that test gone it is always the
+          dark sheet. */}
       {mobileOpen && (
-        <div
-          id="mobile-nav"
-          className={`border-t lg:hidden ${
-            ink ? 'border-black/10 bg-white' : 'border-border-subtle bg-black'
-          }`}
-        >
+        <div id="mobile-nav" className="border-t border-border-subtle bg-black lg:hidden">
           <nav className="section-container flex flex-col gap-1 py-4">
             {NAV_ITEMS.map((item) => {
               const current = isCurrent(item);
@@ -355,13 +322,9 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
                   // the floor for a thumb. Do not tighten it to match the
                   // desktop nav's `py-2`.
                   className={`rounded-lg px-3 py-3 text-step-2 font-medium ${
-                    ink
-                      ? current
-                        ? 'bg-black/[0.06] text-black-obsidian'
-                        : 'text-black-obsidian/80 hover:bg-black/5 hover:text-black-obsidian'
-                      : current
-                        ? 'bg-white/10 text-white'
-                        : 'text-ink-2 hover:bg-white/5 hover:text-white'
+                    current
+                      ? 'bg-white/10 text-white'
+                      : 'text-ink-2 hover:bg-white/5 hover:text-white'
                   }`}
                 >
                   {item.label}
@@ -374,15 +337,11 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
             <a
               href={ROUTES.account}
               onClick={() => setMobileOpen(false)}
-              className={`rounded-lg px-3 py-3 text-step-2 font-medium ${
-                ink
-                  ? 'text-black-obsidian/80 hover:bg-black/5 hover:text-black-obsidian'
-                  : 'text-ink-2 hover:bg-white/5 hover:text-white'
-              }`}
+              className="rounded-lg px-3 py-3 text-step-2 font-medium text-ink-2 hover:bg-white/5 hover:text-white"
             >
               Account
             </a>
-            {renderCta(`mt-2 justify-center ${ink ? 'btn-primary-ink' : 'btn-primary'}`, {
+            {renderCta('mt-2 justify-center btn-primary', {
               // Closing the panel is the shared part: tapping the CTA inside
               // an open mobile menu must dismiss it, whichever of the three
               // actions the CTA currently is.

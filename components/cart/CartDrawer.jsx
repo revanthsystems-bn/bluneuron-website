@@ -163,8 +163,8 @@ function CartDrawerPanel() {
                         src={PRODUCT.image}
                         alt=""
                         fill
-                        sizes="80px"
-                        className="object-cover"
+                        sizes="160px"
+                        className="product-fade-tight object-contain p-1.5"
                       />
                     </div>
 
@@ -219,10 +219,15 @@ function CartDrawerPanel() {
 }
 
 /*
- * The thumbnail is PRODUCT.image (lib/iriz.js) — the retail-box PHOTOGRAPH,
- * not the white-on-white render. At 80px on a dark panel a white unit on a
- * white ground is nearly invisible and says nothing about what ships, which
- * is the same reasoning that picked that file for PRODUCT.image in the first
- * place. Imported rather than re-spelled here, so there is one answer to
- * "which picture represents this product in a list".
+ * The thumbnail is PRODUCT.image (lib/iriz.js) — now the white-on-white
+ * RENDER of the bare unit, front three-quarter, not the old retail-carton
+ * photograph. That photograph showed a box design that does not ship.
+ *
+ * The invisibility that originally argued for a photograph is handled in CSS
+ * rather than by the choice of file: `.product-fade-tight` dissolves the white
+ * studio ground into the dark panel, and `object-contain` keeps the whole unit
+ * in frame instead of centre-cropping it. Imported rather than re-spelled
+ * here, so there is one answer to "which picture represents this product in a
+ * list" — and so all four small tiles (here, the buy sheet, /cart and the
+ * account order rows) change together or not at all.
  */

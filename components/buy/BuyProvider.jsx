@@ -1,7 +1,22 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import BuySheet from './BuySheet';
+import dynamic from 'next/dynamic';
+
+/**
+ * The sheet's CODE, not just its markup, is deferred.
+ *
+ * `renders nothing until opened` was already true of the markup, but a static
+ * import still put BuySheet — and framer-motion and the lucide icon it pulls
+ * in with it — into the JavaScript of every page at load. This provider sits
+ * in the root layout, so that was every page on the site paying for a modal
+ * most visitors never open.
+ *
+ * `ssr: false` is correct here and not a shortcut: the sheet is a dialog that
+ * can only be opened by a click, so there is no first paint of it to server
+ * render, and nothing in it is content a crawler should see.
+ */
+const BuySheet = dynamic(() => import('./BuySheet'), { ssr: false });
 
 /**
  * One sheet for the whole document, opened from anywhere.
@@ -13,8 +28,8 @@ import BuySheet from './BuySheet';
  * every `aria-labelledby`. One instance at the root is also what makes the
  * sheet survive the button that opened it being scrolled away or unmounted.
  *
- * It renders NOTHING until something opens it: <BuySheet> is wrapped in
- * AnimatePresence and returns null while closed, so the cost of the
+ * It renders NOTHING until something opens it, and since the dynamic import
+ * above it does not even DOWNLOAD anything until then — so the cost of this
  * provider on a page nobody buys from is the context object alone.
  */
 const BuyContext = createContext(null);
@@ -31,8 +46,15 @@ export function useBuySheet() {
 
 export default function BuyProvider({ children }) {
   const [open, setOpen] = useState(false);
+  // Latched: once the sheet has been opened, keep it mounted so closing and
+  // reopening does not re-request the chunk and re-run its entry animation
+  // from a cold start.
+  const [everOpened, setEverOpened] = useState(false);
 
-  const openBuySheet = useCallback(() => setOpen(true), []);
+  const openBuySheet = useCallback(() => {
+    setEverOpened(true);
+    setOpen(true);
+  }, []);
   const closeBuySheet = useCallback(() => setOpen(false), []);
 
   const value = useMemo(
@@ -43,7 +65,7 @@ export default function BuyProvider({ children }) {
   return (
     <BuyContext.Provider value={value}>
       {children}
-      <BuySheet open={open} onClose={closeBuySheet} />
+      {everOpened && <BuySheet open={open} onClose={closeBuySheet} />}
     </BuyContext.Provider>
   );
 }

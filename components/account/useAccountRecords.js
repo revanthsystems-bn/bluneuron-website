@@ -5,6 +5,7 @@ import { useAccount } from './AccountContext';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { DEMO_MODE } from '@/lib/supabase/config';
 import { DEMO_ADDRESSES, DEMO_CLAIMS, DEMO_PRODUCTS } from '@/lib/account-demo';
+import { MEDIA } from '@/lib/iriz';
 
 /**
  * The account's rows: profile, addresses, registered products, claims.
@@ -145,4 +146,4 @@ function toClaim(row) {
  * product disagree about what it looks like, and the asset is a front-end
  * concern that changes with a redesign, not with the data.
  */
-const PRODUCT_IMAGE = '/media/iriz/product/retail-box.jpg';
+const PRODUCT_IMAGE = MEDIA.product.heroClean;

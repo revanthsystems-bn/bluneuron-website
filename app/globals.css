@@ -402,27 +402,12 @@
   }
 
   /*
-   * For real PHOTOGRAPHS rather than cutout renders — currently the
-   * retail-box shot, which arrives with its own lit grey seamless and a
-   * reflection under the product.
-   *
-   * Deliberately the opposite of `.product-fade-tight`: no mask at all. That
-   * mask exists to dissolve a white studio backdrop into the dark panel, and
-   * run over a photograph it eats the corners of the box and the ground
-   * beneath the unit, leaving the product floating on black with nothing
-   * holding it. Here the frame is the point — a hairline and a radius, so
-   * the photo reads as a framed image tile sitting ON the panel rather than
-   * a cutout bleeding into it.
+   * `.product-photo` / `.product-photo-frame` are GONE. They existed for
+   * exactly one asset — the retail-box photograph — which pictured a carton
+   * design that does not ship and has been removed from the repository. The
+   * surviving photograph (`boxFront`) is shown in the product gallery, which
+   * frames its own shots.
    */
-  .product-photo {
-    @apply object-cover;
-    filter: contrast(1.02) saturate(1.02);
-  }
-
-  .product-photo-frame {
-    @apply overflow-hidden rounded-xl border border-white/10 bg-black-elevated;
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-  }
 
   /*
    * Ambient radial glow stage lighting behind every projector render:
@@ -456,17 +441,10 @@
   }
 
   /*
-   * The IRIZ "detail" renders are full infographic slides (their own
-   * baked-in headline/caption text, near-black to navy backgrounds), not
-   * clean cutouts on transparent ground — so unlike .product-fade they
-   * keep almost all of their content and only vignette the outer rim,
-   * enough for the rectangular photo bounds to dissolve into the page's
-   * radial stage light behind it instead of reading as a pasted card.
+   * `.detail-fade` is GONE with the six "detail" slides it vignetted. Those
+   * were infographic PNGs with their claims burned in; they are live type
+   * now (components/boards/). Nothing left on the site is a picture of text.
    */
-  .detail-fade {
-    -webkit-mask-image: radial-gradient(ellipse 90% 88% at 50% 50%, black 66%, transparent 100%);
-    mask-image: radial-gradient(ellipse 90% 88% at 50% 50%, black 66%, transparent 100%);
-  }
 }
 
 @layer components {
@@ -498,78 +476,6 @@
     line-height: 1.2;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-  }
-
-  /* ---------------------------------------------------------------- *
-   * Hero overlays — OPTION A, BRIGHT.
-   *
-   * The loop is a white-studio product shot: the unit in one hand
-   * against a lit white seamless. The previous treatment fought that
-   * with a flat 0.42 veil over the whole frame plus two long gradients,
-   * which is why footage shot on white read as night-time. The veil is
-   * GONE — nothing darkens the middle of the frame any more — and what
-   * is left is local:
-   *
-   *   .hero-media         a light grade, so the loop sits at its own
-   *                       exposure instead of under ours
-   *   .hero-scrim-bottom  a short fade behind the TEXT BLOCK only
-   *   .hero-scrim-top     a light fade under the masthead only
-   *
-   * Everything between those two bands is now un-darkened footage.
-   *
-   * THE GRADE sits on the media WRAPPER, not on the <video>, so the
-   * poster frame the video paints before playback and the
-   * reduced-motion still that renders with no video at all both get
-   * the identical grade. MEASURED — mean luma 0-255 over the same band
-   * of frame 0, ungraded -> graded:
-   *
-   *   video                124.15 -> 132.49
-   *   <video poster>       124.04 -> 132.31
-   *   reduced-motion still 123.97 -> 132.36
-   *
-   * i.e. all three land within 0.2 of each other, so there is nothing
-   * to re-encode: the stored poster ALREADY displays at the video's
-   * graded brightness and the swap is invisible. Baking the grade into
-   * the file as well would push the poster to ~141 while the video
-   * stayed at 132 — a bright-to-normal pop, the same artefact the
-   * other way round. One filter, one source of truth.
-   *
-   * contrast() is deliberately 1.04 and no more: the loop already
-   * touches 255 on the seamless, and contrast pushes highlights
-   * outward from mid-grey, so every point of it clips more backdrop.
-   * Measured over the loop's own frames, near-white coverage (all
-   * channels >= 250) goes 1.78% -> 2.46% of frame. That is the
-   * backdrop getting whiter, not detail leaving the chassis.
-   * Re-measure before raising it.
-   * ---------------------------------------------------------------- */
-  .hero-media {
-    filter: brightness(1.08) contrast(1.04);
-  }
-
-  /* Framing for the loop and its poster. This owns `object-position`
-     outright — the elements deliberately carry no `object-center`
-     utility, which is a utility and would outrank anything set here.
-     Both the <video> and the reduced-motion <Image> carry it, so the two
-     media states frame the product identically.
-
-     PHONES. The loop is 16:9 and a phone viewport is about 9:19.5, so
-     `object-fit: cover` keeps only ~26% of the frame's width: every
-     phone frame is a severe crop, and where that crop sits decides
-     whether the thing reads as a projector at all. 40 / 50 / 58 / 66 /
-     74% were rendered at 390x844 across the loop (t = 0, 0.75, 1.5,
-     2.25, 3) and compared.
-
-     50% won, so there is no phone override. The loop's last beat is a
-     push-in on the lens, and that is the one frame that says
-     "projector" without help — at 50% the lens sits whole and centred;
-     at 58% its right edge is clipped and at 74% it is cut badly. The
-     mid-loop beats keep the ports, the vents and the hand holding the
-     unit at every value tested, so they do not decide it.
-
-     Re-run that comparison before shifting this: the right answer is a
-     property of the FOOTAGE, and a re-cut loop can move it. */
-  .hero-media-frame {
-    object-position: 50% 50%;
   }
 
   /* The bottom fade is sized to the TEXT, not to the frame. Its own box
@@ -774,271 +680,6 @@
   }
 }
 
-@layer components {
-  /* ================================================================ *
-   * What You Get — the 2x2 board of full-bleed detail images.
-   *
-   * Same approach as Under the Hood below: sample each image's own
-   * SIDE STRIPS (leftmost/rightmost 6 columns, the pixels that actually
-   * abut bare tile) and paint the tile to match, then feather the edge
-   * so no rectangle shows.
-   *
-   * Every one of these backgrounds is a background-IMAGE, never a
-   * background-color — `.bento-tile`-style surfaces carry Tailwind's
-   * `bg-white/[0.035]`, and utilities outrank the components layer, so
-   * a colour set here would lose to it and leave a lifted-grey rectangle.
-   * ================================================================ */
-
-  /* 11-apps-10000.png — dark slate the whole way down, into black.
-     0% #171b23  10% #151820  25% #13161c  40% #12141b  55% #0f1218
-     70% #141923  85% #7d5d57  95% #04060b  100% #000000
-     The #7d5d57 at 85% is the hand holding the remote touching the
-     right edge, not the field colour — it is interpolated through
-     rather than used as a stop, or the tile would carry a skin-tone
-     band across its full width. The edge feather covers that spot. */
-  .img-field-apps {
-    background-image: linear-gradient(
-      180deg,
-      #171b23 0%, #151820 10%, #13161c 25%, #12141b 40%,
-      #0f1218 55%, #141923 70%, #0b0e14 85%, #04060b 95%, #000000 100%
-    );
-  }
-
-  /* 06-chipset.png — black into deep blue and back out. */
-  .img-field-chipset {
-    background-image: linear-gradient(
-      180deg,
-      #000000 0%, #010208 10%, #00091b 25%, #011f4e 40%,
-      #004b8f 55%, #4c7fa8 70%, #27648c 85%, #001931 95%, #00060d 100%
-    );
-  }
-
-  /* 09-screen-size.png — #000000 at every sampled height. */
-  .img-field-screen {
-    background-image: linear-gradient(180deg, #000000 0%, #000000 100%);
-  }
-
-  /* 08-keystone.png — NOT pure black. The room photograph runs to the
-     frame edges, so only the top and bottom bands are black:
-     0% #000000  10% #171b25  25% #1e2941  40% #253656  55% #4b4861
-     70% #5b4c4c  85% #3e4457  95% #1d1e22  100% #000000 */
-  .img-field-keystone {
-    background-image: linear-gradient(
-      180deg,
-      #000000 0%, #171b25 10%, #1e2941 25%, #253656 40%,
-      #4b4861 55%, #5b4c4c 70%, #3e4457 85%, #1d1e22 95%, #000000 100%
-    );
-  }
-
-  /*
-   * ONE-SCREEN FIT.
-   *
-   * The row height is min(620px, viewport minus everything stacked above and
-   * below it). Every figure subtracted here was MEASURED in the browser at
-   * 1440x900, not estimated:
-   *
-   *   masthead, scrolled state          65px  (h-16 + its 1px border; it
-   *                                            shrinks from 80 past 24px of
-   *                                            scroll, and this section is
-   *                                            never reached unscrolled)
-   *   eyebrow                           16px
-   *   eyebrow margin-bottom             12px
-   *   h2 at md:text-5xl, two lines      96px
-   *   grid margin-top                   48px
-   *   breathing room under the row      48px
-   *   ----------------------------------------
-   *   total chrome                     285px
-   *
-   * 900 - 285 = 615, so the cap never binds at 900 and binds at roughly 905px
-   * of viewport height upward. Re-measure rather than nudge this if the
-   * heading's type scale, the masthead height, or the grid gap changes — a
-   * wrong figure here does not error, it just quietly reintroduces a scroll.
-   */
-  :root {
-    --hl-chrome: 285px;
-  }
-
-  .hl-tile-h {
-    height: min(620px, calc(100svh - var(--hl-chrome)));
-  }
-
-  /* Tablet: 2x2, so TWO rows have to fit the same budget. Half the row height
-     each, less the grid gap, and capped lower so the block still reads as one
-     screen rather than nearly two. */
-  @media (min-width: 768px) and (max-width: 1023px) {
-    .hl-tile-h {
-      height: min(360px, calc((100svh - var(--hl-chrome) - 1rem) / 2));
-    }
-  }
-
-  /*
-   * The framed banners.
-   */
-  /*
-   * The hairline is an inset overlay, NOT a border on the frame itself.
-   *
-   * A real border sits inside the box, so the image renders into
-   * `width - 2px` while the column was sized to `width`. The two banners then
-   * compute to (w1-2)/1.500 and (w2-2)/1.777, which are not equal even when w1
-   * and w2 are exactly proportional to their aspects — it landed as a 1px
-   * height difference between the two frames. With the line drawn as an
-   * overlay the content box is the full column width and the fractions resolve
-   * to identical heights.
-   */
-  .hl-frame {
-    @apply relative overflow-hidden rounded-3xl;
-    box-shadow: 0 32px 64px -24px rgba(0, 0, 0, 0.9), 0 12px 24px -12px rgba(0, 0, 0, 0.7);
-  }
-
-  .hl-frame::after {
-    content: '';
-    @apply pointer-events-none absolute inset-0 rounded-3xl;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
-  }
-
-  /*
-   * The ambient glow behind a framed banner.
-   *
-   * The source is a 64px-wide copy generated once at build time, NOT the
-   * 1.8MB original behind a large CSS filter — a big `filter: blur()` makes
-   * the compositor allocate and re-blur a full-size surface, which is exactly
-   * the kind of thing that shows up as scroll jank. Upscaling a ~1.3KB image
-   * is close to free, and once blurred the two are indistinguishable.
-   *
-   * `translateZ(0)` puts it on its own layer so the blur is rasterised once
-   * instead of on every composite.
-   */
-  .hl-glow {
-    @apply h-full w-full object-cover;
-    /* Blur radius has to EXCEED the inset for any of the glow to clear the
-       frame — at inset 7% on a ~588px banner the element already starts ~41px
-       inside, so a 44px blur spilled about 3px and the halo was invisible.
-       64px of blur plus a small scale-up puts roughly 25-30px of light outside
-       the frame on every side, which is what reads as spill rather than an
-       outline. Cheap regardless of radius: the source is a 64px JPEG and the
-       layer is rasterised once (see translateZ below). */
-    filter: blur(64px) saturate(1.3);
-    opacity: 0.5;
-    /* Own compositing layer, so the blur is rasterised once instead of on
-       every composite during a scroll. */
-    transform: translateZ(0) scale(1.06);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hl-glow {
-      transition: none;
-    }
-  }
-
-  /*
-   * Carousel track. `scrollbar-width: none` and the WebKit equivalent hide the
-   * bar without touching scrollability — the gesture, the keyboard and the
-   * snapping all still work.
-   */
-  .hl-track {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-padding-inline: 11vw;
-    overscroll-behavior-x: contain;
-  }
-
-  .hl-track::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hl-track {
-      scroll-behavior: auto;
-    }
-  }
-
-  /*
-   * The tile shell. Deliberately NOT `.bento-tile`: that class's hover
-   * lift is a plain Tailwind `hover:` variant, which fires on a tap on
-   * touch devices, and this board is specified as desktop-hover-only.
-   * Same radius and hairline, hover gated behind `(hover: hover)`.
-   */
-  /*
-   * The tile's own ground is flat black, NOT the field gradient.
-   *
-   * The gradient belongs on the artwork, where it was sampled from. Painted
-   * across the whole cell it is stretched over a box taller than the artwork,
-   * so the strips above and below show a colour sampled from somewhere in the
-   * middle of the image — above the keystone board that put slate (#1e2941)
-   * hard against the artwork's black top edge. Every one of the four images is
-   * near-black at its top and bottom (#000000, except the apps board's
-   * #171b23 top), so flat black is what those strips should be.
-   */
-  .img-tile {
-    @apply relative flex h-full w-full items-center justify-center overflow-hidden rounded-3xl border border-white/10;
-    background-color: #000000;
-    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 500ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .img-tile-media {
-    transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .img-tile:hover {
-      transform: translateY(-0.25rem);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .img-tile:hover .img-tile-media {
-      transform: scale(1.03);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .img-tile,
-    .img-tile-media {
-      transition: none;
-    }
-
-    .img-tile:hover .img-tile-media {
-      transform: none;
-    }
-  }
-
-  /*
-   * Edge feather, md and up ONLY, and on the HORIZONTAL axis only.
-   *
-   * A mask only does anything on the axis where the artwork actually
-   * fills its box: `object-contain` leaves the rest of the element
-   * transparent, and masking transparent pixels is a no-op. In the
-   * one-row layout every board is WIDTH-constrained inside `.hl-art`,
-   * so the horizontal edges are the real ones and this feathers them.
-   *
-   * Vertically it is both unnecessary and harmful: the artwork's top
-   * and bottom meet `.hl-art`'s own edges, where the tile already
-   * carries the same sampled gradient, and feathering there visibly
-   * faded the headline off the top of every board when it was tried.
-   *
-   * Below md the carousel cards are the artwork's own shape edge to
-   * edge, so there is nothing to blend into and no mask at all.
-   */
-  @media (min-width: 768px) {
-    .img-tile-media {
-      --feather: 4%;
-      -webkit-mask-image: linear-gradient(
-        to right,
-        transparent 0,
-        #000 var(--feather),
-        #000 calc(100% - var(--feather)),
-        transparent 100%
-      );
-      mask-image: linear-gradient(
-        to right,
-        transparent 0,
-        #000 var(--feather),
-        #000 calc(100% - var(--feather)),
-        transparent 100%
-      );
-    }
-  }
-}
 
 @layer components {
   /* ================================================================ *
@@ -1046,104 +687,15 @@
    * ================================================================ */
 
   /*
-   * BOARD BACKGROUNDS, sampled from the images themselves rather than
-   * picked by eye.
-   *
-   * Sampled from the SIDE STRIPS specifically — the leftmost and
-   * rightmost 6 columns — because that is the part of each image that
-   * actually abuts bare tile. Both boards are height-constrained in
-   * their tiles, so the background shows as vertical bars down the two
-   * sides, not as a band top and bottom. An earlier pass averaged the
-   * outer 12% of the width instead, which pulled in artwork well inside
-   * the frame and produced a ramp visibly lighter than the real edge.
-   *
-   *   02-spec-sheet.png    0% #8f97a8    8% #575f70   20% #1f2739
-   *                       35% #141b2d   50% #0e1526   65% #050c1d
-   *                       80% #020208   92% #000000  100% #000000
-   *   07-latency.png      #000000 at every sampled height; the only
-   *                       non-zero reading is #0a0907 on the last row.
-   *
-   * So the spec board gets that exact ramp and the latency board is
-   * flat black. The #8f97a8 at the very top is a one-pixel specular
-   * highlight along the image's edge — it is kept, because the bar
-   * beside it has to match it.
-   *
-   * Re-sample rather than nudge these if either image is replaced.
+   * The two image boards that used to live here — `.board-spec`,
+   * `.board-latency` and the `.board-media` edge feather — are GONE with
+   * the artwork they were sampled from. Each was a gradient matched to
+   * a PNG's own side strips so the tile behind it would not show as a
+   * rectangle; both boards are live type now (components/boards/TechBoard),
+   * so there is no artwork edge left to hide. The stat tiles below are
+   * unchanged.
    */
-  .board-spec {
-    background: linear-gradient(
-      180deg,
-      #8f97a8 0%,
-      #575f70 8%,
-      #1f2739 20%,
-      #141b2d 35%,
-      #0e1526 50%,
-      #050c1d 65%,
-      #020208 80%,
-      #000000 92%,
-      #000000 100%
-    );
-  }
 
-  /*
-   * Painted as a background-IMAGE, not a background-color. `.bento-tile`
-   * carries Tailwind's `bg-white/[0.035]`, and utilities outrank the
-   * components layer — a `background-color` here loses to it and the
-   * tile comes out lifted grey against the image's true black, leaving
-   * exactly the rectangle this is meant to remove. An opaque gradient
-   * paints over that colour instead of competing with it. `.board-spec`
-   * above is immune for the same reason: its gradient is already an
-   * image.
-   */
-  .board-latency {
-    background-image: linear-gradient(180deg, #000000 0%, #000000 100%);
-  }
-
-  /*
-   * The soft edge mask, as an inset feather on all four edges rather
-   * than a radial.
-   *
-   * A radial cannot do this job on a rectangle. Sized to fade at the
-   * edge midpoints it is already past 1.0 at the corners, so it eats
-   * them — and the brief says use both boards whole. Sized to spare the
-   * corners it never reaches the midpoints at all, which is what the
-   * first attempt here did: `ellipse 104% 104%` with an opaque stop at
-   * 78% put the fade 452px from centre in a box only 279px tall, so the
-   * mask was inert and the artwork still had four hard edges.
-   *
-   * A single HORIZONTAL gradient, not both axes. Both boards are
-   * height-constrained in their tiles, so the artwork's top and bottom
-   * edges land exactly on the tile's own edges — there is no bare tile
-   * there to blend into, and the radius and hairline already finish
-   * that boundary. Feathering vertically only ate into the artwork, and
-   * on these files the top edge is where the headline sits. The bare
-   * tile is at the SIDES, which is the one axis that needs it.
-   */
-  .board-media {
-    --feather: 5%;
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      #000 var(--feather),
-      #000 calc(100% - var(--feather)),
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      #000 var(--feather),
-      #000 calc(100% - var(--feather)),
-      transparent 100%
-    );
-  }
-
-  /*
-   * STAT TILES.
-   *
-   * The faint brand-blue corner glow, over the existing dark surface
-   * (`.bento-tile` supplies the radius, hairline and hover lift; this
-   * only adds the light).
-   */
   .stat-tile {
     background-image: radial-gradient(
       ellipse 70% 70% at 0% 0%,
@@ -1189,167 +741,6 @@
   }
 }
 
-@layer components {
-  /* ================================================================ *
-   * LIGHT HERO — the reversible test (lib/heroTheme.js).
-   *
-   * Everything here is scoped under `[data-hero-theme='light']`, which
-   * only ever lands on the hero <section>. The dark path above is
-   * untouched: with HERO_THEME='dark' and no `?hero=light`, not one
-   * selector in this block matches. That is the whole revert story.
-   *
-   * The bet: the loop was shot on a lit white seamless, so the dark
-   * theme's 0.42 veil is throwing away two thirds of the footage's own
-   * exposure to make room for white type. Here the veil goes, the
-   * footage runs near-natural, and the type becomes ink.
-   *
-   * ---------------------------------------------------------------- *
-   * CONTRAST, measured the same way as the dark hero above: the worst
-   * (darkest, here — the polarity is flipped) pixel found inside each
-   * element's own box with the element hidden, at 1440x900 and 375px,
-   * sampled across the whole 4s loop plus a forced pure-black frame.
-   *
-   * Ink is #030303 (`black-obsidian`) — the project's existing dark
-   * text token, the same value the dark hero's scrims are built from.
-   *
-   *                          worst bg   ratio
-   *   the loop's own DARKEST frame, 1440x900
-   *     wordmark (IRIZ)       #b9b7b4   11.03:1
-   *     tagline  (ink/80)     #c6c4c1   10.25:1
-   *     eyebrow  (ink/55)     #c9c7c4    6.42:1
-   *     header wordmark       #d7d5d2   14.08:1
-   *     scroll cue (ink/55)   #cfcdca    6.95:1
-   *   at 375px wide
-   *     wordmark              #a8a6a3    9.09:1
-   *     tagline               #bdbbb8    9.51:1
-   *     eyebrow               #c0bebb    5.83:1
-   *
-   * All clear AA; everything but the two 55%-opacity labels clears
-   * AAA. These are MEASURED — re-run the check (not an estimate)
-   * after any change to `.hero-light-scrim`, the grade, or the
-   * headline padding. The figures above are filled in by the
-   * measurement pass, not guessed ahead of it.
-   *
-   * The soft light scrim is the fallback the brief asked for: it is
-   * sized to the text block alone, so the footage outside it stays at
-   * its natural exposure. It is kept deliberately weak — if the
-   * measured numbers ever need it to go above ~0.55 to pass, that is
-   * the signal the light treatment does not work for this loop, not a
-   * licence to keep stacking it.
-   * ---------------------------------------------------------------- */
-  [data-hero-theme='light'] {
-    background-color: #ffffff;
-  }
-
-  /* No veil and no grade: the footage runs at its own exposure. The
-     tiny contrast lift only recovers what the camera's white seamless
-     flattened; it does not darken the frame. */
-  .hero-light-media {
-    filter: contrast(1.03) saturate(1.02);
-  }
-
-  /* The soft light scrim behind the text block. This is the brief's
-     fallback, and the measurement says it is REQUIRED, not optional:
-     the loop's subject is a dark-grey chassis on a white seamless and
-     it tracks straight through the headline band, so ink over bare
-     footage measures 1.8-4.4:1 on frames that actually occur, not
-     just on a synthetic worst case.
-     
-     Deliberately the MIRROR of `.hero-scrim-bottom` above — same
-     height (78%), same five stops, same curve, white instead of
-     near-black. The dark hero solves exactly this problem in exactly
-     this way; the light hero has no reason to solve it differently,
-     and matching the curve is what keeps the two comparable. It is
-     local to the text band, not a veil over the frame: the top ~22%
-     of the hero, where the product actually reads, is untouched. */
-  .hero-light-scrim {
-    background: linear-gradient(
-      to top,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(255, 255, 255, 0.82) 25%,
-      rgba(255, 255, 255, 0.52) 50%,
-      rgba(255, 255, 255, 0.2) 75%,
-      rgba(255, 255, 255, 0) 100%
-    );
-  }
-
-  /* The TEXT PLATE — the part of the fallback that does the real work.
-     
-     The bottom scrim alone cannot carry the eyebrow: the eyebrow sits
-     at the TOP of the headline block, ~65% of the way up a gradient
-     that is designed to fade out by then, and it measured 2.7:1 there
-     against the dark chassis. Making the bottom scrim tall enough to
-     cover it would wash the entire lower two thirds of the frame,
-     which is the "darken the whole video" move the brief rules out.
-     
-     So the plate is sized to the TEXT BLOCK instead. It is a radial
-     feather anchored toward the left, where the copy is: near-opaque
-     white under the type, gone by the right third of the frame, so
-     the product and the white seamless still read at their own
-     exposure either side of it. */
-  /*
-   * A horizontal wash plus a vertical MASK feather, not a radial.
-   * A radial sized to this box could not finish fading before the box
-   * ended, so it clipped — the plate read as a white rectangle with
-   * three hard edges. Splitting the two axes makes each one
-   * independently predictable: the gradient controls left-to-right
-   * falloff, the mask controls top-and-bottom, and both reach zero
-   * inside the element by construction rather than by tuning.
-   */
-  .hero-light-plate {
-    background: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.97) 0%,
-      rgba(255, 255, 255, 0.95) 36%,
-      rgba(255, 255, 255, 0.62) 58%,
-      rgba(255, 255, 255, 0.22) 76%,
-      rgba(255, 255, 255, 0) 90%
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      black 24%,
-      black 74%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      black 24%,
-      black 74%,
-      transparent 100%
-    );
-  }
-
-  /* A matching, much lighter wash under the floating header, so the
-     dark masthead type has a floor on the loop's brightest-to-darkest
-     swing without putting a band across the top of the frame. */
-  .hero-light-scrim-top {
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.88),
-      rgba(255, 255, 255, 0.55) 45%,
-      rgba(255, 255, 255, 0) 100%
-    );
-  }
-
-  /* The seam. The hero is white and the section under it is #080808
-     (Highlights) or #030303 — a hard edge there reads as a mistake,
-     so the last ~22% of the hero ramps white -> black. Tall and
-     multi-stop rather than a single linear fade, which would band
-     visibly across a 300px-plus run. */
-  .hero-light-blend {
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(236, 236, 236, 0.55) 26%,
-      rgba(168, 168, 168, 0.8) 48%,
-      rgba(84, 84, 84, 0.94) 70%,
-      rgba(20, 20, 20, 1) 88%,
-      #030303 100%
-    );
-  }
-}
 
 @layer components {
   /* ================================================================ *
@@ -1385,10 +776,10 @@
     @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent;
   }
 
-  /* The media band inside a tile. The detail renders are infographic
-     slides on their own near-black grounds, so they get ambient stage
-     light behind them and `detail-fade` on the image itself — the same
-     treatment they had as full-bleed panels, just tile-scale. */
+  /* The media band inside a tile: ambient stage light behind whatever
+     image a tile carries. It no longer has the infographic "detail"
+     slides to hold — those are live type now — but it is still the
+     treatment for a product shot inside a bento tile. */
   .bento-media {
     @apply relative w-full overflow-hidden;
     background: radial-gradient(
@@ -1812,5 +1203,504 @@
        exactly one element on the site (the hero h1), so the display ramp
        that every other heading shares is untouched. */
     font-size: clamp(2.4rem, 7.5vw, 7.5rem);
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * THE LISTING BOARDS — live type, where seven PNGs used to be.
+   *
+   * Every rule in this block exists because the marketplace listing
+   * artwork was re-typeset (lib/iriz.js has the full note, including
+   * the three figures corrected against the retail box). There is no
+   * image left in any of these surfaces except the decorative inline
+   * SVG diagrams in components/boards/BoardFigures.
+   *
+   * ONE SHELL, THREE DENSITIES: `.board` for the homepage row,
+   * `.banner` for the two wide panels under it, `.tech-board` for the
+   * pair in "Under the Hood". They share the tile surface and the type
+   * ramp and differ only in how they lay their parts out.
+   * ================================================================ */
+
+  /* ---- The tile surface, shared ---------------------------------- */
+  /*
+   * NO `backdrop-blur` on these, unlike `.bento-tile`. A backdrop filter
+   * makes the compositor snapshot and blur everything behind the element;
+   * behind these there is one flat section colour, so it is a large
+   * per-frame cost for an effect that is mathematically a no-op. Seven of
+   * them on one screen was measurable.
+   */
+  .board,
+  .banner,
+  .tech-board {
+    @apply relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-6 sm:p-7;
+    /* The same top-edge sheen `.bento-tile` carries, so a board sitting
+       next to a bento tile reads as the same material. Painted with a
+       gradient border-image rather than ::after, because these tiles
+       use ::after for their own ambient light below. */
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  }
+
+  .board::after,
+  .banner::after,
+  .tech-board::after {
+    content: '';
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent;
+  }
+
+  /* ---- Type ramp, shared ----------------------------------------- */
+  .board-title,
+  .banner-title,
+  .tech-board-title {
+    @apply mt-3 text-step-4 font-semibold tracking-tight text-ink sm:text-step-5;
+    text-wrap: balance;
+  }
+
+  .board-sub,
+  .tech-board-sub {
+    @apply mt-2 text-step-2 leading-relaxed text-ink-3;
+  }
+
+  .board-badge {
+    @apply mt-3 inline-flex items-center self-start rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-step-1 font-medium text-ink-2;
+  }
+
+  /* ---- The figure well ------------------------------------------- */
+  /*
+   * `flex-1` with `min-h-0` and a centred SVG: the three boards in the
+   * homepage row have different amounts of copy, and this is what lets
+   * their callout strips still line up along a common baseline. The
+   * well absorbs the difference instead of the type doing it.
+   */
+  .board-figure-box {
+    @apply mt-6 flex min-h-0 flex-1 items-center justify-center py-2;
+  }
+
+  .board-figure {
+    @apply h-auto w-full text-ink;
+    max-height: 190px;
+  }
+
+  .board-figure-wide {
+    max-height: 170px;
+  }
+
+  /* SVG text has no access to the Tailwind ramp, so the two label sizes
+     the figures use are set here in one place. */
+  .board-figure text {
+    font-family: var(--font-sans);
+    letter-spacing: 0.01em;
+  }
+
+  /* ---- Callout strip --------------------------------------------- */
+  .board-callouts {
+    @apply mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-white/10 pt-5;
+  }
+
+  .board-callout {
+    @apply flex flex-col gap-1;
+  }
+
+  /*
+   * The value slot is ALWAYS rendered, empty or not (see
+   * components/boards/HighlightBoard). Only two of the chipset board's four
+   * callouts carry a figure, and without a reserved slot the two that do
+   * pushed their titles a line lower than the two that don't — four callouts
+   * on three different baselines. `min-height` on the empty span is what
+   * keeps the strip on a grid.
+   */
+  .board-callout-value {
+    @apply text-step-4 font-bold leading-none tracking-tight text-ink;
+    min-height: 1em;
+  }
+
+  .board-callout-title {
+    @apply text-step-1 leading-snug text-ink-3;
+  }
+
+  /* ================================================================ *
+   * THE TWO WIDE BANNERS
+   * ================================================================ */
+  .banner {
+    @apply gap-6 sm:p-8;
+  }
+
+  .banner-title {
+    @apply text-step-5 sm:text-step-6;
+  }
+
+  .banner-sub {
+    @apply mt-2 text-step-3 font-medium text-ink-2;
+  }
+
+  .banner-body {
+    @apply mt-2 max-w-prose text-step-2 leading-relaxed text-ink-3;
+  }
+
+  /*
+   * `flex-1` so the figure absorbs the height difference between the two
+   * banners — the brightness one carries a comparison and four callouts with
+   * bodies, the speaker one three bare titles — and both callout strips
+   * still land on a common baseline.
+   */
+  .banner-figure {
+    @apply flex flex-1 items-center justify-center py-2 text-ink;
+  }
+
+  /*
+   * TWO columns, not four. Each banner is half the container at lg, so a
+   * 4-up strip gave every callout about 175px and broke "True 500 ANSI
+   * Lumens" over two lines in a block whose body text is one line. The
+   * artwork could run four across because it was a full-width 1672px
+   * composite; this is not.
+   */
+  .banner-callouts {
+    @apply mt-2 grid gap-x-6 gap-y-5 border-t border-white/10 pt-6 sm:grid-cols-2;
+  }
+
+  /* The speaker banner has three callouts, not four, and no bodies — so
+     its strip is a row of three. An explicit modifier from the component
+     rather than `:has(> :nth-child(3):last-child)`: the selector worked,
+     but it made the column count a consequence of how many items happened
+     to be in the array, which is the kind of rule that silently relays
+     itself the next time the copy changes. */
+  .banner-callouts-3 {
+    @apply sm:grid-cols-3;
+  }
+
+  .banner-callout {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .banner-callout-title {
+    @apply text-step-2 font-semibold text-ink;
+  }
+
+  .banner-callout-body {
+    @apply text-step-1 leading-relaxed text-ink-3;
+  }
+
+  /* ---- 1080P vs 720P --------------------------------------------- */
+  /*
+   * The claim drawn rather than photographed. The two swatches carry
+   * the SAME gradient; the 720P one is flattened with a filter, so the
+   * difference on screen is exactly the difference being described —
+   * brightness and saturation — and not a second, dimmer picture.
+   */
+  .banner-compare {
+    @apply grid w-full grid-cols-2 gap-3;
+  }
+
+  .compare-panel {
+    @apply flex flex-col gap-2;
+  }
+
+  .compare-swatch {
+    @apply block aspect-[4/3] w-full rounded-xl border border-white/10;
+    background-image:
+      radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.9) 0%, transparent 42%),
+      linear-gradient(135deg, rgb(var(--accent-soft)) 0%, rgb(var(--accent)) 48%, #141a2e 100%);
+  }
+
+  .compare-panel-bad .compare-swatch {
+    filter: brightness(0.46) saturate(0.4) contrast(0.9);
+  }
+
+  .compare-label {
+    @apply text-step-1 font-bold uppercase tracking-[0.14em] text-ink;
+  }
+
+  .compare-panel-bad .compare-label {
+    @apply text-ink-3;
+  }
+
+  .compare-caption {
+    @apply text-step-1 leading-snug text-ink-3;
+  }
+
+  /* ================================================================ *
+   * UNDER THE HOOD — the spec board and the latency board
+   * ================================================================ */
+  .tech-board {
+    @apply justify-between gap-6;
+  }
+
+  .spec-rows {
+    @apply grid gap-px overflow-hidden rounded-2xl border border-white/10;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .spec-row {
+    @apply flex items-baseline justify-between gap-4 bg-black-soft px-4 py-3;
+  }
+
+  .spec-row-label {
+    @apply text-step-1 text-ink-3;
+  }
+
+  .spec-row-value {
+    @apply text-step-2 font-semibold tracking-tight text-ink;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- Latency ---------------------------------------------------- */
+  .tech-board-latency {
+    @apply justify-start;
+  }
+
+  .latency-figure {
+    @apply mt-8 flex flex-col gap-5;
+  }
+
+  .latency-value {
+    @apply block font-bold leading-none tracking-tight text-ink;
+    font-size: clamp(2.75rem, 6vw, 4rem);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .latency-against-value {
+    @apply text-step-5 font-semibold leading-none tracking-tight text-ink-3;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .latency-label {
+    @apply mt-2 text-step-1 uppercase tracking-[0.14em] text-ink-3;
+  }
+
+  .latency-bars {
+    @apply flex flex-col gap-2;
+  }
+
+  .latency-bar {
+    @apply block h-1.5 rounded-full;
+  }
+
+  .latency-bar-fast {
+    width: 8%;
+    background-color: rgb(var(--accent-soft));
+  }
+
+  .latency-bar-slow {
+    @apply w-full;
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * THE HERO STAGE — a front-facing still, not the rear-facing loop.
+   *
+   * components/HeroBackdrop has the full reasoning: the video shows the
+   * back of the unit in every frame, so the hero is now `heroClean`,
+   * the one front three-quarter render in the repository.
+   *
+   * Two layers, both full-bleed, painted in DOM order with no z-index:
+   * `.hero-stage` is the light the product stands in, `.hero-product`
+   * is the product. The section's own `bg-black-obsidian` is the floor
+   * under both.
+   * ================================================================ */
+
+  /*
+   * Ambient stage light. A warm-neutral hotspot behind and slightly above
+   * the product, falling off to the page's own black well before the
+   * edges of the frame — so the hero has a lit centre and dark corners
+   * for the type to sit in, which is what carries the contrast.
+   *
+   * The hotspot is OFF-CENTRE to the right at desktop widths, under the
+   * product, leaving the bottom-left quadrant dark for the headline
+   * block. The mobile override below moves it back to the middle, where
+   * the product also moves.
+   */
+  .hero-stage {
+    @apply pointer-events-none absolute inset-0;
+    background:
+      radial-gradient(
+        ellipse 58% 52% at 50% 38%,
+        rgba(214, 226, 245, 0.17) 0%,
+        rgba(140, 170, 215, 0.07) 38%,
+        rgba(3, 3, 3, 0) 72%
+      ),
+      radial-gradient(
+        ellipse 90% 70% at 50% 42%,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(3, 3, 3, 0) 68%
+      );
+  }
+
+  /*
+   * The product.
+   *
+   * `object-contain`, so the unit is never cropped — a hero that cuts the
+   * lens off defeats the entire point of changing it.
+   *
+   * The mask is the same idea as `.product-fade` but sized for a
+   * full-bleed box: the render arrives on a white seamless that would
+   * otherwise paint a hard white rectangle across a near-black section,
+   * and there is no clean key available (white product, white ground —
+   * see the note in lib/iriz.js). Feathering its own bounds into the
+   * stage light behind it is what dissolves the join.
+   *
+   * `brightness`/`contrast` are a grade, not a correction: the render is
+   * lit for a white page and needs to sit a little hotter and harder to
+   * read as a lit object on black.
+   *
+   * NO `drop-shadow()` HERE, and that is a performance decision with a
+   * measurement behind it. A drop-shadow on a MASKED, full-bleed element
+   * forces the compositor to rasterize the whole masked layer into a
+   * texture and then blur it at the shadow's radius — at 100vw x 100svh,
+   * on Lighthouse's 4x-throttled mobile CPU, that landed as seconds of
+   * "Other" main-thread work sitting directly in front of the paint of
+   * this element, which is the page's LCP. The ground it was providing
+   * comes from `.hero-stage` behind it instead, which is a gradient and
+   * costs nothing.
+   */
+  .hero-product {
+    object-fit: contain;
+    object-position: 50% 34%;
+    padding: 4.5rem 1.25rem 0;
+    -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 36%, #000 44%, transparent 88%);
+    mask-image: radial-gradient(ellipse 62% 58% at 50% 36%, #000 44%, transparent 88%);
+    filter: contrast(1.06) brightness(1.04);
+  }
+
+  /*
+   * md and up: the product moves right and the stage light follows it,
+   * clearing the bottom-left quadrant for the headline block. Below md
+   * the type sits UNDER the product rather than beside it, so both stay
+   * centred and the product simply lifts.
+   */
+  @media (min-width: 768px) {
+    .hero-stage {
+      background:
+        radial-gradient(
+          ellipse 46% 56% at 64% 42%,
+          rgba(214, 226, 245, 0.19) 0%,
+          rgba(140, 170, 215, 0.08) 38%,
+          rgba(3, 3, 3, 0) 74%
+        ),
+        radial-gradient(
+          ellipse 85% 75% at 62% 46%,
+          rgba(255, 255, 255, 0.05) 0%,
+          rgba(3, 3, 3, 0) 70%
+        );
+    }
+
+    .hero-product {
+      object-position: 64% 44%;
+      padding: 5rem 2rem 6rem;
+      -webkit-mask-image: radial-gradient(ellipse 54% 64% at 64% 42%, #000 46%, transparent 88%);
+      mask-image: radial-gradient(ellipse 54% 64% at 64% 42%, #000 46%, transparent 88%);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .hero-product {
+      object-position: 66% 46%;
+      padding: 5rem 4rem 7rem;
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * HERO ENTRANCE — a CSS keyframe, not a hydrated animation.
+   *
+   * The hero's four type blocks (eyebrow, wordmark, tagline, Buy) used
+   * to be framer-motion <Reveal>s: server-rendered at `opacity: 0` and
+   * faded in by an IntersectionObserver after hydration. Above the fold
+   * that means the headline cannot paint until the JavaScript bundle
+   * has downloaded, parsed and run — which is exactly what made this
+   * page's LCP 4.9s with 90% render delay.
+   *
+   * A keyframe starts with the first paint. No observer, no bundle, no
+   * client component, and the element is a real painted LCP candidate
+   * from the moment it is in the DOM.
+   *
+   * `--rise-delay` staggers the four without four components. It
+   * defaults to 0 so an element can use `.hero-rise` with no inline
+   * style at all.
+   * ================================================================ */
+  .hero-rise {
+    animation: hero-rise 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--rise-delay, 0ms);
+    /* `both` holds the from-state before the delay elapses, so a
+       staggered element does not flash at full opacity first. */
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /*
+   * Reduced motion gets the END STATE, immediately — not a shortened
+   * animation and not `animation: none` on a rule whose from-state is
+   * `opacity: 0`, which would leave the hero permanently invisible for
+   * exactly the people who cannot be shown a fallback.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-rise {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * SCROLL REVEALS — scroll-driven CSS, no JavaScript.
+   *
+   * components/Reveal has the full reasoning. The short version: these
+   * used to be framer-motion elements rendered at `opacity: 0` and
+   * faded in after hydration, which made every revealed element —
+   * including the LCP element on two routes — invisible until the
+   * bundle ran. Measured at 4.9s / 4.7s LCP, ~90% render delay.
+   *
+   * THE DEFAULT IS VISIBLE. Read that first: `.reveal` on its own does
+   * nothing at all. The animation is applied only inside `@supports
+   * (animation-timeline: view())`, so a browser that cannot drive an
+   * animation from scroll position (Firefox and Safari, today) shows
+   * the page plainly rather than showing nothing. A reveal is a
+   * decoration and must never be load-bearing for legibility.
+   * ================================================================ */
+  .reveal {
+    /* Intentionally empty of visual state. See above. */
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal-in linear both;
+        animation-timeline: view();
+        /*
+         * Starts once the element is 12% into its entry and finishes by
+         * the time it is 34% across the scrollport, plus whatever
+         * `--reveal-delay` a staggered caller asked for. Finishing well
+         * before the element is centred is what keeps the page from
+         * feeling like it is animating constantly.
+         */
+        animation-range: entry calc(12% + var(--reveal-delay, 0%)) cover
+          calc(34% + var(--reveal-delay, 0%));
+      }
+    }
+  }
+
+  @keyframes reveal-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, var(--reveal-y, 28px), 0) scale(var(--reveal-scale, 1));
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
   }
 }

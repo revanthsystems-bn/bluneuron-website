@@ -108,16 +108,37 @@ export default function BuySheet({ open, onClose }) {
 
             {/* `sm:pr-12` keeps the eyebrow clear of the close button,
                 which is absolutely positioned in the same corner. Without
-                it "Mini portable projector for home" ran underneath the X
-                at desktop widths. */}
+                it "Mini projector for home" ran underneath the X at desktop
+                widths. */}
             <div className="flex items-start gap-4 sm:pr-12">
               <div className="relative h-20 w-20 flex-none overflow-hidden rounded-ctl border border-border bg-black-elevated">
+                {/* CONTAIN, NOT COVER, and sized for retina.
+
+                    This tile rendered as an unreadable dark square. Three
+                    things were wrong at once and all three are fixed here:
+
+                      - It pointed at the old retail-carton photograph. The
+                        source is now PRODUCT.image = the bare unit, front
+                        three-quarter (lib/iriz.js has the full note).
+                      - `object-cover` centre-cropped a 1.66:1 photo into a
+                        1:1 box, which discarded the product and kept a patch
+                        of background. `object-contain` + `p-1.5` keeps the
+                        whole unit in frame with a little air around it.
+                      - `sizes="80px"` asked the optimiser for an 80px-wide
+                        source, so a 2x phone got a 96px file scaled up and
+                        a 1x one got 80x48 of actual pixels. `sizes="160px"`
+                        buys the 2x variant; it is a ~6KB AVIF either way.
+
+                    `.product-fade-tight` dissolves the render's white studio
+                    ground into the dark panel. Without it a white-on-white
+                    shot on `bg-black-elevated` is a white rectangle, which
+                    is the original reason this was a photograph. */}
                 <Image
                   src={PRODUCT.image}
                   alt=""
                   fill
-                  sizes="80px"
-                  className="object-cover"
+                  sizes="160px"
+                  className="product-fade-tight object-contain p-1.5"
                 />
               </div>
 

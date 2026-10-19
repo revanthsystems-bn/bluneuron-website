@@ -97,12 +97,15 @@ export default function CartPanel() {
             href={ROUTES.product}
             className="relative aspect-square w-full shrink-0 overflow-hidden rounded-ctl border border-border-subtle bg-black sm:h-32 sm:w-32"
           >
+            {/* contain + fade, as in the buy sheet and the drawer: the
+                source is a white-on-white render and this panel is dark.
+                See PRODUCT.image in lib/iriz.js. */}
             <Image
               src={PRODUCT.image}
               alt={BRAND.fullName}
               fill
-              sizes="(min-width: 640px) 128px, 92vw"
-              className="object-cover"
+              sizes="(min-width: 640px) 256px, 92vw"
+              className="product-fade-tight object-contain p-3"
             />
           </a>
 
