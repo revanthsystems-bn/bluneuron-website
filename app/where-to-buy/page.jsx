@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import DraftBanner from '@/components/DraftBanner';
 import StoreButtons from '@/components/buy/StoreButtons';
 import Reveal from '@/components/Reveal';
@@ -49,10 +49,12 @@ const SPLIT = [
 export default function WhereToBuyPage() {
   return (
     <PageShell>
-      <PageHeading
+      <PageHero
         eyebrow="Where to buy"
         title={`Buy the ${BRAND.model} on Amazon or Flipkart.`}
         subtitle="We do not sell direct. Both listings are the official BluNeuron store, and both ship the same unit with the same warranty."
+        image={MEDIA.product.boxFront}
+        imagePosition="58% 50%"
       />
 
       <section className="border-b border-border-subtle bg-black py-16 sm:py-20">

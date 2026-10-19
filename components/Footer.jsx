@@ -181,12 +181,26 @@ export default function Footer() {
               <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
                 {column.title}
               </h2>
-              <ul className="mt-4 space-y-2.5">
+              {/*
+                THE TARGET IS 44px TALL; THE TEXT STILL LOOKS THE SAME SIZE.
+
+                These rows were ~20px high — the smallest tap targets on the
+                site, and there are 19 of them on every page. The fix is
+                `inline-flex` + `min-h-[44px]` on the ANCHOR with the vertical
+                space taken out of the list's own `space-y`, so each link grows
+                into padding it already had around it rather than pushing the
+                column taller. Measured at 390: the footer's height is within
+                a few pixels of what it was.
+
+                `w-fit` matters — a block-level anchor would make the whole
+                column width clickable, which is a different bug.
+              */}
+              <ul className="mt-2 space-y-0">
                 {column.links.map((link) => (
                   <li key={`${column.title}-${link.href}-${link.label}`}>
                     <a
                       href={link.href}
-                      className="text-sm text-white/60 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                      className="inline-flex min-h-[44px] w-fit items-center text-sm text-white/60 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     >
                       {link.label}
                     </a>
@@ -244,7 +258,11 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`BluNeuron on ${social.label}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle text-white/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                      // The RING stays 32px — `before:` draws the 44px target
+                      // around it. Growing the circle itself would have made
+                      // three small marks into three heavy buttons; growing
+                      // the hit area leaves the design alone.
+                      className="relative flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle text-white/50 transition-all duration-300 before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     >
                       <svg
                         viewBox="0 0 24 24"
@@ -320,7 +338,7 @@ export default function Footer() {
           {SHOW_PRIVACY && (
             <a
               href={ROUTES.privacy}
-              className="shrink-0 text-white/45 underline underline-offset-2 transition-colors hover:text-white sm:text-right"
+              className="inline-flex min-h-[44px] w-fit shrink-0 items-center text-white/45 underline underline-offset-2 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft sm:text-right"
             >
               Privacy Policy
             </a>

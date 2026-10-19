@@ -44,6 +44,13 @@ const SECTIONS = [
   {
     heading: 'Cover period',
     body: `${WARRANTY.label} from the date of purchase shown on your invoice. The invoice date is what counts — not the delivery date, and not the date you registered the product. The tenure is also printed on the warranty card inside the box.`,
+    // A PULL-QUOTE, not a second source of truth. Both halves are read from
+    // the same WARRANTY object the paragraph above interpolates, so the box
+    // cannot drift from the policy and no wording was added to produce it.
+    highlight: {
+      label: `${WARRANTY.label} from the invoice date`,
+      value: 'Not the delivery date, and not the date you registered the product.',
+    },
   },
   {
     heading: 'What is covered',

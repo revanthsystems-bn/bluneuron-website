@@ -1,9 +1,9 @@
 import Image from 'next/image';
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
 import AddToCart from '@/components/shop/AddToCart';
-import { BRAND, GALLERY, HERO } from '@/lib/iriz';
+import { BRAND, GALLERY, HERO, MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import { MARKETPLACE, WARRANTY, formatInr } from '@/lib/site-config';
@@ -54,10 +54,12 @@ const ASSURANCES = [
 export default function ShopPage() {
   return (
     <PageShell>
-      <PageHeading
+      <PageHero
         eyebrow="Shop"
         title="One projector. Built properly."
         subtitle="The IRIZ is the only thing we make, and everything we know about it is on this site."
+        image={MEDIA.product.heroClean}
+        imagePosition="62% 50%"
       />
 
       <section className="border-b border-border-subtle bg-black py-14 sm:py-20">

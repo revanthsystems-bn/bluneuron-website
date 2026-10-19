@@ -1,8 +1,9 @@
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import SupportTiles from '@/components/SupportTiles';
+import AnswerSearch from '@/components/support/AnswerSearch';
 import Reveal from '@/components/Reveal';
-import { BRAND } from '@/lib/iriz';
+import { BRAND, FAQS, MEDIA, TROUBLESHOOTING } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 
@@ -42,11 +43,30 @@ export const metadata = {
 export default function SupportPage() {
   return (
     <PageShell>
-      <PageHeading
+      {/* A STILL FROM THE LOOP WE ALREADY SHIP, not new photography.
+
+          The hub used to open on flat black — a heading, one line, then six
+          tiles — which is what made a page about owning the product feel
+          like a directory. The poster frame is a hand holding the unit,
+          which suits "we've got you covered" better than a beauty render
+          would. */}
+      <PageHero
         eyebrow="Support"
         title="We've got you covered."
         subtitle={`Everything for your ${BRAND.model} in one place — warranty, answers, documents, and a direct line to our team.`}
-      />
+        image={MEDIA.heroLoop.poster}
+        imagePosition="60% 45%"
+      >
+        {/* The search box is the first interactive thing on the page because
+            "find the answer" is the commonest reason to be here, and it
+            otherwise took two clicks and a page of scrolling to begin. */}
+        <AnswerSearch
+          faqs={FAQS}
+          fixes={TROUBLESHOOTING}
+          faqHref={ROUTES.faq}
+          contactHref={ROUTES.contact}
+        />
+      </PageHero>
 
       <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
         <div className="section-container">

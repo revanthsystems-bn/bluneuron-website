@@ -1,9 +1,10 @@
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import { COMPANY, allKnown } from '@/lib/site-config';
+import { MEDIA } from '@/lib/iriz';
 
 export const metadata = {
   ...pageMetadata({
@@ -33,10 +34,12 @@ const VALUES = [
 export default function AboutPage() {
   return (
     <PageShell>
-      <PageHeading
+      <PageHero
         eyebrow="About BluNeuron"
         title="A projector brand built around one honest number."
         subtitle="We started BluNeuron because the home-projector market is full of inflated brightness claims — and we wanted to build the projector we couldn't find."
+        image={MEDIA.product.heroClean}
+        imagePosition="62% 50%"
       />
 
       <section className="border-b border-border-subtle bg-black py-16 sm:py-20">

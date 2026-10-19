@@ -60,6 +60,12 @@ const SECTIONS = [
       `Physical damage or transit damage: report within ${RETURNS.damageReportHours} hours of delivery. A claim made after that is treated as out-of-warranty mishandling.`,
       `Wrong item or a specification mismatch — the unit delivered is not what was ordered: report within ${RETURNS.damageReportHours} hours of delivery.`,
     ],
+    // The two figures restated from RETURNS, the same constants the bullets
+    // above interpolate. No new wording.
+    highlight: {
+      label: `${RETURNS.replacementDays} days for a dead unit · ${RETURNS.damageReportHours} hours for damage`,
+      value: 'Both clocks start at delivery. The marketplace you bought from also has its own window, usually wider.',
+    },
     note: 'The two clocks differ because the questions differ. Whether a unit works is answerable in a week; whether it arrived damaged stops being answerable almost immediately. Photograph the outer packaging and the unit before anything else.',
   },
   {

@@ -230,7 +230,10 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
       >
         <motion.a
           href="/"
-          className="flex items-center"
+          // `min-h-[44px]` and not a taller mark: the wordmark stays 20px and
+          // the anchor grows into the bar's own padding, so the logo lock-up
+          // is unchanged and the target clears the touch floor.
+          className="flex min-h-[44px] items-center rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
           aria-label="BluNeuron home"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -286,7 +289,7 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
                 // reader and, at this contrast, easy to miss at a glance;
                 // this is what actually announces "you are here".
                 aria-current={current ? 'page' : undefined}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors duration-500 ${
+                className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-sm font-medium transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
                   ink
                     ? current
                       ? 'bg-black/[0.06] text-black-obsidian'
@@ -319,7 +322,7 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
-            className={`rounded-full p-2 transition-colors duration-500 lg:hidden ${
+            className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-500 lg:hidden ${
               ink
                 ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
                 : frosted

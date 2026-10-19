@@ -1,7 +1,7 @@
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
-import { FULL_SPEC_SHEET, BOX_CONTENTS, WARRANTY, SHOW_PENDING_SPECS } from '@/lib/iriz';
+import { FULL_SPEC_SHEET, BOX_CONTENTS, WARRANTY, SHOW_PENDING_SPECS, MEDIA } from '@/lib/iriz';
 import { pageMetadata } from '@/lib/seo';
 
 // The groups this page actually renders. Everything still lives in
@@ -39,10 +39,12 @@ export const metadata = pageMetadata({
 export default function SpecsPage() {
   return (
     <PageShell>
-      <PageHeading
+      <PageHero
         eyebrow="Full Spec Sheet"
         title="Every spec, in one place."
         subtitle="The complete technical breakdown for the BluNeuron IRIZ — no rounding, no marketing shorthand."
+        image={MEDIA.product.heroClean}
+        imagePosition="62% 50%"
       />
 
       {/* `border-b` stays with this section, not with the one below it: it is

@@ -3,23 +3,16 @@ import Reveal from './Reveal';
 import { SUPPORT_TILES } from '@/lib/routes';
 
 /**
- * The support hub's tiles (app/support).
+ * The support hub's cards.
  *
- * Content, order and destinations come from SUPPORT_TILES in lib/routes.js —
- * this file is only how they look. The registry names an icon abstractly
- * ('shield', 'wrench') and the mapping to an actual glyph lives here, so the
- * route registry stays free of component imports and a swapped icon set is one
- * edit in one file.
+ * TWO GROUPS, NOT ONE ROW OF SIX. The two warranty actions lead and the rest
+ * follow, driven by `lead` in SUPPORT_TILES (lib/routes.js) — see the note
+ * there for why. Six tiles of identical weight made the hub read as a
+ * sitemap and left the reader to work out which one was theirs.
  *
- * WHOLE TILE IS THE LINK, not a "Learn more" inside it. On a phone these are
- * the primary navigation of the support section, and a 44px text link inside a
- * 160px card wastes the other 90% of the target. `<a>` wrapping the content
- * also means one tab stop per tile rather than two.
- *
- * Icons are lucide-react, the same source as components/TrustBadges, and all
- * are `aria-hidden` — each tile's heading already says what it is, so an
- * announced icon would just repeat it. No emoji: they render differently on
- * every platform and read as decoration a screen reader has to spell out.
+ * THE WHOLE CARD IS THE TARGET. The anchor fills the tile and the arrow is a
+ * cue inside it, not a separate control — the previous markup had a 20px
+ * "→" glyph that looked like the thing to press.
  */
 const ICONS = {
   shield: ShieldCheck,
@@ -30,44 +23,77 @@ const ICONS = {
   document: FileText,
 };
 
-export default function SupportTiles() {
+function Tile({ tile, index }) {
+  const Icon = ICONS[tile.icon] ?? FileText;
+
   return (
-    <ul className="bento-grid">
-      {SUPPORT_TILES.map((tile, i) => {
-        const Icon = ICONS[tile.icon] ?? FileText;
+    <Reveal as="li" y={20} delay={Math.min(index, 3) * 0.05} className="h-full">
+      <a
+        href={tile.href}
+        className={[
+          'group relative flex h-full flex-col rounded-3xl border border-border-subtle p-6 sm:p-7',
+          'transition-all duration-500 hover:-translate-y-1 hover:border-white/20',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft',
+          // The lead pair carry a faint accent wash so the difference reads
+          // as emphasis rather than as two unrelated card styles.
+          tile.lead
+            ? 'bg-[linear-gradient(135deg,rgba(59,130,246,0.10),rgba(59,130,246,0)_58%)] bg-black-surface/60 hover:bg-white/[0.05]'
+            : 'bg-black-surface/50 hover:bg-white/[0.045]',
+        ].join(' ')}
+      >
+        <span
+          aria-hidden="true"
+          className="mb-5 flex h-11 w-11 items-center justify-center rounded-[13px] border border-accent-soft/25 bg-accent/10 text-accent-soft transition-colors duration-500 group-hover:border-accent-soft/45"
+        >
+          <Icon className="h-[21px] w-[21px]" />
+        </span>
 
-        return (
-          <Reveal
-            key={tile.href}
-            as="li"
-            y={20}
-            delay={Math.min(i, 3) * 0.05}
-            className="bento-tile lg:col-span-4"
+        <h3 className="text-[17px] font-semibold tracking-tight text-white">{tile.title}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-white/60">{tile.body}</p>
+
+        {/* `mt-auto` pins the cue to the bottom edge, so tiles with one line
+            of body and tiles with three still line their arrows up. */}
+        <span className="mt-auto flex items-center gap-2 pt-5 text-[13px] font-semibold text-accent-soft">
+          {tile.cta || 'Open'}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
           >
-            <a
-              href={tile.href}
-              className="flex h-full flex-col p-6 outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-            >
-              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft">
-                <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
-              </span>
+            <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </a>
+    </Reveal>
+  );
+}
 
-              <h3 className="text-base font-semibold text-white">{tile.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/55">{tile.body}</p>
+export default function SupportTiles() {
+  const lead = SUPPORT_TILES.filter((t) => t.lead);
+  const rest = SUPPORT_TILES.filter((t) => !t.lead);
 
-              {/* `mt-auto` pins the cue to the bottom edge, so tiles with one
-                  line of body and tiles with three still line their arrows up
-                  across the row. */}
-              <span
-                className="mt-auto pt-5 text-sm font-medium text-white/70"
-                aria-hidden="true"
-              >
-                →
-              </span>
-            </a>
-          </Reveal>
-        );
-      })}
-    </ul>
+  return (
+    <div className="space-y-12">
+      <div>
+        <p className="eyebrow mb-4">Your warranty</p>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {lead.map((tile, i) => (
+            <Tile key={tile.href} tile={tile} index={i} />
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <p className="eyebrow mb-4">Answers &amp; documents</p>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {rest.map((tile, i) => (
+            <Tile key={tile.href} tile={tile} index={i} />
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }

@@ -3,10 +3,13 @@ import Reveal from '@/components/Reveal';
 import BuyButton from '@/components/buy/BuyButton';
 import AddToCart from '@/components/shop/AddToCart';
 import ProductGallery from '@/components/shop/ProductGallery';
+import ProductShowcase from '@/components/ProductShowcase';
+import FaqAccordion from '@/components/FaqAccordion';
 import StickyProductBar from '@/components/shop/StickyProductBar';
 import {
   BOX_CONTENTS,
   BRAND,
+  FAQS,
   GALLERY,
   HERO,
   HIGHLIGHTS,
@@ -45,10 +48,14 @@ import { MARKETPLACE, WARRANTY, formatInr } from '@/lib/site-config';
  *     owns the ~750-word case — and repeating either would put the same text
  *     on two indexable URLs, with this page competing against the pages it
  *     should be feeding from. FURTHER_READING links to all three instead.
- *   - "In the box" renders only when SHOW_PENDING_SPECS is on. BOX_CONTENTS
- *     is INFERRED from marketing copy rather than sourced from the
- *     manufacturer (see the note on it in lib/iriz.js), and a packing list is
- *     exactly the kind of claim a buyer holds you to.
+ *   - "In the box" IS on this page now. That bullet used to say BOX_CONTENTS
+ *     was inferred from marketing copy and therefore too risky to print on a
+ *     buying page. It is no longer inferred: the list was re-read off the
+ *     PRINTED carton (see the note on BOX_CONTENTS in lib/iriz.js), which is
+ *     also what corrected it — the inferred version said "1x Google TV
+ *     Remote" and missed a fifth item. A packing list is exactly the kind of
+ *     claim a buyer holds you to, which is the argument FOR showing a sourced
+ *     one on the page where they decide.
  */
 
 /**
@@ -133,8 +140,24 @@ export default function ProductPage() {
           {/* `gap-6` below lg, not `gap-10`: on a phone this gap sits
               between the gallery and the price, and every pixel of it pushes
               the buy decision further down the first screen. */}
+          {/*
+            `min-w-0` ON THE GRID ITEM, and it is the whole fix for the 54px
+            of horizontal overflow this page carried at 390px.
+
+            A grid item defaults to `min-width: auto`, which means it refuses
+            to shrink below its content's minimum. The gallery's thumbnail
+            rail bleeds to the screen edge with `-mx-6 px-6`, so its minimum
+            is 48px WIDER than the column it sits in — and the column grew to
+            match instead of the rail scrolling. Measured: the 342px track
+            became 396px, the rail became 444px, and the document scrolled
+            54px sideways on every phone.
+
+            With `min-w-0` the column takes the track width, the rail's bleed
+            lands exactly on the viewport edges, and `overflow-x: auto` on the
+            rail does the job it was always meant to do.
+          */}
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-14">
-            <Reveal>
+            <Reveal className="min-w-0">
               <ProductGallery shots={GALLERY} />
             </Reveal>
 
@@ -229,6 +252,13 @@ export default function ProductPage() {
         </div>
       </section>
 
+      {/* IN THE BOX. The same section the homepage runs, reused rather than
+          rebuilt — it is already a photograph of the real carton beside the
+          five items read off it, which is exactly what a buying page needs
+          and exactly what this page was missing. One component, so the
+          packing list cannot say different things on two pages. */}
+      <ProductShowcase />
+
       {/* SPECS — the six headline figures, with the full sheet one click
           away. The whole FULL_SPEC_SHEET here would be a 30-row table on a
           page whose job is a decision, not a reference. */}
@@ -275,6 +305,29 @@ export default function ProductPage() {
               </ul>
             </Reveal>
           )}
+        </div>
+      </section>
+
+      {/* THE QUESTIONS, ON THE PAGE WHERE THEY ARE ASKED.
+
+          These live on /support/faq and are rendered here from the same
+          FAQS array — not copied. A buyer's last three doubts (is it bright
+          enough, do I need a stick, how far back do I sit) were two clicks
+          away on a support page, which is the wrong moment to send someone
+          off a product page.
+
+          `idPrefix` keeps the fragment ids distinct from the support page's,
+          so a deep link into one cannot open the other's accordion. */}
+      <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
+        <div className="section-container">
+          <Reveal className="mb-10 max-w-lg">
+            <p className="eyebrow mb-3">Questions</p>
+            <h2 className="text-2xl font-bold tracking-tighter text-white sm:text-3xl">
+              Before you buy.
+            </h2>
+          </Reveal>
+
+          <FaqAccordion items={FAQS} idPrefix="pdp-faq" />
         </div>
       </section>
 

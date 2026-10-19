@@ -1,5 +1,5 @@
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import DraftBanner from '@/components/DraftBanner';
 import ContactForm from '@/components/ContactForm';
 import Reveal from '@/components/Reveal';
@@ -7,6 +7,7 @@ import { Briefcase, Clock, Mail, Phone } from 'lucide-react';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import { GRIEVANCE_OFFICER, SUPPORT, allKnown, isTBD } from '@/lib/site-config';
+import { MEDIA } from '@/lib/iriz';
 
 export const metadata = {
   ...pageMetadata({
@@ -98,10 +99,12 @@ const TILE_SPAN = VISIBLE_CHANNELS.length === 4 ? 'lg:col-span-6' : 'lg:col-span
 export default function ContactPage() {
   return (
     <PageShell>
-      <PageHeading
+      <PageHero
         eyebrow="Support"
         title="Talk to us."
         subtitle="Order, delivery and refund questions go to Amazon or Flipkart. Everything about the product itself comes to us."
+        image={MEDIA.heroLoop.poster}
+        imagePosition="55% 45%"
       />
 
       <section className="border-b border-border-subtle bg-black py-16 sm:py-20">

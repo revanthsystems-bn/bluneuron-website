@@ -1,8 +1,8 @@
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import ComparisonTable from '@/components/ComparisonTable';
 import Reveal from '@/components/Reveal';
-import { COMPARISON } from '@/lib/iriz';
+import { COMPARISON, MEDIA } from '@/lib/iriz';
 import { pageMetadata } from '@/lib/seo';
 
 export const metadata = pageMetadata({
@@ -29,10 +29,12 @@ export default function ComparePage() {
 
   return (
     <PageShell>
-      <PageHeading
+      <PageHero
         eyebrow="IRIZ vs. Others"
         title='Not all "500 lumens" are the same.'
         subtitle="A side-by-side look at where the BluNeuron IRIZ pulls ahead of a typical budget projector."
+        image={MEDIA.product.heroClean}
+        imagePosition="62% 50%"
       />
 
       <ComparisonTable

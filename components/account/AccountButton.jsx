@@ -35,7 +35,7 @@ export default function AccountButton(props) {
 function AccountButtonControl({ className = '', ink = false }) {
   const { user, hydrated } = useAccount();
 
-  const base = `relative flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
+  const base = `relative flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft ${
     ink
       ? 'text-black-obsidian/75 hover:bg-black/5 hover:text-black-obsidian'
       : 'text-white/80 hover:bg-white/5 hover:text-white'

@@ -1,9 +1,9 @@
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import DraftBanner from '@/components/DraftBanner';
 import Reveal from '@/components/Reveal';
 import { Download, FileText } from 'lucide-react';
-import { SETUP_STEPS } from '@/lib/iriz';
+import { SETUP_STEPS, MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import { MANUALS, TBD, isTBD } from '@/lib/site-config';
@@ -35,10 +35,12 @@ export const metadata = {
 export default function ManualsPage() {
   return (
     <PageShell>
-      <PageHeading
+      <PageHero
         eyebrow="Support"
         title="Manuals & downloads"
         subtitle="Everything that ships in the box, as a document — and the setup walkthrough if you would rather just follow along."
+        image={MEDIA.product.boxFront}
+        imagePosition="58% 50%"
       />
 
       <section className="border-b border-border-subtle bg-black py-16 sm:py-20">

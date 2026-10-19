@@ -2,7 +2,25 @@ import PageShell from './PageShell';
 import PageHeading from './PageHeading';
 import DraftBanner from './DraftBanner';
 import Reveal from './Reveal';
+import PolicyToc from './legal/PolicyToc';
 import { ROUTES } from '@/lib/routes';
+
+/**
+ * A heading turned into a stable fragment id.
+ *
+ * Derived from the heading TEXT rather than the array index, so a link into
+ * a policy survives a section being inserted above it — an index-based
+ * anchor would silently start pointing at the wrong clause, which on a legal
+ * page is the worst kind of broken link.
+ */
+function slugify(heading) {
+  return heading
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .slice(0, 60);
+}
 
 /**
  * Turn the route paths written inside a policy sentence into real links.
@@ -87,54 +105,113 @@ function linkify(text) {
  * this" caveats that would otherwise be buried in the main prose.
  */
 export default function LegalPage({ title, path, sections, intro, lastUpdated }) {
+  // Built from the headings the page already renders, so the contents list
+  // can never advertise a section that is not there.
+  const toc = sections.map((section) => ({
+    id: slugify(section.heading),
+    heading: section.heading,
+  }));
+
   return (
     <PageShell>
       <PageHeading eyebrow="Legal" title={title} subtitle={intro} />
 
-      <section className="bg-black py-16 sm:py-20">
-        {/* `max-w-[680px]` on the PROSE, not on the container, so the page keeps
-            the same left gutter as the heading above it and as every other
-            section on the site — the same call /legal/privacy makes, and the
-            reason this does not read as a centred column floating under a
-            left-aligned title.
-
-            680px rather than `max-w-3xl` (768px): a policy is read, not
-            skimmed, and 680px at 16px keeps lines near the 65-75 characters
-            that stay comfortable for continuous text. */}
+      <section className="bg-black py-14 sm:py-18">
         <div className="section-container">
           <DraftBanner path={path} className="mb-10 max-w-[680px]" />
 
-          <div className="max-w-[680px] space-y-9 text-sm leading-relaxed text-white/65">
-            {sections.map((section) => (
-              <div key={section.heading}>
-                <h2 className="mb-2.5 text-lg font-semibold tracking-tight text-white">
-                  {section.heading}
-                </h2>
+          {/*
+            TWO COLUMNS AT lg, ONE BELOW IT.
 
-                {Array.isArray(section.body) ? (
-                  <ul className="list-disc space-y-1.5 pl-5">
-                    {section.body.map((line) => (
-                      <li key={line}>{linkify(line)}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>{linkify(section.body)}</p>
-                )}
+            `lg:grid-cols-[232px_minmax(0,680px)]` rather than fractions: the
+            prose measure is the thing being protected (680px keeps a 16px
+            line near the 65-75 characters that stay readable in continuous
+            text), so it is stated as a real maximum and the contents rail
+            takes a fixed width beside it. A fractional split would let the
+            measure drift with the viewport, which is the one thing a reading
+            column must not do.
 
-                {section.note && (
-                  <p className="mt-2.5 text-xs leading-relaxed text-white/40">
-                    {linkify(section.note)}
-                  </p>
-                )}
+            `items-start` so the sticky rail has somewhere to stick — a
+            stretched grid item is full-height and `position: sticky` has no
+            room to move inside it.
+          */}
+          <div className="grid gap-10 lg:grid-cols-[232px_minmax(0,680px)] lg:items-start lg:gap-14">
+            <PolicyToc items={toc} />
+
+            <div className="min-w-0">
+              <div className="space-y-10 text-[15px] leading-[1.75] text-white/70">
+                {sections.map((section, i) => (
+                  <Reveal key={section.heading} as="section" y={16} delay={Math.min(i, 4) * 0.03}>
+                    {/*
+                      `scroll-mt-24` is what makes the contents links usable:
+                      the masthead is fixed, so an un-offset anchor jump puts
+                      the heading underneath it and the reader lands on the
+                      previous section's last line.
+                    */}
+                    <h2
+                      id={slugify(section.heading)}
+                      className="scroll-mt-24 text-xl font-semibold tracking-tight text-white"
+                    >
+                      {section.heading}
+                    </h2>
+
+                    <div className="mt-3">
+                      {Array.isArray(section.body) ? (
+                        <ul className="list-disc space-y-2 pl-5 marker:text-white/30">
+                          {section.body.map((line) => (
+                            <li key={line}>{linkify(line)}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>{linkify(section.body)}</p>
+                      )}
+                    </div>
+
+                    {/*
+                      THE KEY-POINT BOX.
+
+                      Opt-in per section via a `highlight` key, and it carries
+                      NO new wording: a page supplies the figure it already
+                      states in the prose above (the warranty period, the
+                      return window) so the box is a pull-quote, not a second
+                      source of truth that could drift from the policy.
+                    */}
+                    {section.highlight && (
+                      <div className="mt-4 flex gap-3 rounded-2xl border border-accent-soft/25 bg-accent/[0.07] p-4 sm:p-5">
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.7"
+                          className="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent-soft"
+                        >
+                          <circle cx="12" cy="12" r="9" />
+                          <path d="M12 8h.01M11 12h1v4h1" strokeLinecap="round" />
+                        </svg>
+                        <div className="min-w-0 text-[13px] leading-relaxed">
+                          <p className="font-semibold text-white">{section.highlight.label}</p>
+                          <p className="mt-1 text-white/70">{linkify(section.highlight.value)}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {section.note && (
+                      <p className="mt-3 text-[13px] leading-relaxed text-white/45">
+                        {linkify(section.note)}
+                      </p>
+                    )}
+                  </Reveal>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {lastUpdated && (
-            <Reveal className="mt-12 max-w-[680px] border-t border-border-subtle pt-6">
-              <p className="text-xs text-white/40">Last updated {lastUpdated}.</p>
-            </Reveal>
-          )}
+              {lastUpdated && (
+                <div className="mt-12 border-t border-border-subtle pt-6">
+                  <p className="text-xs text-white/45">Last updated {lastUpdated}.</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
     </PageShell>
