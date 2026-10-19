@@ -108,8 +108,8 @@ export default function BuySheet({ open, onClose }) {
 
             {/* `sm:pr-12` keeps the eyebrow clear of the close button,
                 which is absolutely positioned in the same corner. Without
-                it "Mini portable projector for home" ran underneath the X
-                at desktop widths. */}
+                it "Mini projector for home" ran underneath the X at desktop
+                widths. */}
             <div className="flex items-start gap-4 sm:pr-12">
               <div className="relative h-20 w-20 flex-none overflow-hidden rounded-xl border border-border bg-black-elevated">
                 {/* CONTAIN, NOT COVER, and sized for retina.
@@ -121,15 +121,17 @@ export default function BuySheet({ open, onClose }) {
                     unreadable smudge. `sizes="160px"` buys the 2x variant and
                     still costs only a few KB as AVIF.
 
-                    `.product-fade-tight` dissolves the render's white studio
-                    ground; without it a white-on-white shot on a dark panel
-                    is a white rectangle. See PRODUCT.image in lib/iriz.js. */}
+                    NO FADE MASK any more. The source is a transparent
+                    cutout (PRODUCT.image -> MEDIA.product.cutout), so there
+                    is no white ground to dissolve — and the radial mask that
+                    used to do that job would now only eat the product's own
+                    edges. */}
                 <Image
                   src={PRODUCT.image}
                   alt=""
                   fill
                   sizes="160px"
-                  className="product-fade-tight object-contain p-1.5"
+                  className="object-contain p-1.5"
                 />
               </div>
 

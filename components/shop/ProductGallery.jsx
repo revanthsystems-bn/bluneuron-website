@@ -54,8 +54,8 @@ export default function ProductGallery({ shots }) {
           square matches the thumbnails and the rest of the site's product
           frames. */}
       <div
-        className={`relative aspect-[3/2] max-h-[42svh] w-full overflow-hidden rounded-3xl border border-border-subtle sm:aspect-square sm:max-h-none ${
-          current.fade ? 'product-glow bg-black' : 'bg-black-soft'
+        className={`product-stage relative aspect-[3/2] max-h-[42svh] w-full overflow-hidden rounded-3xl border border-border-subtle sm:aspect-square sm:max-h-none ${
+          current.fade ? 'product-glow bg-black' : ''
         }`}
       >
         <Image
@@ -65,7 +65,9 @@ export default function ProductGallery({ shots }) {
           fill
           sizes="(min-width: 1024px) 560px, 92vw"
           priority={active === 0}
-          className={`object-contain ${current.fade ? 'product-fade' : ''}`}
+          // `p-6` so a cut-out product has air around it inside the card
+          // rather than touching the hairline.
+          className={`object-contain p-6 sm:p-10 ${current.fade ? 'product-fade' : ''}`}
         />
       </div>
 
@@ -111,7 +113,7 @@ export default function ProductGallery({ shots }) {
                 width={80}
                 height={80}
                 sizes="80px"
-                className={`h-full w-full object-contain ${shot.fade ? 'product-fade' : ''}`}
+                className={`h-full w-full object-contain p-1 ${shot.fade ? 'product-fade' : ''}`}
               />
             </button>
           </li>

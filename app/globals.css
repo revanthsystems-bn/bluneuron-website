@@ -1567,3 +1567,35 @@
     }
   }
 }
+
+@layer components {
+  /* ================================================================ *
+   * .product-stage — the dark card a CUT-OUT product sits on.
+   *
+   * It replaces the `.product-glow` + `.product-fade` pair on every
+   * surface that shows the projector against the dark page.
+   *
+   * WHY THAT PAIR HAD TO GO. The source was a white product on a white
+   * seamless, and `.product-fade` hid the photo's rectangular bounds
+   * behind a radial mask. A radial mask is an ellipse; a projector is
+   * not. So what actually reached the screen was a glowing white
+   * lozenge with the corners of the frame left over as dark bars down
+   * either side — which is how it was reported, and it was right.
+   *
+   * The product is a real transparent cutout now
+   * (design-src/cutout.mjs -> MEDIA.product.cutout), so there are no
+   * bounds to hide. This is just the lighting: a soft off-centre key
+   * so the card reads as a lit space rather than a flat panel, over
+   * the page's own near-black.
+   * ================================================================ */
+  .product-stage {
+    background:
+      radial-gradient(
+        ellipse 62% 58% at 50% 42%,
+        rgba(214, 226, 245, 0.13) 0%,
+        rgba(140, 170, 215, 0.05) 42%,
+        rgba(5, 7, 11, 0) 74%
+      ),
+      linear-gradient(165deg, #141922 0%, #0b0e14 58%, #07090d 100%);
+  }
+}

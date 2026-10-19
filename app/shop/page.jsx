@@ -80,14 +80,14 @@ export default function ShopPage() {
                   same trap; this card fell into it and is fixed the same way.
                   `self-center` keeps the square from stretching when the buy
                   column beside it is taller. */}
-              <div className="product-glow relative aspect-square w-full self-center border-b border-border-subtle lg:border-b-0 lg:border-r">
+              <div className="product-stage relative aspect-square w-full self-center border-b border-border-subtle lg:border-b-0 lg:border-r">
                 <Image
                   src={GALLERY[0].src}
                   alt={GALLERY[0].alt}
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
                   priority
-                  className="product-fade object-contain"
+                  className="object-contain p-8"
                 />
               </div>
 

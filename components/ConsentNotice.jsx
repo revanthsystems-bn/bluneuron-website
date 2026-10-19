@@ -104,8 +104,8 @@ function ConsentNoticeBar() {
     >
       <div className="section-container flex flex-col items-start justify-between gap-4 py-5 sm:flex-row sm:items-center">
         <p className="max-w-2xl text-xs leading-relaxed text-white/60">
-          We use cookies and similar tools to measure visits and our ads, and we use your email only for launch
-          updates. See our{' '}
+          We use cookies and similar tools to measure visits and our ads, and we use your details only for
+          the updates or support you ask for. See our{' '}
           <a href="/legal/privacy" className="underline underline-offset-2 hover:text-white">
             Privacy Policy
           </a>

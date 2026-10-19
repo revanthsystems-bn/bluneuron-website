@@ -7,11 +7,11 @@ import { MEDIA } from '@/lib/iriz';
  * Under the Hood — two spec boards over three stat tiles.
  *
  * WHY THE NUMBER TILES WENT. This section used to restate Resolution, Chipset,
- * Throw Ratio and Low-Latency as four small number tiles beside a chipset
+ * Throw Ratio and Audio as four small number tiles beside a chipset
  * render. The two boards below already state every one of those, in the
  * manufacturer's own artwork and in more detail than a three-word tile could:
  * 02-spec-sheet carries native 1080P, 3.5" LTPS LCD, Allwinner H723, auto
- * focus, 0.9-5m, 35-200", and 1:1; 07-latency carries the 0.004s lockup. The
+ * 0.9-5m, 40"-200", and 1:1. The
  * tiles were the same claims a second time, smaller.
  *
  * `SPECS` in lib/iriz.js is UNTOUCHED — /specs and the comparison table still
@@ -24,8 +24,8 @@ import { MEDIA } from '@/lib/iriz';
  *
  * LAYOUT. Top row 1.3fr/1fr, equal height — grid items stretch, so both tiles
  * take the taller of the two and each image centres in its own box. Below lg
- * everything is one column in DOM order: spec board, latency board, then the
- * three stat tiles.
+ * everything is one column in DOM order: the spec board, then the stat
+ * tiles.
  */
 
 const STATS = [
@@ -40,7 +40,7 @@ const STATS = [
   {
     eyebrow: 'Audio',
     value: '5W',
-    suffix: '4Ω',
+    suffix: 'mono',
     line: 'Built-in speaker. No soundbar needed to start.',
   },
 ];
@@ -56,16 +56,8 @@ const BOARDS = [
     className: 'board-spec aspect-[750/698] lg:aspect-auto',
     alt:
       'IRIZ specification board: native 1080P (1920×1080) resolution, 3.5-inch LTPS LCD display '
-      + 'technology, Allwinner H723 chipset, auto focus, 0.9m–5m projection distance, 35–200 inch '
-      + 'projection size, and a 1:1 throw ratio.',
-  },
-  {
-    src: MEDIA.detail.latency,
-    // 1fr side. Image is 750x889.
-    className: 'board-latency aspect-[750/889] lg:aspect-auto',
-    alt:
-      'High definition, low latency: a 0.004s response time shown against a 2-second lag, '
-      + 'illustrated by a sharp game frame beside a blurred, still-loading one.',
+      + 'technology, Allwinner H723 chipset, 0.9m–5m projection distance, 40–200 inch projection '
+      + 'size, and a 1:1 throw ratio.',
   },
 ];
 
@@ -85,7 +77,11 @@ export default function TechSpecs({
             column spans: 1.3/1 is not expressible on a 12-track grid without
             rounding it to 7/5, which is a different ratio. `items-stretch` is
             the default and is what gives them a common height. */}
-        <div className="mt-12 grid grid-cols-1 items-stretch gap-3 sm:gap-4 lg:grid-cols-[1.3fr_1fr]">
+        {/* ONE BOARD, so no column split. This was a 1.3fr/1fr pair; the
+            second tile was the latency board, whose headline figure was the
+            0.004s response time the retail box does not print. It is gone
+            rather than reworded — there was nothing else on it. */}
+        <div className="mt-12 grid grid-cols-1 items-stretch gap-3 sm:gap-4">
           {BOARDS.map((board) => (
             <Reveal
               key={board.src}

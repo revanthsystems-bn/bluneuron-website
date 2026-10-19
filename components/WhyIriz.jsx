@@ -77,21 +77,21 @@ const POINTS = [
     heading: 'Bedrooms, ceilings and awkward angles',
     body: [
       'The stand adjusts steplessly through 0° to 180°, so the picture can go on the wall opposite, or straight up onto the ceiling from a bedside table. Projecting at an angle normally means a trapezoid instead of a rectangle, and that is the problem automatic keystone correction exists to solve: the unit squares the image up in hardware.',
-      'Auto focus runs on the same trigger. Move the projector and it refocuses and re-squares itself once it settles, which is what makes it reasonable to carry it from one room to another rather than leaving it where it was first set up.',
+      'It runs on movement. Move the projector and it re-squares itself once it settles, which is what makes it reasonable to carry it from one room to another rather than leaving it where it was first set up.',
     ],
   },
   {
     heading: 'Set up in about five minutes',
     body: [
-      `Put it on something flat between ${THROW_RANGE.min.distance} and ${THROW_RANGE.max.distance} m from the wall, angle it, and plug it in. Android 14 walks you through joining Wi-Fi and signing in, the auto focus and keystone settle the picture while you do, and that is setup finished.`,
-      'If a tricky room defeats the automatic correction, the F+ and F− keys on the remote trim the focus and the keystone can be nudged in Settings. Those are a trim on top of auto focus, not a manual mode you have to switch into.',
+      `Put it on something flat between ${THROW_RANGE.min.distance} and ${THROW_RANGE.max.distance} m from the wall, angle it, and plug it in. Android 14 walks you through joining Wi-Fi and signing in, the auto keystone squares the picture while you do, and that is setup finished.`,
+      'If a tricky room defeats the automatic correction, the F+ and F− keys on the remote trim the focus and the keystone can be nudged in Settings.',
     ],
   },
   {
     heading: 'Everything you watch, already on it',
     body: [
       'Android 14 is built in, with a remote in the box — so the apps you watch install onto the projector itself over Wi-Fi. There is no stick to buy, no second remote, no HDMI input occupied before you start.',
-      'The inputs are there when you want them: HDMI for a console or a laptop, USB-A for playing files off a drive, and a 3.5 mm output for headphones or a speaker. A low-latency mode brings response time down to 0.004 s for gaming over HDMI, and HDMI and USB playback work with no network at all — only the streaming side of it needs Wi-Fi.',
+      'The inputs are there when you want them: HDMI for a console or a laptop, USB-A for playing files off a drive, and a 3.5 mm output for headphones or a speaker. HDMI and USB playback work with no network at all — only the streaming side of it needs Wi-Fi.',
     ],
   },
 ];

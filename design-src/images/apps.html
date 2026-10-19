@@ -8,6 +8,16 @@
 <link rel="stylesheet" href="../tokens.css">
 <style>
 /*
+ * THE CUTOUT, so there is no vignette hack.
+ *
+ * These boards used to composite `hero-clean.png` — a white product on a
+ * white seamless — and hide its edges with a wide radial mask plus an
+ * overlay that darkened the surviving ring of backdrop. It worked, barely,
+ * and it was two tricks stacked on a problem that should not exist.
+ * `iriz-cutout.png` is the same render with the seamless keyed out
+ * (design-src/cutout.mjs), so the product just drops onto the board.
+ */
+/*
  * REPLACES public/media/iriz/detail/11-apps-10000.png  (1014 x 1551)
  *
  * WHAT WAS WRONG WITH THE ORIGINAL. It was a photograph of a Google TV home
@@ -163,24 +173,6 @@ body {
   overflow: hidden;
 }
 /*
- * THE VIGNETTE, not a tighter mask.
- *
- * Feathering alone cannot fix a white-on-white render on a dark board: pull
- * the mask in far enough to hide the seamless and it starts eating the
- * product (the first attempt at this clipped the lens barrel and the stand
- * clean off). So the mask stays WIDE — the whole unit is in frame — and this
- * overlay darkens the ring of backdrop around it instead. Transparent over
- * the product, near-opaque by the edges, in the board's own ground colour.
- */
-.unit::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse 48% 56% at 50% 49%,
-    rgba(5,7,11,0) 34%, rgba(5,7,11,.55) 60%, rgba(5,7,11,.92) 80%, #05070b 100%);
-}
-/*
  * CROPPED FIRST, THEN FEATHERED.
  *
  * hero-clean.png is a 1:1 render with the unit across its middle band and
@@ -196,12 +188,8 @@ body {
 .unit img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 50% 47%;
+  object-fit: contain;
   display: block;
-  -webkit-mask-image: radial-gradient(ellipse 60% 68% at 50% 50%, #000 48%, transparent 92%);
-  mask-image: radial-gradient(ellipse 60% 68% at 50% 50%, #000 48%, transparent 92%);
-  filter: contrast(1.06) brightness(.98);
 }
 
 .foot {
@@ -262,7 +250,7 @@ body {
   </div>
 </div>
 
-<div class="unit"><img src="../../public/media/iriz/product/hero-clean.png" alt=""></div>
+<div class="unit"><img src="../../public/media/iriz/product/iriz-cutout.png" alt=""></div>
 <div class="foot">Android 14 · Wi-Fi · 1080p</div>
 
 </body>

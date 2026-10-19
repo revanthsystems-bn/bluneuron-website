@@ -23,7 +23,7 @@ const VALUES = [
   },
   {
     title: 'Cut what doesn’t matter, keep what does',
-    body: 'A built-in smart OS, auto keystone, auto focus, and real audio aren’t upsells to us — they’re what makes a projector usable the day it arrives. We’d rather ship those than a marketing spec that reads bigger on paper.',
+    body: 'A built-in smart OS, 4-point auto keystone, and real audio aren’t upsells to us — they’re what makes a projector usable the day it arrives. We’d rather ship those than a marketing spec that reads bigger on paper.',
   },
   {
     title: 'Stand behind one product',
@@ -50,7 +50,7 @@ export default function AboutPage() {
               Most budget projectors advertise brightness numbers that don't survive contact with a real room —
               inflated "LED lumens" figures that collapse the moment you turn a lamp on. The IRIZ is our answer:
               a projector rated in true ANSI lumens, with a built-in smart OS so you're not stuck buying a
-              separate streaming stick, and the auto-focus and auto-keystone correction that should have been
+              separate streaming stick, and the auto-keystone correction that should have been
               standard on budget projectors years ago. It's the projector we wanted to buy and couldn't find, so
               we built it.
             </p>

@@ -28,7 +28,7 @@ export const metadata = {
  * thing that turns a working product into a bad review.
  *
  * Troubleshooting comes first for the same reason: most of what arrives as "it
- * is broken" is auto-focus that has not re-triggered or an audio output set to
+ * is broken" is a focus that needs trimming on the remote, or an audio output set to
  * the wrong device, and both are a minute on /support/faq rather than a week
  * without a projector.
  */

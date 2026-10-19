@@ -54,13 +54,13 @@ export default function BuySection() {
               short of the artwork and leaves a hard white edge showing through
               at the corners. The aspect ratio is declared, so nothing reflows
               when it decodes. */}
-          <Reveal className="product-glow relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl">
+          <Reveal className="product-stage relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl border border-border-subtle">
             <Image
-              src={MEDIA.product.heroClean}
+              src={MEDIA.product.cutout}
               alt={`${BRAND.fullName} projector`}
               fill
               sizes="(min-width: 1024px) 520px, 92vw"
-              className="product-fade object-contain"
+              className="object-contain p-10"
             />
           </Reveal>
 

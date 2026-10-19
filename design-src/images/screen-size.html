@@ -8,6 +8,16 @@
 <link rel="stylesheet" href="../tokens.css">
 <style>
 /*
+ * THE CUTOUT, so there is no vignette hack.
+ *
+ * These boards used to composite `hero-clean.png` — a white product on a
+ * white seamless — and hide its edges with a wide radial mask plus an
+ * overlay that darkened the surviving ring of backdrop. It worked, barely,
+ * and it was two tricks stacked on a problem that should not exist.
+ * `iriz-cutout.png` is the same render with the seamless keyed out
+ * (design-src/cutout.mjs), so the product just drops onto the board.
+ */
+/*
  * REPLACES public/media/iriz/detail/09-screen-size.png  (750 x 1065)
  *
  * WHAT WAS WRONG WITH THE ORIGINAL. Its screen ladder started at 35", and
@@ -135,20 +145,8 @@ body {
 }
 .unit img {
   width: 100%; height: 100%;
-  object-fit: cover;
-  object-position: 50% 47%;
+  object-fit: contain;
   display: block;
-  -webkit-mask-image: radial-gradient(ellipse 60% 68% at 50% 50%, #000 48%, transparent 92%);
-  mask-image: radial-gradient(ellipse 60% 68% at 50% 50%, #000 48%, transparent 92%);
-  filter: contrast(1.06) brightness(.98);
-}
-/* Same vignette trick as the apps board: a wide mask keeps the whole unit,
-   this darkens the ring of white seamless around it. */
-.unit::after {
-  content: '';
-  position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse 48% 56% at 50% 49%,
-    rgba(5,7,11,0) 34%, rgba(5,7,11,.55) 60%, rgba(5,7,11,.92) 80%, #05070b 100%);
 }
 
 .foot {
@@ -187,7 +185,7 @@ body {
   <span class="tick" style="left:640px"><span>5m</span></span>
 </div>
 
-<div class="unit"><img src="../../public/media/iriz/product/hero-clean.png" alt=""></div>
+<div class="unit"><img src="../../public/media/iriz/product/iriz-cutout.png" alt=""></div>
 
 <!-- The three figures restated, all off the retail box. -->
 <div class="foot">1 : 1 throw &middot; 0.9&ndash;5 m &middot; 40&Prime;&ndash;200&Prime;</div>
