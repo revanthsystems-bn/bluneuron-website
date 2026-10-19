@@ -1516,3 +1516,54 @@
     }
   } /* <--- Check if this outer bracket or an inner one is missing */
 }
+
+@layer components {
+  /* ================================================================ *
+   * ABOVE-THE-FOLD ENTRANCE — a CSS keyframe, not a hydrated one.
+   *
+   * components/Reveal is framer-motion with `initial={{opacity: 0}}`:
+   * the element is SERVER-RENDERED INVISIBLE and only fades in once the
+   * bundle has downloaded, parsed, hydrated and run an
+   * IntersectionObserver. Below the fold that is free — nobody is
+   * looking. Above it, it is the page's largest paint waiting on
+   * JavaScript.
+   *
+   * Measured on this build before the change: the homepage's LCP was
+   * its hero tagline at 4.3s with 89% render delay, /shop/iriz was the
+   * gallery image at 4.1s with 89% render delay, and both images had
+   * finished downloading inside the first second.
+   *
+   * A keyframe starts at first paint. No observer, no bundle, and the
+   * element is a real painted LCP candidate the moment it is in the DOM.
+   * `--rise-delay` staggers a group without needing a component each.
+   * ================================================================ */
+  .rise-in {
+    animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 16px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /*
+   * Reduced motion gets the END STATE immediately — not `animation:
+   * none` on a rule whose from-state is `opacity: 0`, which would leave
+   * the content permanently invisible for exactly the people who cannot
+   * be shown a fallback.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .rise-in {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

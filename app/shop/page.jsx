@@ -109,7 +109,7 @@ export default function ShopPage() {
                 <dl className="mt-7 grid gap-x-6 gap-y-3 border-t border-border-subtle pt-6 sm:grid-cols-3">
                   {ASSURANCES.map((item) => (
                     <div key={item.label}>
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                      <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/55">
                         {item.label}
                       </dt>
                       <dd className="mt-1 text-sm text-white/75">{item.value}</dd>

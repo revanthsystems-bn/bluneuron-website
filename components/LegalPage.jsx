@@ -197,7 +197,7 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
                     )}
 
                     {section.note && (
-                      <p className="mt-3 text-[13px] leading-relaxed text-white/45">
+                      <p className="mt-3 text-[13px] leading-relaxed text-white/55">
                         {linkify(section.note)}
                       </p>
                     )}
@@ -207,7 +207,7 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
 
               {lastUpdated && (
                 <div className="mt-12 border-t border-border-subtle pt-6">
-                  <p className="text-xs text-white/45">Last updated {lastUpdated}.</p>
+                  <p className="text-xs text-white/55">Last updated {lastUpdated}.</p>
                 </div>
               )}
             </div>

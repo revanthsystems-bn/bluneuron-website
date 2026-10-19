@@ -96,7 +96,7 @@ export default function WhereToBuyPage() {
                   here because this is the page someone lands on from a search
                   for the price, and a stale number is exactly what they would
                   otherwise take away. */}
-              <p className="mt-6 text-xs leading-relaxed text-white/40">
+              <p className="mt-6 text-xs leading-relaxed text-white/55">
                 Amazon and Flipkart set their own prices and run their own offers, so the listing
                 price can differ from the one above. The price on the listing is the price that
                 applies to your order.

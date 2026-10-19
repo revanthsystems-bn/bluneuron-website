@@ -309,7 +309,7 @@ export default function RegistrationForm() {
       <div className="mb-6 md:hidden">
         <div className="mb-2 flex items-baseline justify-between">
           <p className="text-sm font-semibold text-white">{STEP_TITLES[step]}</p>
-          <p className="text-xs text-white/45">Step {step} of 2</p>
+          <p className="text-xs text-white/55">Step {step} of 2</p>
         </div>
         <div
           className="h-1 w-full overflow-hidden rounded-full bg-white/10"
@@ -479,7 +479,7 @@ export default function RegistrationForm() {
 function Row({ label, children }) {
   return (
     <div className="flex items-baseline justify-between gap-4 py-2.5">
-      <dt className="shrink-0 text-xs text-white/45">{label}</dt>
+      <dt className="shrink-0 text-xs text-white/55">{label}</dt>
       <dd className="text-right text-sm font-medium text-white/85">{children}</dd>
     </div>
   );

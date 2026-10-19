@@ -65,7 +65,7 @@ export default function ProductList() {
           <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
             My products &amp; warranty
           </h2>
-          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/55">
             Registering a unit records its serial number and purchase date against your account, so
             a claim does not depend on finding the invoice again.
           </p>
@@ -76,7 +76,7 @@ export default function ProductList() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-white/40">Loading…</p>
+        <p className="text-sm text-white/55">Loading…</p>
       ) : products.length === 0 ? (
         <div className="rounded-3xl border border-border-subtle bg-black-soft px-6 py-14 text-center">
           <h3 className="text-base font-semibold text-white">No units registered yet</h3>
@@ -133,7 +133,7 @@ export default function ProductList() {
                       </a>
                       <a
                         href={ROUTES.warranty}
-                        className="px-2 py-2 text-xs text-white/45 underline underline-offset-2 transition-colors hover:text-white/70"
+                        className="px-2 py-2 text-xs text-white/55 underline underline-offset-2 transition-colors hover:text-white/70"
                       >
                         What is covered
                       </a>
@@ -149,7 +149,7 @@ export default function ProductList() {
       <section className="rounded-3xl border border-border-subtle bg-black-soft p-6 sm:p-7">
         <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">Claims</h3>
         {claims.length === 0 ? (
-          <p className="mt-4 text-sm leading-relaxed text-white/45">
+          <p className="mt-4 text-sm leading-relaxed text-white/55">
             No claims raised. If something goes wrong with a registered unit, a claim from here
             arrives with its serial number and purchase date already attached.
           </p>
@@ -159,7 +159,7 @@ export default function ProductList() {
               <li key={claim.id} className="flex flex-wrap items-baseline justify-between gap-3 py-4 first:pt-0 last:pb-0">
                 <div className="min-w-0">
                   <p className="text-sm text-white/80">{claim.issue}</p>
-                  <p className="mt-1 text-xs text-white/40">{formatDate(claim.createdAt)}</p>
+                  <p className="mt-1 text-xs text-white/55">{formatDate(claim.createdAt)}</p>
                 </div>
                 <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/60">
                   {claim.status}
@@ -176,7 +176,7 @@ export default function ProductList() {
 function Row({ label, value, mono = false }) {
   return (
     <div>
-      <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
+      <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/55">
         {label}
       </dt>
       {/* `break-all` on the identifiers: an Amazon order ID is a single

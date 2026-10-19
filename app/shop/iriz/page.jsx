@@ -127,7 +127,7 @@ export default function ProductPage() {
         <div className="section-container">
           {/* A breadcrumb, not a back button: it states where this page sits
               rather than assuming where the visitor came from. */}
-          <nav aria-label="Breadcrumb" className="mb-5 text-xs text-white/40 sm:mb-8">
+          <nav aria-label="Breadcrumb" className="mb-5 text-xs text-white/55 sm:mb-8">
             <a href={ROUTES.shop} className="transition-colors hover:text-white/70">
               Shop
             </a>
@@ -157,9 +157,15 @@ export default function ProductPage() {
             rail does the job it was always meant to do.
           */}
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-14">
-            <Reveal className="min-w-0">
+            {/* NOT wrapped in <Reveal>. This gallery is the page's LCP
+                element, and Reveal server-renders its children at opacity 0
+                until framer-motion has hydrated — measured at 4.1s LCP with
+                89% of it render delay, on an image that had finished
+                downloading inside the first second. `.rise-in` is a CSS
+                keyframe that starts at first paint instead. */}
+            <div className="min-w-0 rise-in">
               <ProductGallery shots={GALLERY} />
-            </Reveal>
+            </div>
 
             {/* `id` is what StickyProductBar observes — when this panel
                 leaves the viewport, the bar takes over. `self-start` is
@@ -279,11 +285,11 @@ export default function ProductPage() {
           <dl className="grid gap-px overflow-hidden rounded-2xl border border-border-subtle bg-border-subtle sm:grid-cols-2 lg:grid-cols-3">
             {SPECS.map((spec) => (
               <div key={spec.label} className="bg-black p-6">
-                <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/55">
                   {spec.label}
                 </dt>
                 <dd className="mt-2 text-2xl font-bold tracking-tight text-white">{spec.value}</dd>
-                <dd className="mt-1 text-xs text-white/45">{spec.unit}</dd>
+                <dd className="mt-1 text-xs text-white/55">{spec.unit}</dd>
               </div>
             ))}
           </dl>
@@ -299,7 +305,7 @@ export default function ProductPage() {
                 {BOX_CONTENTS.map((item) => (
                   <li key={item.title}>
                     {item.title}
-                    {item.note && <span className="text-white/40">{' — ' + item.note}</span>}
+                    {item.note && <span className="text-white/55">{' — ' + item.note}</span>}
                   </li>
                 ))}
               </ul>

@@ -19,7 +19,7 @@ export default function PriceTag({ size = 'md', align = 'left', className = '' }
       className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${align === 'center' ? 'justify-center' : ''} ${className}`}
     >
       <span className={`font-bold tracking-tight text-white ${s.price}`}>{formatPrice(PRICING.offerPrice)}</span>
-      <span className={`text-white/40 line-through ${s.mrp}`}>{formatPrice(PRICING.mrp)}</span>
+      <span className={`text-white/55 line-through ${s.mrp}`}>{formatPrice(PRICING.mrp)}</span>
       <span className={`rounded-full bg-[#a3e635] font-bold text-black ${s.badge}`}>{DISCOUNT_PERCENT}% OFF</span>
     </div>
   );

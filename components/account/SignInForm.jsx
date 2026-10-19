@@ -121,7 +121,7 @@ export default function SignInForm() {
             <label htmlFor="signin-code" className="mb-2 block text-sm font-medium text-white/80">
               Six-digit code
             </label>
-            <p className="mb-3 text-xs leading-relaxed text-white/45">
+            <p className="mb-3 text-xs leading-relaxed text-white/55">
               Sent to <span className="text-white/70">{email}</span>.{' '}
               <button
                 type="button"
@@ -171,7 +171,7 @@ export default function SignInForm() {
           </p>
         )}
 
-        <p className="mt-7 text-xs leading-relaxed text-white/40">
+        <p className="mt-7 text-xs leading-relaxed text-white/55">
           Signing in creates a BluNeuron account for warranty registration and support. See our{' '}
           <a href={ROUTES.privacy} className="underline underline-offset-2 hover:text-white/70">
             privacy policy

@@ -79,7 +79,7 @@ export default function ManualsPage() {
                         <Download className="h-4 w-4" aria-hidden="true" />
                         Download PDF
                         {!isTBD(doc.size) && (
-                          <span className="text-white/40">({doc.size})</span>
+                          <span className="text-white/55">({doc.size})</span>
                         )}
                       </a>
                     )}

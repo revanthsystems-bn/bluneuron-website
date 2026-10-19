@@ -92,7 +92,7 @@ export default function AnswerSearch({ faqs = [], fixes = [], faqHref, contactHr
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
-          className="pointer-events-none absolute left-5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-white/40"
+          className="pointer-events-none absolute left-5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-white/55"
         >
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" strokeLinecap="round" />
@@ -105,7 +105,7 @@ export default function AnswerSearch({ faqs = [], fixes = [], faqHref, contactHr
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search answers — brightness, Wi-Fi, keystone…"
           autoComplete="off"
-          className="h-[52px] w-full rounded-full border border-border bg-black-surface/80 pl-[52px] pr-5 text-sm text-white placeholder:text-white/40 backdrop-blur-glass transition-colors focus:border-accent-soft/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+          className="h-[52px] w-full rounded-full border border-border bg-black-surface/80 pl-[52px] pr-5 text-sm text-white placeholder:text-white/55 backdrop-blur-glass transition-colors focus:border-accent-soft/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
         />
       </div>
 
@@ -129,7 +129,7 @@ export default function AnswerSearch({ faqs = [], fixes = [], faqHref, contactHr
                       <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent-soft">
                         {entry.topic}
                       </span>
-                      <span className="text-[10px] uppercase tracking-[0.14em] text-white/30">
+                      <span className="text-[10px] uppercase tracking-[0.14em] text-white/55">
                         {entry.kind}
                       </span>
                     </span>

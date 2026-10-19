@@ -277,11 +277,22 @@ export default function Hero({ theme = 'dark' }) {
             <span aria-hidden className="hero-text-plate pointer-events-none absolute -inset-y-20 -left-[50vw] -right-[25vw] sm:-right-[6vw]" />
           )}
 
-          <Reveal amount={0.2}>
-            <p className={`type-label relative ${eyebrowClass}`}>{HERO.eyebrow}</p>
-          </Reveal>
+          {/* `.rise-in`, NOT <Reveal>, for all three.
 
-          <Reveal amount={0.2} delay={0.08}>
+              Reveal is framer-motion with `initial={{opacity: 0}}`: it
+              server-renders its children INVISIBLE and fades them in once the
+              bundle has hydrated and an IntersectionObserver has fired. The
+              hero is above the fold by definition, so that made the page's
+              largest paint wait on its JavaScript — measured at 4.3s LCP with
+              89% render delay, on a tagline that was in the HTML all along.
+
+              A CSS keyframe starts at first paint instead, and the stagger is
+              three `--rise-delay` values rather than three components. See
+              `.rise-in` in app/globals.css; it collapses to the end state
+              under prefers-reduced-motion. */}
+          <p className={`type-label relative rise-in ${eyebrowClass}`}>{HERO.eyebrow}</p>
+
+          <div className="rise-in" style={{ '--rise-delay': '80ms' }}>
             {/* TWO CHILDREN, one for each audience.
 
                 The name the machines read is a real text node in an
@@ -314,11 +325,14 @@ export default function Hero({ theme = 'dark' }) {
               <span className="sr-only">{HERO.accessibleName}</span>
               <span aria-hidden="true">{wordmarkText}</span>
             </h1>
-          </Reveal>
+          </div>
 
-          <Reveal amount={0.2} delay={0.16}>
-            <p className={`type-lede relative mt-5 max-w-xl ${taglineClass}`}>{HERO.tagline}</p>
-          </Reveal>
+          <p
+            className={`type-lede relative mt-5 max-w-xl rise-in ${taglineClass}`}
+            style={{ '--rise-delay': '160ms' }}
+          >
+            {HERO.tagline}
+          </p>
         </div>
       </div>
 

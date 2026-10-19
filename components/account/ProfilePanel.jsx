@@ -100,7 +100,7 @@ export default function ProfilePanel() {
     router.push(ROUTES.home);
   };
 
-  if (loading && !person) return <p className="text-sm text-white/40">Loading…</p>;
+  if (loading && !person) return <p className="text-sm text-white/55">Loading…</p>;
 
   const fields = [
     { label: 'Name', value: name || 'Not set' },
@@ -160,7 +160,7 @@ export default function ProfilePanel() {
           <dl className="mt-6 divide-y divide-border-subtle">
             {fields.map((field) => (
               <div key={field.label} className="flex flex-wrap gap-x-6 gap-y-1 py-4 first:pt-0 last:pb-0">
-                <dt className="w-28 shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-white/40">
+                <dt className="w-28 shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-white/55">
                   {field.label}
                 </dt>
                 <dd className="min-w-0 break-words text-sm text-white/80">{field.value}</dd>
@@ -178,7 +178,7 @@ export default function ProfilePanel() {
           </p>
         )}
 
-        <p className="mt-6 text-xs leading-relaxed text-white/40">
+        <p className="mt-6 text-xs leading-relaxed text-white/55">
           We hold your name, email and mobile number so a warranty claim can be matched to a unit
           and answered. Your email address is your sign-in and cannot be changed here — write to{' '}
           {SUPPORT.email} to move an account to a new address. What we store and how to have it
@@ -209,13 +209,13 @@ export default function ProfilePanel() {
 
         <div className="mt-8 border-t border-red-400/15 pt-6">
           <h3 className="text-sm font-semibold text-red-300">Delete my account and data</h3>
-          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/55">
             Permanently removes your profile, saved addresses, registered products and claim
             history. Your warranty itself is not affected — it runs from the invoice date and
             belongs to the unit — but you would need your invoice and serial number again to make
             a claim.
           </p>
-          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/55">
             Your sign-in record (your email address and nothing else) is removed separately by us:
             email {SUPPORT.email} from that address and we will erase it.
           </p>
@@ -238,7 +238,7 @@ export default function ProfilePanel() {
             className="mt-4 rounded-full border border-red-400/40 px-5 py-2.5 text-xs font-semibold text-red-300 transition-colors hover:bg-red-400/10 disabled:cursor-not-allowed disabled:border-red-400/20 disabled:text-red-300/40 disabled:hover:bg-transparent"
           >
             {busy ? 'Deleting…' : 'Delete my data'}
-            {DEMO_MODE && <span className="ml-2 font-normal text-white/35">(not active in demo)</span>}
+            {DEMO_MODE && <span className="ml-2 font-normal text-white/55">(not active in demo)</span>}
           </button>
         </div>
       </section>

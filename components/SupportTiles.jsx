@@ -78,7 +78,10 @@ export default function SupportTiles() {
   return (
     <div className="space-y-12">
       <div>
-        <p className="eyebrow mb-4">Your warranty</p>
+        {/* REAL HEADINGS. These were styled paragraphs, which left the
+            tiles’ <h3>s with no <h2> above them and broke the document
+            outline — axe reports it as heading-order. */}
+        <h2 className="eyebrow mb-4">Your warranty</h2>
         <ul className="grid gap-4 sm:grid-cols-2">
           {lead.map((tile, i) => (
             <Tile key={tile.href} tile={tile} index={i} />
@@ -87,7 +90,7 @@ export default function SupportTiles() {
       </div>
 
       <div>
-        <p className="eyebrow mb-4">Answers &amp; documents</p>
+        <h2 className="eyebrow mb-4">Answers &amp; documents</h2>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((tile, i) => (
             <Tile key={tile.href} tile={tile} index={i} />

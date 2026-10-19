@@ -175,14 +175,14 @@ export default function ProductShowcase() {
                   <span className="min-w-0">
                     <span className="block text-sm font-semibold text-white">{item.title}</span>
                     {item.note && (
-                      <span className="mt-0.5 block text-xs text-white/45">{item.note}</span>
+                      <span className="mt-0.5 block text-xs text-white/55">{item.note}</span>
                     )}
                   </span>
                 </li>
               ))}
             </ul>
 
-            <p className="mt-5 text-xs text-white/40">{BOX_SUMMARY}</p>
+            <p className="mt-5 text-xs text-white/55">{BOX_SUMMARY}</p>
           </Reveal>
         </div>
       </div>

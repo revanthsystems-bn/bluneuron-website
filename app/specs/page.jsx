@@ -112,7 +112,7 @@ export default function SpecsPage() {
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent-soft" aria-hidden="true" />
                     <span>
                       {item.title}
-                      {item.note && <span className="text-white/45">{' — ' + item.note}</span>}
+                      {item.note && <span className="text-white/55">{' — ' + item.note}</span>}
                     </span>
                   </li>
                 ))}

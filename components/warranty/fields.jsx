@@ -88,7 +88,7 @@ export function PhonePrefix({ children, invalid }) {
       }`}
     >
       <span
-        className="flex select-none items-center border-r border-border px-3 text-sm text-white/45"
+        className="flex select-none items-center border-r border-border px-3 text-sm text-white/55"
         aria-hidden="true"
       >
         +91

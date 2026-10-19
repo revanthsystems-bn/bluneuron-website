@@ -197,7 +197,7 @@ export default function ContactForm() {
         {busy ? 'Sending…' : 'Send message'}
       </Magnetic>
 
-      <p className="text-xs leading-relaxed text-white/35">
+      <p className="text-xs leading-relaxed text-white/55">
         We use what you send only to answer you.{' '}
         <a
           href={ROUTES.privacy}

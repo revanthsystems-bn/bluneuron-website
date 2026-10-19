@@ -97,7 +97,7 @@ export default function BuySection() {
               <StoreButtons />
             </div>
 
-            <p className="mt-6 text-xs leading-relaxed text-white/40">
+            <p className="mt-6 text-xs leading-relaxed text-white/55">
               Prices on Amazon and Flipkart move with their own offers — the price shown on the
               listing is the one that applies to your order.{' '}
               <a

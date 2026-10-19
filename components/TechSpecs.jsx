@@ -134,7 +134,7 @@ export default function TechSpecs({
               <div className="mt-auto pt-8">
                 <p className="flex items-baseline gap-2.5">
                   <CountUp value={stat.value} className="stat-number" />
-                  <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/40">
+                  <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/55">
                     {stat.suffix}
                   </span>
                 </p>
@@ -153,7 +153,7 @@ export default function TechSpecs({
               <p className="text-lg font-semibold tracking-tight text-white">Want the full sheet?</p>
               <a
                 href="/specs"
-                className="mt-3 inline-block text-sm font-semibold text-accent-soft underline-offset-4 hover:underline"
+                className="mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold text-accent-soft underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
               >
                 See full specs →
               </a>

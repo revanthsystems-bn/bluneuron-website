@@ -316,7 +316,7 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
           <AccountButton ink={ink} />
           <CartButton ink={ink} />
           {renderCta(
-            `ml-1 hidden px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
+            `ml-1 hidden min-h-[44px] px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
           )}
           <button
             aria-label="Toggle menu"

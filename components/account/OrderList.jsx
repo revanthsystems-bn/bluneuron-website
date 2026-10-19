@@ -44,14 +44,14 @@ export default function OrderList() {
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
           My orders
         </h2>
-        <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+        <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/55">
           These are the purchases you registered with us. Your invoice, delivery status and return
           window live with the marketplace that took the order — we are not given access to them.
         </p>
       </div>
 
       {loading ? (
-        <p className="text-sm text-white/40">Loading…</p>
+        <p className="text-sm text-white/55">Loading…</p>
       ) : products.length === 0 ? (
         <div className="rounded-3xl border border-border-subtle bg-black-soft px-6 py-14 text-center">
           <h3 className="text-base font-semibold text-white">Nothing registered yet</h3>
@@ -72,7 +72,7 @@ export default function OrderList() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="text-base font-semibold text-white">{order.name}</p>
-                  <p className="mt-1 text-xs text-white/45">
+                  <p className="mt-1 text-xs text-white/55">
                     {order.marketplace} · {formatDate(order.purchaseDate)}
                   </p>
                   <p className="mt-3 break-all font-mono text-xs text-white/60">{order.orderId}</p>

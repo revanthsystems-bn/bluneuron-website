@@ -97,7 +97,7 @@ export default function FaqAccordion({ items, idPrefix = 'faq' }) {
         <Reveal key={group.topic} y={18} delay={Math.min(gi, 4) * 0.04}>
           {/* The topic label is a real heading, so the groups are navigable
               by heading in a screen reader and not just visually separated. */}
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
             {group.topic}
           </h3>
 
@@ -133,7 +133,7 @@ export default function FaqAccordion({ items, idPrefix = 'faq' }) {
                           cannot land mid-swap. */}
                       <span
                         aria-hidden="true"
-                        className={`relative h-4 w-4 shrink-0 text-white/45 transition-transform duration-300 ${
+                        className={`relative h-4 w-4 shrink-0 text-white/55 transition-transform duration-300 ${
                           open ? 'rotate-45' : ''
                         }`}
                       >

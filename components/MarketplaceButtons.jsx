@@ -204,7 +204,7 @@ export default function MarketplaceButtons({
         </p>
       )}
 
-      <p className="mt-4 text-xs leading-relaxed text-white/45">{note}</p>
+      <p className="mt-4 text-xs leading-relaxed text-white/55">{note}</p>
     </div>
   );
 }

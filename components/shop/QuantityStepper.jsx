@@ -26,7 +26,7 @@ export default function QuantityStepper({ value, onChange, min = 1, max = 10, id
 
   return (
     <div className="flex items-center gap-3">
-      <label htmlFor={id} className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+      <label htmlFor={id} className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
         Qty
       </label>
 

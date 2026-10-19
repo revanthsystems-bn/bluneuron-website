@@ -116,7 +116,7 @@ export default function CartPanel() {
             <p className="mt-1 text-sm text-white/50">
               {unitPrice === null ? '—' : formatInr(unitPrice)} each · {MARKETPLACE.priceNote}
             </p>
-            <p className="mt-1 text-xs text-white/40">
+            <p className="mt-1 text-xs text-white/55">
               {WARRANTY.label} manufacturer warranty included
             </p>
 
@@ -126,7 +126,7 @@ export default function CartPanel() {
               <button
                 type="button"
                 onClick={removeItem}
-                className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs text-white/45 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs text-white/55 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
               >
                 <Trash2 size={14} aria-hidden="true" />
                 Remove
@@ -162,11 +162,11 @@ export default function CartPanel() {
             {/* NOT "Free". Amazon and Flipkart set delivery per order, per
                 pincode and per membership, and we are not told which applies
                 to you. "Shown at checkout" is the only true answer. */}
-            <dd className="text-white/45">Shown at checkout</dd>
+            <dd className="text-white/55">Shown at checkout</dd>
           </div>
         </dl>
 
-        <p className="mt-5 text-xs leading-relaxed text-white/40">
+        <p className="mt-5 text-xs leading-relaxed text-white/55">
           {MARKETPLACE.priceNote}. The marketplace price at the time you order is the one that
           applies.
         </p>
@@ -188,7 +188,7 @@ export default function CartPanel() {
 
         <a
           href={ROUTES.shop}
-          className="mt-6 block text-center text-xs text-white/45 transition-colors hover:text-white/70"
+          className="mt-6 block text-center text-xs text-white/55 transition-colors hover:text-white/70"
         >
           Continue shopping
         </a>

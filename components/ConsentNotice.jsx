@@ -113,7 +113,7 @@ function ConsentNoticeBar() {
         </p>
         <button
           onClick={dismiss}
-          className="btn-secondary shrink-0 px-5 py-2 text-xs"
+          className="btn-secondary min-h-[44px] shrink-0 px-5 py-2 text-xs"
         >
           Got it
         </button>

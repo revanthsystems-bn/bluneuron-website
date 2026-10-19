@@ -50,7 +50,7 @@ export default function ComparisonTable({
           <table className="w-full min-w-[640px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th className="p-5 font-medium text-white/50">&nbsp;</th>
+                <th scope="col" className="p-5 font-medium text-white/55"><span className="sr-only">Feature</span></th>
                 {columns.map((col) => (
                   <th
                     key={col.key}
@@ -72,7 +72,17 @@ export default function ComparisonTable({
                   key={row.label}
                   className={`transition-colors duration-200 hover:bg-accent-soft/[0.06] ${i % 2 === 0 ? 'bg-white/[0.015]' : ''}`}
                 >
-                  <td className="border-t border-border-subtle p-5 text-white/50">{row.label}</td>
+                  {/* A ROW HEADER, not a data cell. The left column names what
+                      each row compares, which is exactly what `<th scope="row">`
+                      is for — and without it every cell in the table is a value
+                      with nothing saying what it is a value OF, which is what
+                      axe's td-has-header rule reports. */}
+                  <th
+                    scope="row"
+                    className="border-t border-border-subtle p-5 text-left font-medium text-white/55"
+                  >
+                    {row.label}
+                  </th>
                   {columns.map((col) => (
                     <td key={col.key} className="border-t border-border-subtle p-5">
                       <Cell value={row[col.key]} />
@@ -88,7 +98,7 @@ export default function ComparisonTable({
           <Reveal delay={0.15} className="mt-8 text-center">
             <a
               href="/compare"
-              className="text-sm font-semibold text-accent-soft underline-offset-4 hover:underline"
+              className="inline-flex min-h-[44px] items-center text-sm font-semibold text-accent-soft underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
             >
               See the full comparison →
             </a>

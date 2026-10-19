@@ -178,7 +178,7 @@ export default function Footer() {
         >
           {columns.map((column) => (
             <div key={column.title} className="mb-10 break-inside-avoid lg:mb-0">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
                 {column.title}
               </h2>
               {/*
@@ -200,7 +200,7 @@ export default function Footer() {
                   <li key={`${column.title}-${link.href}-${link.label}`}>
                     <a
                       href={link.href}
-                      className="inline-flex min-h-[44px] w-fit items-center text-sm text-white/60 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                      className="inline-flex min-h-[44px] w-fit min-w-[44px] items-center text-sm text-white/60 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     >
                       {link.label}
                     </a>
@@ -262,16 +262,22 @@ export default function Footer() {
                       // around it. Growing the circle itself would have made
                       // three small marks into three heavy buttons; growing
                       // the hit area leaves the design alone.
-                      className="relative flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle text-white/50 transition-all duration-300 before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                      className="group flex h-11 w-11 items-center justify-center rounded-full text-white/50 transition-colors duration-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     >
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="h-[15px] w-[15px]"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path d={social.path} />
-                      </svg>
+                      {/* The RING is 32px and the TARGET is 44px. Growing
+                          the ring itself would turn three small marks into
+                          three heavy buttons; this keeps the design and
+                          gives the thumb something to hit. */}
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-white/20 group-hover:bg-white/5">
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="h-[15px] w-[15px]"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path d={social.path} />
+                        </svg>
+                      </span>
                     </a>
                   </li>
                 ))}
@@ -299,7 +305,7 @@ export default function Footer() {
           Below sm it stacks and the link simply follows the copyright,
           where `items-end` has no effect on a one-column flex.
         */}
-        <div className="mt-8 flex flex-col gap-3 border-t border-border-subtle pt-6 text-xs leading-relaxed text-white/40 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div className="mt-8 flex flex-col gap-3 border-t border-border-subtle pt-6 text-xs leading-relaxed text-white/55 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
           <div className="min-w-0">
             {showIdentity && (
               <>
@@ -308,7 +314,7 @@ export default function Footer() {
                 {allKnown(COMPANY.gstin) && <p className="mt-1">GSTIN: {COMPANY.gstin}</p>}
               </>
             )}
-            <p className={showIdentity ? 'mt-1 text-white/45' : 'text-white/45'}>
+            <p className={showIdentity ? 'mt-1 text-white/55' : 'text-white/55'}>
               © {new Date().getFullYear()} BluNeuron. All rights reserved.
             </p>
             {/*
@@ -324,7 +330,7 @@ export default function Footer() {
               what an attribution is — not a claim about the product, and
               not something to give the weight of a feature line.
             */}
-            <p className="mt-1 text-white/35">
+            <p className="mt-1 text-white/55">
               Android is a trademark of Google LLC.
             </p>
           </div>
@@ -338,7 +344,7 @@ export default function Footer() {
           {SHOW_PRIVACY && (
             <a
               href={ROUTES.privacy}
-              className="inline-flex min-h-[44px] w-fit shrink-0 items-center text-white/45 underline underline-offset-2 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft sm:text-right"
+              className="inline-flex min-h-[44px] w-fit shrink-0 items-center text-white/55 underline underline-offset-2 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft sm:text-right"
             >
               Privacy Policy
             </a>

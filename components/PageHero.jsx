@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Reveal from './Reveal';
 
 /**
  * A page opener with a picture behind it.
@@ -74,17 +73,32 @@ export default function PageHero({
       )}
 
       <div className="section-container relative py-16 sm:py-20 lg:py-24">
-        <Reveal>
-          {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
-          <h1 className="max-w-2xl text-4xl font-bold tracking-tighter text-white sm:text-5xl">
-            {title}
-          </h1>
-          {subtitle && (
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-white/70">{subtitle}</p>
-          )}
-        </Reveal>
+        {/* `.rise-in`, NOT <Reveal>. This block is above the fold on every
+            page that uses this component, and Reveal is framer-motion with
+            `initial={{opacity: 0}}` — which server-renders it invisible and
+            waits for hydration. That made a page's largest paint depend on
+            its JavaScript. See the note on `.rise-in` in app/globals.css. */}
+        {eyebrow && <p className="eyebrow mb-3 rise-in">{eyebrow}</p>}
+        <h1
+          className="max-w-2xl text-4xl font-bold tracking-tighter text-white rise-in sm:text-5xl"
+          style={{ '--rise-delay': '70ms' }}
+        >
+          {title}
+        </h1>
+        {subtitle && (
+          <p
+            className="mt-4 max-w-xl text-base leading-relaxed text-white/70 rise-in"
+            style={{ '--rise-delay': '140ms' }}
+          >
+            {subtitle}
+          </p>
+        )}
 
-        {children && <div className="relative mt-8">{children}</div>}
+        {children && (
+          <div className="relative mt-8 rise-in" style={{ '--rise-delay': '210ms' }}>
+            {children}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -126,7 +126,7 @@ export default function ContactPage() {
                     <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                   </span>
 
-                  <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+                  <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
                     {channel.label}
                   </h2>
 
@@ -207,11 +207,11 @@ export default function ContactPage() {
 
             <dl className="mt-6 space-y-3 text-sm">
               <div className="flex flex-wrap gap-x-3 gap-y-1">
-                <dt className="text-white/45">Name</dt>
+                <dt className="text-white/55">Name</dt>
                 <dd className="font-medium text-white">{GRIEVANCE_OFFICER.name}</dd>
               </div>
               <div className="flex flex-wrap gap-x-3 gap-y-1">
-                <dt className="text-white/45">Email</dt>
+                <dt className="text-white/55">Email</dt>
                 <dd className="break-words font-medium text-white">
                   {isTBD(GRIEVANCE_OFFICER.email) ? (
                     GRIEVANCE_OFFICER.email

@@ -146,7 +146,7 @@ function CartDrawerPanel() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-white">Your cart is empty</p>
-                  <p className="mt-2 text-sm leading-relaxed text-white/45">
+                  <p className="mt-2 text-sm leading-relaxed text-white/55">
                     The {BRAND.model} is the only thing we make — and it is one tap away.
                   </p>
                 </div>
@@ -170,7 +170,7 @@ function CartDrawerPanel() {
 
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-white">{BRAND.fullName}</p>
-                      <p className="mt-1 text-xs text-white/45">
+                      <p className="mt-1 text-xs text-white/55">
                         {unitPrice === null ? '—' : formatInr(unitPrice)} each
                       </p>
 
@@ -180,7 +180,7 @@ function CartDrawerPanel() {
                           type="button"
                           onClick={removeItem}
                           aria-label="Remove from cart"
-                          className="flex h-10 w-10 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                          className="flex h-10 w-10 items-center justify-center rounded-full text-white/55 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                         >
                           <Trash2 size={16} aria-hidden="true" />
                         </button>
@@ -196,7 +196,7 @@ function CartDrawerPanel() {
                       {subtotal === null ? '—' : formatInr(subtotal)}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-white/40">{MARKETPLACE.priceNote}</p>
+                  <p className="mt-1 text-xs text-white/55">{MARKETPLACE.priceNote}</p>
 
                   <a href={ROUTES.cart} onClick={closeCart} className="btn-primary mt-5 w-full justify-center">
                     Go to cart
@@ -204,7 +204,7 @@ function CartDrawerPanel() {
                   <button
                     type="button"
                     onClick={closeCart}
-                    className="mt-3 w-full text-center text-xs text-white/45 transition-colors hover:text-white/70"
+                    className="mt-3 w-full text-center text-xs text-white/55 transition-colors hover:text-white/70"
                   >
                     Continue browsing
                   </button>

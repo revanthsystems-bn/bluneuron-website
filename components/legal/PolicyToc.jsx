@@ -101,7 +101,7 @@ export default function PolicyToc({ items }) {
             fill="none"
             stroke="currentColor"
             strokeWidth="1.8"
-            className="h-4 w-4 shrink-0 text-white/40 transition-transform duration-300 [details[open]_&]:rotate-180"
+            className="h-4 w-4 shrink-0 text-white/55 transition-transform duration-300 [details[open]_&]:rotate-180"
           >
             <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -116,7 +116,7 @@ export default function PolicyToc({ items }) {
         aria-label="On this page"
         className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100svh-8rem)] lg:overflow-y-auto"
       >
-        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
           On this page
         </p>
         {list}

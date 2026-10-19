@@ -99,7 +99,7 @@ export default function AddressList() {
           <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
             Saved addresses
           </h2>
-          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45">
+          <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/55">
             Used to arrange a service pickup or return when you raise a warranty claim. Your
             marketplace delivery address stays with Amazon or Flipkart — we are not given it.
           </p>
@@ -142,7 +142,7 @@ export default function AddressList() {
       )}
 
       {loading ? (
-        <p className="text-sm text-white/40">Loading…</p>
+        <p className="text-sm text-white/55">Loading…</p>
       ) : addresses.length === 0 ? (
         <div className="rounded-3xl border border-border-subtle bg-black-soft px-6 py-14 text-center">
           <h3 className="text-base font-semibold text-white">No addresses saved</h3>
@@ -217,7 +217,7 @@ function Field({ name, label, className = '', ...rest }) {
     <div className={className}>
       <label htmlFor={`addr-${name}`} className="mb-1.5 block text-xs font-medium text-white/60">
         {label}
-        {rest.required && <span className="text-white/35"> *</span>}
+        {rest.required && <span className="text-white/55"> *</span>}
       </label>
       <input
         id={`addr-${name}`}

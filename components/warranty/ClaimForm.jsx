@@ -318,7 +318,7 @@ export default function ClaimForm() {
           {!errors.description && (
             <p
               className={`mt-1.5 text-xs ${
-                described >= CLAIM_DESCRIPTION_MIN ? 'text-white/35' : 'text-white/45'
+                described >= CLAIM_DESCRIPTION_MIN ? 'text-white/35' : 'text-white/55'
               }`}
               aria-live="polite"
             >
@@ -382,7 +382,7 @@ export default function ClaimForm() {
 function Row({ label, children }) {
   return (
     <div className="flex items-baseline justify-between gap-4 py-2.5">
-      <dt className="shrink-0 text-xs text-white/45">{label}</dt>
+      <dt className="shrink-0 text-xs text-white/55">{label}</dt>
       <dd className="text-right text-sm font-medium text-white/85">{children}</dd>
     </div>
   );

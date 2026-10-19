@@ -49,7 +49,7 @@ export default function AccountsDisabled() {
         </a>
       </div>
 
-      <p className="mt-6 text-xs text-white/45">
+      <p className="mt-6 text-xs text-white/55">
         Bought an IRIZ elsewhere?{' '}
         <a
           href={ROUTES.support}

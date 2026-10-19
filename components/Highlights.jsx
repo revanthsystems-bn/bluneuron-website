@@ -152,7 +152,20 @@ export default function Highlights() {
                   className="pointer-events-none absolute inset-[6%] z-0"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={banner.glow} alt="" aria-hidden="true" className="hl-glow" />
+                  <img
+                    src={banner.glow}
+                    alt=""
+                    aria-hidden="true"
+                    // LAZY AND ASYNC. React hoists a plain <img> in the
+                    // initial HTML into a <link rel="preload">, so these two
+                    // decorative glows — both below the fold — were being
+                    // fetched at high priority alongside the hero poster they
+                    // compete with. They are ~1.3KB each and nobody sees them
+                    // until the Highlights section is scrolled to.
+                    loading="lazy"
+                    decoding="async"
+                    className="hl-glow"
+                  />
                 </Reveal>
 
                 <div className="hl-frame z-10">
