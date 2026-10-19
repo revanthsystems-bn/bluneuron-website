@@ -11,7 +11,7 @@ import { MEDIA } from '@/lib/iriz';
  * render. The two boards below already state every one of those, in the
  * manufacturer's own artwork and in more detail than a three-word tile could:
  * 02-spec-sheet carries native 1080P, 3.5" LTPS LCD, Allwinner H723, auto
- * focus, 0.9-5m, 40-200", and 1:1; 07-latency carries the 0.004s lockup. The
+ * focus, 0.9-5m, 35-200", and 1:1; 07-latency carries the 0.004s lockup. The
  * tiles were the same claims a second time, smaller.
  *
  * `SPECS` in lib/iriz.js is UNTOUCHED — /specs and the comparison table still
@@ -62,7 +62,7 @@ const BOARDS = [
     className: 'board-spec aspect-[750/698] lg:aspect-auto',
     alt:
       'IRIZ specification board: native 1080P (1920×1080) resolution, 3.5-inch LTPS LCD display '
-      + 'technology, Allwinner H723 chipset, auto focus, 0.9m–5m projection distance, 40–200 inch '
+      + 'technology, Allwinner H723 chipset, auto focus, 0.9m–5m projection distance, 35–200 inch '
       + 'projection size, and a 1:1 throw ratio.',
   },
   {
