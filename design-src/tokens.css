@@ -1,0 +1,140 @@
+/*
+ * THE SITE'S OWN TOKENS, restated for standalone design files.
+ *
+ * Everything in here is COPIED from tailwind.config.js and app/globals.css —
+ * it is not a new palette and must never become one. The files in this folder
+ * render outside Next (a plain browser, driven by Playwright), so they cannot
+ * use Tailwind's build or next/font; this is the bridge.
+ *
+ * If a value here ever disagrees with tailwind.config.js, tailwind.config.js
+ * is right and this file is stale. Re-copy rather than reconcile.
+ */
+
+:root {
+  /* tailwind.config.js → theme.extend.colors.black */
+  --black: #000000;
+  --obsidian: #030303;
+  --soft: #0a0a0a;
+  --surface: #121212;
+  --elevated: #1a1a1a;
+
+  /* theme.extend.colors.border */
+  --line-subtle: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.2);
+
+  /* theme.extend.colors.accent */
+  --accent: #3b82f6;
+  --accent-soft: #60a5fa;
+
+  /* The wordmark blue, from components/Header: the one non-white hue in the
+     logo art. Used only where the brand mark itself appears. */
+  --brand: rgb(2, 109, 254);
+
+  /* Text ramp. The app writes these as `text-white/NN`; they are named here
+     so a design file cannot invent a fourth step. */
+  --ink: #ffffff;
+  --ink-2: rgba(255, 255, 255, 0.85);
+  --ink-3: rgba(255, 255, 255, 0.65);
+  --ink-4: rgba(255, 255, 255, 0.45);
+
+  /* app/layout.jsx loads Inter Tight through next/font as --font-display.
+     Standalone files pull the same family from Google Fonts. */
+  --font-sans: 'Inter Tight', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* components/Hero's wordmark face. */
+  --font-iriz: 'Zen Dots', var(--font-sans);
+
+  /* .section-container in app/globals.css */
+  --container: 1440px;
+
+  --radius-card: 24px;
+  --radius-tile: 16px;
+  --radius-pill: 999px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* .section-container */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 64px;
+  }
+}
+
+/* .eyebrow — uppercase label, the site's section opener. */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* .btn-primary — white pill, black label. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  min-height: 44px;
+}
+
+.btn-primary {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* .btn-secondary */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-strong);
+  color: #ffffff;
+}
+
+/* .glass-panel */
+.panel {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line-subtle);
+  background: rgba(18, 18, 18, 0.6);
+}
