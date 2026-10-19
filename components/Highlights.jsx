@@ -45,7 +45,7 @@ import { HIGHLIGHT_BANNERS, HIGHLIGHT_BOARDS } from '@/lib/iriz';
  * where the artwork ends. That is exactly what happened on an earlier pass.
  */
 const TILE = [
-  { ratio: 'aspect-[1014/1551]', field: 'img-field-apps' },     // 11-apps-builtin
+  { ratio: 'aspect-[1014/1551]', field: 'img-field-apps' },     // 11-apps-10000
   { ratio: 'aspect-[750/1240]', field: 'img-field-chipset' },   // 06-chipset
   { ratio: 'aspect-[750/1065]', field: 'img-field-screen' },    // 09-screen-size
   { ratio: 'aspect-[750/967]', field: 'img-field-keystone' },   // 08-keystone
