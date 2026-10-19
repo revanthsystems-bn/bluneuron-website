@@ -18,7 +18,7 @@ export const metadata = pageMetadata({
 // assistant to put in the cell, and an empty one would be a comparison the
 // table cannot support.
 const EXTRA_ROWS = [
-  { label: 'App Store', iriz: '10,000+ official apps, pre-installed', other: 'Sideloading required, if supported' },
+  { label: 'Apps', iriz: 'Installed over Wi-Fi, on the device', other: 'Sideloading required, if supported' },
   { label: 'Video Decoding', iriz: 'Up to 8K (decode)', other: 'Typically 1080p or lower' },
   { label: 'Chipset', iriz: 'Allwinner H723, Quad-core Cortex-A53', other: 'Often unnamed/unspecified' },
   { label: 'Projection Distance', iriz: '0.9m – 5m', other: 'Varies, often more restrictive' },

@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { usePathname } from 'next/navigation';
 import NewsletterPopup from '../NewsletterPopup';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
+import { NOTIFY_AUTO_OPEN } from '@/lib/site-config';
 
 /**
  * Pre-launch, every CTA on the site means the same thing: "put me on the
@@ -82,6 +83,19 @@ export default function NotifyProvider({ children }) {
    * who asks for the modal must always get it.
    */
   useEffect(() => {
+    /*
+     * THE UNPROMPTED INVITATION IS OFF (NOTIFY_AUTO_OPEN, lib/site-config),
+     * because the product is on sale: a modal offering to tell you when IRIZ
+     * launches is both out of date and sitting on top of the Buy button.
+     *
+     * Checked FIRST, before the storage read and before the timer is
+     * scheduled — a switched-off feature that still sets a timeout is a
+     * switched-off feature that can still surprise you.
+     *
+     * This gates ONLY the automatic open. Every explicit "Notify Me" control
+     * still calls `openNotify` directly and still works.
+     */
+    if (!NOTIFY_AUTO_OPEN) return undefined;
     if (pathname !== '/') return undefined;
 
     try {

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Reveal from './Reveal';
-import MarketplaceButtons from './MarketplaceButtons';
+import StoreButtons from './buy/StoreButtons';
 import { BRAND, HERO, MEDIA } from '@/lib/iriz';
 import { BUY_ANCHOR, ROUTES } from '@/lib/routes';
 import { MARKETPLACE, formatInr } from '@/lib/site-config';
@@ -83,7 +83,18 @@ export default function BuySection() {
             </div>
 
             <div className="mt-8">
-              <MarketplaceButtons />
+              {/* StoreButtons, NOT MarketplaceButtons.
+
+                  The old row rendered a real, clickable link to the
+                  marketplace's HOME PAGE whenever the listing URL was still a
+                  PLACEHOLDER — so a visitor pressing "Buy on Amazon" in a
+                  preview landed on amazon.in with no IRIZ in sight. That is a
+                  fake destination wearing a real button.
+
+                  StoreButtons withholds the href entirely until a genuine
+                  listing URL exists and shows a short note instead. See
+                  lib/buy-destinations.js. */}
+              <StoreButtons />
             </div>
 
             <p className="mt-6 text-xs leading-relaxed text-white/40">

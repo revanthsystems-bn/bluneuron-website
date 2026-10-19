@@ -293,6 +293,22 @@ export default function Footer() {
             <p className={showIdentity ? 'mt-1 text-white/45' : 'text-white/45'}>
               © {new Date().getFullYear()} BluNeuron. All rights reserved.
             </p>
+            {/*
+              THE ANDROID TRADEMARK ATTRIBUTION.
+
+              The site states "Android 14" as a spec and the chipset board
+              carries the Android robot, so the mark is used here and the
+              attribution has to appear with it. The wording is copied from
+              the printed IRIZ carton rather than written fresh, so the site
+              and the box say the same sentence.
+
+              It sits in the legal block, muted and last, because that is
+              what an attribution is — not a claim about the product, and
+              not something to give the weight of a feature line.
+            */}
+            <p className="mt-1 text-white/35">
+              Android is a trademark of Google LLC.
+            </p>
           </div>
 
           {/* Privacy Policy, right-aligned, on the copyright's line. It is

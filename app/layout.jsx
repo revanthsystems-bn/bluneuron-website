@@ -9,6 +9,7 @@ import { AccountProvider } from '@/components/account/AccountContext';
 import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import NotifyProvider from '@/components/notify/NotifyProvider';
+import BuyProvider from '@/components/buy/BuyProvider';
 import MetaPixel from '@/components/MetaPixel';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL } from '@/lib/site';
@@ -53,7 +54,7 @@ const zenDots = Zen_Dots({
 const TITLE = 'BluNeuron IRIZ — Mini Projector for Home';
 const DESCRIPTION =
   'The BluNeuron IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, '
-  + 'and built-in Android 14 with 10,000+ apps.';
+  + 'and built-in Android 14 — your apps over Wi-Fi, with no streaming stick.';
 
 export const metadata = {
   // Resolves every root-relative URL in this file and in `pageMetadata` —
@@ -103,11 +104,19 @@ export default function RootLayout({ children }) {
           <AccountProvider>
             <CartProvider>
               <NotifyProvider>
+                {/* ONE "choose where to buy" sheet for the whole document.
+                    Every Buy button on the site opens this instance rather
+                    than mounting its own — a page carries up to four Buy
+                    affordances, and four sheets would mean four focus traps
+                    and four colliding `aria-labelledby` ids. It renders
+                    nothing until opened. See components/buy/BuyProvider. */}
+                <BuyProvider>
                 <SmoothScroll />
                 <PageIntro />
                 {children}
                 <ConsentNotice />
                 <CartDrawer />
+                </BuyProvider>
               </NotifyProvider>
             </CartProvider>
           </AccountProvider>

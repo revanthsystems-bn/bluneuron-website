@@ -11,7 +11,8 @@ import NotifyButton from './NotifyButton';
 import { useCart } from './cart/CartContext';
 import { runBuyNow } from '@/lib/commerce';
 import { COMMERCE_ENABLED } from '@/lib/launch';
-import { BUY_HREF, NAV_ITEMS, ROUTES } from '@/lib/routes';
+import { NAV_ITEMS, ROUTES } from '@/lib/routes';
+import BuyButton from '@/components/buy/BuyButton';
 import { SHOW_BUY } from '@/lib/site-config';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
 
@@ -163,11 +164,20 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
    */
   const renderCta = (className, { onNavigate, strength = 0.15 } = {}) => {
     if (SHOW_BUY) {
-      return (
-        <Magnetic as="a" href={BUY_HREF} className={className} strength={strength} onClick={onNavigate}>
-          Buy
-        </Magnetic>
-      );
+      /*
+       * A <button> that opens the sheet, not an <a> to the homepage anchor.
+       *
+       * BUY_HREF was "/#buy" — the homepage's buy card. That works on the
+       * homepage and is a cross-page jump from everywhere else: press Buy on
+       * a policy page and you land on / and then have to find the card. The
+       * sheet answers the question where it is asked, with the price and the
+       * fulfilment note in it.
+       *
+       * BuyButton carries the aria-haspopup that says a dialog is coming,
+       * and composes `onNavigate` with its own handler so the mobile menu
+       * still closes. See components/buy/BuyButton.
+       */
+      return <BuyButton className={className} onClick={onNavigate} />;
     }
 
     if (COMMERCE_ENABLED) {

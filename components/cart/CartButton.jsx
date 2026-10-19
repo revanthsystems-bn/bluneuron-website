@@ -2,6 +2,7 @@
 
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from './CartContext';
+import { CART_ENABLED } from '@/lib/site-config';
 
 /**
  * The masthead's basket.
@@ -23,7 +24,21 @@ import { useCart } from './CartContext';
  * in anyway. Suppressing it until then costs nothing — the badge is
  * absolutely positioned and reserves no layout.
  */
-export default function CartButton({ className = '', ink = false }) {
+/**
+ * The gate. NO HOOKS OF ITS OWN, so the early return cannot reorder the ones
+ * in the control below — a conditional `useCart()` would be a hooks-order
+ * violation the first time the flag flipped at runtime.
+ *
+ * Gating HERE rather than at the call sites keeps every masthead variant —
+ * desktop bar and open mobile menu — consistent from one decision. See
+ * CART_ENABLED in lib/site-config.
+ */
+export default function CartButton(props) {
+  if (!CART_ENABLED) return null;
+  return <CartButtonControl {...props} />;
+}
+
+function CartButtonControl({ className = '', ink = false }) {
   const { itemCount, openCart, hydrated } = useCart();
   const count = hydrated ? itemCount : 0;
 

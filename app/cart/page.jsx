@@ -1,7 +1,9 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import CartPanel from '@/components/cart/CartPanel';
+import { redirect } from 'next/navigation';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { CART_ENABLED } from '@/lib/site-config';
 import { pageMetadata } from '@/lib/seo';
 
 /**
@@ -26,6 +28,18 @@ export const metadata = {
 };
 
 export default function CartPage() {
+  /*
+   * THE BASKET IS OFF (CART_ENABLED, lib/site-config), so this route sends
+   * people to the product page.
+   *
+   * A redirect rather than a 404 or a "cart is empty" panel: with the cart
+   * switched off nothing can ever put an item in it, so an empty-cart screen
+   * would be permanently, confusingly true. Anyone landing here typed the URL
+   * or kept a bookmark, and what they want is the thing they were going to
+   * buy — which is one page away and has a working Buy button on it.
+   */
+  if (!CART_ENABLED) redirect(ROUTES.product);
+
   return (
     <PageShell>
       <PageHeading

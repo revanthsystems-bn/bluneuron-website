@@ -8,7 +8,7 @@ import QuantityStepper from '../shop/QuantityStepper';
 import { useCart } from './CartContext';
 import { BRAND, PRODUCT } from '@/lib/iriz';
 import { ROUTES } from '@/lib/routes';
-import { MARKETPLACE, formatInr } from '@/lib/site-config';
+import { CART_ENABLED, MARKETPLACE, formatInr } from '@/lib/site-config';
 
 /**
  * The cart drawer — a right-hand slide-over, and the basket's quick view.
@@ -36,7 +36,18 @@ import { MARKETPLACE, formatInr } from '@/lib/site-config';
  * reducedMotion="user"> in app/layout.jsx, which drops the transform and
  * leaves the fade.
  */
+/**
+ * The gate — see the note on components/cart/CartButton. The drawer can only
+ * be opened by a control that is itself hidden while CART_ENABLED is false,
+ * but it is gated anyway: a modal that cannot be reached is still a focus
+ * trap and a scroll lock sitting in the document.
+ */
 export default function CartDrawer() {
+  if (!CART_ENABLED) return null;
+  return <CartDrawerPanel />;
+}
+
+function CartDrawerPanel() {
   const { isOpen, closeCart, qty, unitPrice, subtotal, setItemQty, removeItem } = useCart();
   const panelRef = useRef(null);
   const closeRef = useRef(null);

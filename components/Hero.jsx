@@ -267,7 +267,7 @@ export default function Hero({ theme = 'dark' }) {
             <span aria-hidden className="hero-light-plate pointer-events-none absolute -inset-y-28 -left-[50vw] -right-[6vw] sm:-right-[12vw]" />
           ) : (
             // The plate's right-hand falloff reaches further on phones than it
-            // used to: the eyebrow is now "Mini portable projector for home",
+            // used to: the eyebrow is now "Mini projector for home",
             // 265px of it at 390px wide, and at -6vw the gradient had already
             // decayed to ~0.08 alpha under its last third — which measured
             // 4.36:1 against the brightest frame of the loop and missed AA. At

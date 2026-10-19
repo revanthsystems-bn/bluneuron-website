@@ -1,10 +1,12 @@
 import { redirect } from 'next/navigation';
+import AccountsDisabled from '@/components/account/AccountsDisabled';
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import AccountGuard from '@/components/account/AccountGuard';
 import AccountNav from '@/components/account/AccountNav';
 import DemoNotice from '@/components/account/DemoNotice';
 import { DEMO_MODE } from '@/lib/supabase/config';
+import { ACCOUNTS_ENABLED } from '@/lib/site-config';
 import { getServerUser } from '@/lib/supabase/server';
 import { ROUTES } from '@/lib/routes';
 
@@ -44,6 +46,33 @@ import { ROUTES } from '@/lib/routes';
  * it would hold even if this check were removed entirely.
  */
 export default async function AccountLayout({ children }) {
+  /*
+   * ACCOUNTS ARE OFF (ACCOUNTS_ENABLED, lib/site-config), so the whole area
+   * renders the "coming soon" panel.
+   *
+   * Gating in the LAYOUT covers /account and all four sub-routes from one
+   * place, and it returns BEFORE the Supabase session check below — which
+   * matters, because that check would otherwise redirect a signed-out
+   * visitor to /sign-in, where they would meet the same panel after a
+   * pointless round trip.
+   */
+  if (!ACCOUNTS_ENABLED) {
+    return (
+      <PageShell>
+        <PageHeading
+          eyebrow="Account"
+          title="Accounts, soon."
+          subtitle="Warranty registration and claims are open to everyone in the meantime — no account needed."
+        />
+        <section className="bg-black py-14 sm:py-20">
+          <div className="section-container">
+            <AccountsDisabled />
+          </div>
+        </section>
+      </PageShell>
+    );
+  }
+
   // Demo mode has no session to check and exists precisely so these screens
   // can be reviewed without a backend.
   if (!DEMO_MODE) {

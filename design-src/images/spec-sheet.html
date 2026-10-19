@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+/*
+ * REPLACES public/media/iriz/detail/02-spec-sheet.png  (750 x 698)
+ *
+ * WHAT WAS WRONG WITH THE ORIGINAL. One figure: it printed "35-200 Inch" as
+ * the projection size. The retail box says 40"-200", and so do SPECS and
+ * FULL_SPEC_SHEET in lib/iriz.js.
+ *
+ * Everything else on this board is carried over unchanged, because every
+ * other figure on it already matched the box: native 1080P (1920x1080),
+ * 3.5" LTPS LCD, Allwinner H723, auto focus, 0.9M-5M, and a 1:1 throw ratio.
+ *
+ * The original was also a photo-composite — a macro of a blue flower behind
+ * the resolution tile, a prism graphic, a chip render. Those are stock
+ * images illustrating nothing; the figures are the content. This draws the
+ * same tiles with the same words, in the site's own type, over the site's
+ * own grounds, with our photograph where a product belongs.
+ */
+html, body { width: 750px; height: 698px; overflow: hidden; }
+body {
+  background: radial-gradient(ellipse 90% 60% at 50% 0%, #151b26 0%, #0a0d13 55%, #05070b 100%);
+  padding: 34px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tile {
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: linear-gradient(165deg, rgba(255,255,255,.055), rgba(255,255,255,.02));
+  position: relative;
+  overflow: hidden;
+}
+/* The top-edge sheen the site puts on every raised surface. */
+.tile::after {
+  content: '';
+  position: absolute; inset: 0 0 auto 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+}
+
+.row { display: flex; gap: 14px; }
+
+/* ---- Top row ------------------------------------------------------- */
+.res { flex: 1.45; padding: 26px 28px; display: flex; flex-direction: column; justify-content: center; }
+.res h2 { font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1.05; }
+.res h2 em { font-style: normal; color: var(--accent-soft); }
+.res p { margin: 10px 0 0; font-size: 19px; color: rgba(255,255,255,.58); }
+
+.lcd { flex: 1; padding: 26px 24px; display: flex; flex-direction: column; justify-content: center; }
+.lcd .n { font-size: 32px; font-weight: 700; letter-spacing: -.02em; }
+.lcd p { margin: 8px 0 0; font-size: 16px; color: rgba(255,255,255,.55); line-height: 1.4; }
+
+/* ---- Chipset band, with the unit --------------------------------- */
+.chip { display: flex; align-items: center; gap: 22px; padding: 22px 28px; }
+.chip .txt { flex: 1; }
+.chip .n { font-size: 32px; font-weight: 700; letter-spacing: -.02em; }
+.chip p { margin: 7px 0 0; font-size: 16px; color: rgba(255,255,255,.55); }
+/*
+ * The vignette has to fade to the colour BEHIND it, and inside a tile that
+ * is not the page ground: the tile paints a translucent white over the body
+ * gradient, so a vignette ending at the page colour left a visible dark box.
+ * Both are pinned to the same literal here.
+ */
+.chip .pic { width: 230px; height: 112px; position: relative; overflow: hidden; flex: 0 0 auto; background: #141922; border-radius: 12px; }
+.chip .pic img {
+  width: 100%; height: 100%; object-fit: cover; object-position: 50% 47%; display: block;
+  -webkit-mask-image: radial-gradient(ellipse 60% 68% at 50% 50%, #000 48%, transparent 92%);
+  mask-image: radial-gradient(ellipse 60% 68% at 50% 50%, #000 48%, transparent 92%);
+  filter: contrast(1.06) brightness(.98);
+}
+/* Wide mask keeps the whole unit; this kills the ring of white seamless. */
+.chip .pic::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 48% 56% at 50% 49%,
+    rgba(20,25,34,0) 34%, rgba(20,25,34,.6) 62%, rgba(20,25,34,.95) 82%, #141922 100%);
+}
+
+/* ---- Bottom row: the four figures -------------------------------- */
+.four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.f { padding: 20px 18px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+.f .n { font-size: 25px; font-weight: 700; letter-spacing: -.02em; line-height: 1.12; }
+.f .n.sm { font-size: 21px; }
+.f p { margin: 8px 0 0; font-size: 14px; color: rgba(255,255,255,.52); line-height: 1.35; }
+</style>
+</head>
+<body>
+
+<div class="row" style="flex:1">
+  <div class="tile res">
+    <h2>Native <em>1080P</em></h2>
+    <p>1920&times;1080 resolution</p>
+  </div>
+  <div class="tile lcd">
+    <div class="n">3.5&Prime; LTPS LCD</div>
+    <p>Display technology</p>
+  </div>
+</div>
+
+<div class="tile chip" style="flex:1">
+  <div class="txt">
+    <div class="n">Allwinner H723</div>
+    <p>Quad-core ARM Cortex-A53</p>
+  </div>
+  <div class="pic"><img src="../../public/media/iriz/product/hero-clean.png" alt=""></div>
+</div>
+
+<div class="four" style="flex:1">
+  <div class="tile f"><div class="n sm">Auto<br>Focus</div></div>
+  <div class="tile f"><div class="n">0.9&ndash;5 m</div><p>Projection distance</p></div>
+  <!-- 40"-200", not the original's "35-200 Inch". See the note at the top. -->
+  <div class="tile f"><div class="n">40&Prime;&ndash;200&Prime;</div><p>Projection size</p></div>
+  <div class="tile f"><div class="n">1 : 1</div><p>Throw ratio</p></div>
+</div>
+
+</body>
+</html>

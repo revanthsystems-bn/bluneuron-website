@@ -68,6 +68,22 @@ function ExternalGlyph() {
   );
 }
 
+/*
+ * SUPERSEDED BY components/buy/StoreButtons — do not add a new caller.
+ *
+ * The only thing still importing this is components/cart/CartPanel, which is
+ * reachable only from /cart, which redirects while CART_ENABLED is false
+ * (lib/site-config). So this code does not run today.
+ *
+ * It must not come back as-is. Its PLACEHOLDER branch renders a REAL,
+ * CLICKABLE link to the marketplace's home page — so "Buy on Amazon" lands a
+ * visitor on amazon.in with no IRIZ anywhere, which is a fake destination
+ * wearing a real button. StoreButtons withholds the href entirely until a
+ * genuine listing URL exists and shows a note instead.
+ *
+ * Switching the basket back on means pointing CartPanel at StoreButtons
+ * first.
+ */
 export default function MarketplaceButtons({
   className = 'flex flex-col gap-3 sm:flex-row sm:flex-wrap',
   buttonClassName = 'w-full justify-center sm:w-auto',

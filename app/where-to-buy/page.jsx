@@ -2,7 +2,7 @@ import Image from 'next/image';
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import DraftBanner from '@/components/DraftBanner';
-import MarketplaceButtons from '@/components/MarketplaceButtons';
+import StoreButtons from '@/components/buy/StoreButtons';
 import Reveal from '@/components/Reveal';
 import { BRAND, HERO, MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
@@ -87,7 +87,7 @@ export default function WhereToBuyPage() {
               </div>
 
               <div className="mt-8">
-                <MarketplaceButtons />
+                <StoreButtons />
               </div>
 
               {/* The homepage says this beside its own buttons too. Said again

@@ -1,7 +1,9 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import SignInForm from '@/components/account/SignInForm';
+import AccountsDisabled from '@/components/account/AccountsDisabled';
 import { ROUTES, routeRobots } from '@/lib/routes';
+import { ACCOUNTS_ENABLED } from '@/lib/site-config';
 import { pageMetadata } from '@/lib/seo';
 
 export const metadata = {
@@ -22,17 +24,30 @@ export const metadata = {
  * marketplace), so the only honest pitch is warranty and support.
  */
 export default function SignInPage() {
+  /*
+   * ACCOUNTS ARE OFF (ACCOUNTS_ENABLED, lib/site-config). The heading changes
+   * with the body: leaving "Sign in." over a panel that says accounts do not
+   * exist yet would be the page contradicting itself in two type sizes.
+   *
+   * SignInForm is still imported and still works — it is one flag away.
+   */
+  const live = ACCOUNTS_ENABLED;
+
   return (
     <PageShell>
       <PageHeading
         eyebrow="Account"
-        title="Sign in."
-        subtitle="An account is for after the purchase — register a unit's warranty, keep your serial numbers in one place, and raise a claim without typing it all out again."
+        title={live ? 'Sign in.' : 'Accounts, soon.'}
+        subtitle={
+          live
+            ? "An account is for after the purchase — register a unit's warranty, keep your serial numbers in one place, and raise a claim without typing it all out again."
+            : 'Warranty registration and claims are open to everyone in the meantime — no account needed.'
+        }
       />
 
       <section className="bg-black py-14 sm:py-20">
         <div className="section-container">
-          <SignInForm />
+          {live ? <SignInForm /> : <AccountsDisabled />}
         </div>
       </section>
     </PageShell>

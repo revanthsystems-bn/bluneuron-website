@@ -90,7 +90,7 @@ const POINTS = [
   {
     heading: 'Everything you watch, already on it',
     body: [
-      'Android 14 is built in, with a remote in the box — so Netflix, YouTube, Disney+, Prime Video and the rest of the 10,000+ official apps are on the device itself. There is no stick to buy, no second remote, no HDMI input occupied before you start.',
+      'Android 14 is built in, with a remote in the box — so the apps you watch install onto the projector itself over Wi-Fi. There is no stick to buy, no second remote, no HDMI input occupied before you start.',
       'The inputs are there when you want them: HDMI for a console or a laptop, USB-A for playing files off a drive, and a 3.5 mm output for headphones or a speaker. A low-latency mode brings response time down to 0.004 s for gaming over HDMI, and HDMI and USB playback work with no network at all — only the streaming side of it needs Wi-Fi.',
     ],
   },

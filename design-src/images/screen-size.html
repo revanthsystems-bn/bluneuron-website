@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+/*
+ * REPLACES public/media/iriz/detail/09-screen-size.png  (750 x 1065)
+ *
+ * WHAT WAS WRONG WITH THE ORIGINAL. Its screen ladder started at 35", and
+ * its sub-head read "1.4-5 meters optimal projection distance". The retail
+ * box prints 40"-200", and SPECS / FULL_SPEC_SHEET in lib/iriz.js both say
+ * 40"-200" over 0.9m-5m. So the picture contradicted the box, the spec table
+ * and the scroll dial on the homepage — all three of which agreed with each
+ * other.
+ *
+ * It was also internally inconsistent: it stepped 35/75/125/200 against
+ * 0.9/1.5/2.5/5m, which is not a 1:1 throw at any of those points (1.5m ->
+ * 75" implies 50"/m; 5m -> 200" implies 40"/m).
+ *
+ * WHAT THIS DRAWS. The ladder rebuilt from the rule the site already states
+ * in THROW_RANGE — a 1:1 throw, roughly 40 inches of diagonal per metre —
+ * so 0.9m -> 40", 2.5m -> 100", 5m -> 200". Every figure on this board now
+ * matches the box and the spec sheet.
+ *
+ * The screen rectangles are sized in proportion to their diagonals, so the
+ * picture is to scale rather than decorative.
+ */
+html, body { width: 750px; height: 1065px; overflow: hidden; }
+body {
+  background: radial-gradient(ellipse 85% 45% at 50% 12%, #161c28 0%, #0a0d13 52%, #05070b 100%);
+  position: relative;
+}
+
+.head { padding: 58px 48px 0; text-align: center; }
+.head h1 {
+  font-size: 50px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+}
+.head h1 em { font-style: normal; color: var(--accent-soft); }
+.head p {
+  margin: 16px 0 0;
+  font-size: 20px;
+  color: rgba(255,255,255,.62);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 22px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(96,165,250,.32);
+  background: rgba(59,130,246,.12);
+  font-size: 17px;
+  font-weight: 600;
+  color: #cfe0ff;
+}
+
+/* ---- The ladder ---------------------------------------------------- */
+/*
+ * The ladder, the axis and the unit are ONE flow column, not three things
+ * positioned against the page. The first pass absolutely-positioned the axis
+ * and the unit against <body>, and they collided: the 2.5m tick landed behind
+ * the projector and the axis line ran through it.
+ */
+.stage {
+  position: relative;
+  margin: 30px 40px 0;
+  height: 400px;
+}
+
+/* Each screen is an absolutely positioned 16:9 rectangle, anchored on a
+   common bottom-left origin so the stack opens out the way a throw does. */
+.scr {
+  position: absolute;
+  left: 0;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255,255,255,.28);
+  background: linear-gradient(160deg, rgba(90,130,200,.16), rgba(20,28,44,.10));
+}
+.scr.big {
+  border-color: rgba(140,180,255,.72);
+  background: linear-gradient(160deg, rgba(96,165,250,.20), rgba(20,28,44,.12));
+  box-shadow: 0 0 60px -12px rgba(96,165,250,.35);
+}
+.scr .tag {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: rgba(255,255,255,.92);
+}
+.scr.small .tag { font-size: 15px; color: rgba(255,255,255,.72); }
+
+/* ---- Distance axis -------------------------------------------------- */
+.axis {
+  position: relative;
+  margin: 0 40px;
+  height: 1px;
+  background: rgba(255,255,255,.18);
+}
+.tick {
+  position: absolute;
+  top: -7px;
+  width: 1px;
+  height: 15px;
+  background: rgba(255,255,255,.3);
+}
+.tick span {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(255,255,255,.62);
+  white-space: nowrap;
+}
+
+.unit {
+  position: relative;
+  margin: 54px auto 0;
+  width: 420px;
+  height: 190px;
+  overflow: hidden;
+}
+.unit img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 47%;
+  display: block;
+  -webkit-mask-image: radial-gradient(ellipse 60% 68% at 50% 50%, #000 48%, transparent 92%);
+  mask-image: radial-gradient(ellipse 60% 68% at 50% 50%, #000 48%, transparent 92%);
+  filter: contrast(1.06) brightness(.98);
+}
+/* Same vignette trick as the apps board: a wide mask keeps the whole unit,
+   this darkens the ring of white seamless around it. */
+.unit::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 48% 56% at 50% 49%,
+    rgba(5,7,11,0) 34%, rgba(5,7,11,.55) 60%, rgba(5,7,11,.92) 80%, #05070b 100%);
+}
+
+.foot {
+  position: absolute;
+  left: 0; right: 0; bottom: 40px;
+  text-align: center;
+  font-size: 17px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255,255,255,.40);
+}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1><em>200"</em> screen<br>projection display</h1>
+  <p>0.9&ndash;5 metres projection distance</p>
+  <div class="badge">Throw Ratio 1 : 1</div>
+</div>
+
+<div class="stage">
+  <!-- Widths are proportional to the diagonals: 40 / 100 / 200 inches, drawn
+       at 134 / 335 / 670 px so the picture is to scale. Heights follow 16:9. -->
+  <div class="scr big"  style="width:640px; height:360px; bottom:0;"><span class="tag">200&Prime;</span></div>
+  <div class="scr"      style="width:320px; height:180px; bottom:0;"><span class="tag">100&Prime;</span></div>
+  <div class="scr small" style="width:128px; height:72px;  bottom:0;"><span class="tag">40&Prime;</span></div>
+</div>
+
+<div class="axis">
+  <!-- Ticks sit under each screen's right edge, so the distance reads as
+       "step back to here and the picture is this wide". -->
+  <span class="tick" style="left:128px"><span>0.9m</span></span>
+  <span class="tick" style="left:320px"><span>2.5m</span></span>
+  <span class="tick" style="left:640px"><span>5m</span></span>
+</div>
+
+<div class="unit"><img src="../../public/media/iriz/product/hero-clean.png" alt=""></div>
+
+<!-- The three figures restated, all off the retail box. -->
+<div class="foot">1 : 1 throw &middot; 0.9&ndash;5 m &middot; 40&Prime;&ndash;200&Prime;</div>
+
+</body>
+</html>

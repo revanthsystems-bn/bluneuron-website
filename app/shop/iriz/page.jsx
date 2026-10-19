@@ -1,6 +1,6 @@
 import PageShell from '@/components/PageShell';
 import Reveal from '@/components/Reveal';
-import MarketplaceButtons from '@/components/MarketplaceButtons';
+import BuyButton from '@/components/buy/BuyButton';
 import AddToCart from '@/components/shop/AddToCart';
 import ProductGallery from '@/components/shop/ProductGallery';
 import StickyProductBar from '@/components/shop/StickyProductBar';
@@ -156,17 +156,27 @@ export default function ProductPage() {
                 <p className="mt-1.5 text-xs text-white/50">{MARKETPLACE.priceNote}</p>
               </div>
 
+              {/* ONE ACTION.
+
+                  This panel used to carry three: a quantity stepper, "Add to
+                  cart", and a separate "Or buy direct from a marketplace"
+                  row with its own pair of buttons. With the basket switched
+                  off (CART_ENABLED, lib/site-config) the first two render
+                  nothing, and the third asked the same question the sheet now
+                  answers — so a visitor was being asked to choose a store
+                  before being told the price applies on either.
+
+                  `AddToCart` is left mounted rather than deleted: it gates
+                  itself on the flag, so turning the basket back on restores
+                  the stepper and the button here with no edit to this page.
+
+                  The marketplace row is GONE from this panel, not moved: the
+                  buy sheet contains it, with the price and the fulfilment
+                  note beside it. */}
               <AddToCart className="mt-7" idPrefix="pdp" />
 
-              <div className="mt-8 border-t border-border-subtle pt-7">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
-                  Or buy direct from a marketplace
-                </p>
-                <MarketplaceButtons
-                  className="flex flex-col gap-3"
-                  buttonClassName="w-full justify-center"
-                  note="Payment, invoicing and delivery are handled by the marketplace. We provide the manufacturer warranty and support."
-                />
+              <div className="mt-7">
+                <BuyButton className="btn-primary w-full justify-center" />
               </div>
 
               {/* THE WARRANTY BADGE. A real, sourced fact with a link to the

@@ -5,6 +5,7 @@ import { Check } from 'lucide-react';
 import QuantityStepper from './QuantityStepper';
 import { useCart } from '@/components/cart/CartContext';
 import { trackAddToCart } from '@/lib/shop-analytics';
+import { CART_ENABLED } from '@/lib/site-config';
 
 /**
  * Quantity + "Add to cart", as one unit.
@@ -26,7 +27,19 @@ import { trackAddToCart } from '@/lib/shop-analytics';
  * see the basket), while adding from the shop CARD should not pull a panel
  * over the page they are still scanning.
  */
-export default function AddToCart({
+/**
+ * The gate — see components/cart/CartButton.
+ *
+ * This hides the QUANTITY STEPPER as well as the button, which is the whole
+ * control and not an accident: a quantity picker with nothing to add it to is
+ * an input the visitor cannot complete.
+ */
+export default function AddToCart(props) {
+  if (!CART_ENABLED) return null;
+  return <AddToCartControl {...props} />;
+}
+
+function AddToCartControl({
   openDrawer = true,
   className = '',
   buttonClassName = 'btn-primary w-full justify-center',
