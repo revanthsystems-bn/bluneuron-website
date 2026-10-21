@@ -1516,3 +1516,80 @@
     }
   } /* <--- Check if this outer bracket or an inner one is missing */
 }
+
+/* ==================================================================== *
+ * SCROLL REVEAL — progressive enhancement, and nothing more.
+ *
+ * The hidden state for <Reveal> (components/Reveal.jsx) lives here and
+ * ONLY here. It is gated behind `html.js-anim`, a class added by the
+ * inline boot script in app/layout.jsx before the page paints, and only
+ * when script execution works and the visitor has not asked for reduced
+ * motion. That gate is the fix: with no class there is no rule, so the
+ * server-rendered markup is visible as written — no inline opacity:0, no
+ * inline translate, nothing for a blocked or slow bundle to leave hidden.
+ *
+ * Both declarations are needed on the revealed state: `opacity` for the
+ * fade, and `transform: none` rather than a translate back to 0 so a
+ * finished reveal leaves no transform (and so no new containing block or
+ * stacking context) on the element.
+ *
+ * The media query at the end is belt and braces. The boot script already
+ * refuses to add `js-anim` under reduced motion, but if the class ever
+ * arrives by another route — a future script, a stale cached document —
+ * this still collapses the animation to nothing rather than to a slower
+ * version of itself.
+ * ==================================================================== */
+html.js-anim [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-y, 28px), 0) scale(var(--reveal-scale, 1));
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+html.js-anim [data-reveal][data-reveal-in] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js-anim [data-reveal],
+  html.js-anim [data-reveal][data-reveal-in] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* The comparison-table tick, drawn on as its panel reveals.
+ *
+ * Keyed off the enclosing [data-reveal]'s revealed state rather than having
+ * an observer of its own: there are a few dozen of these in the table and
+ * they all belong to the one panel. Dash length 18 against a path that
+ * measures ~15.9 user units, so the offset state is comfortably past the
+ * end and the tick is fully hidden before it draws.
+ *
+ * `stroke-dashoffset` only — never opacity, and never on the svg itself.
+ * Outside html.js-anim neither rule matches and the markup is an ordinary
+ * finished tick, which is what a browser with no bundle must see: a blank
+ * cell in this table reads as a missing feature, not as a missing animation.
+ */
+html.js-anim [data-reveal] .tick-path {
+  stroke-dasharray: 18;
+  stroke-dashoffset: 18;
+}
+
+html.js-anim [data-reveal][data-reveal-in] .tick-path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js-anim [data-reveal] .tick-path,
+  html.js-anim [data-reveal][data-reveal-in] .tick-path {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+}

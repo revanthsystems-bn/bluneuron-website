@@ -1,6 +1,5 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
-import Reveal from '@/components/Reveal';
 import { ROUTES } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import { COMPANY, SUPPORT } from '@/lib/site-config';
@@ -106,7 +105,7 @@ export default function PrivacyPage() {
         <div className="section-container">
           {/* `max-w-[680px]` on the prose itself, not on the container, so the
               page keeps the same left gutter as every other section. */}
-          <Reveal className="max-w-[680px] text-base leading-relaxed text-white/70">
+          <div className="max-w-[680px] text-base leading-relaxed text-white/70">
             <p>
               {COMPANY.brandName} (&ldquo;we&rdquo;, &ldquo;us&rdquo;) is a brand of{' '}
               {COMPANY.legalName}, which makes the IRIZ projector. This policy explains what
@@ -318,7 +317,7 @@ export default function PrivacyPage() {
               <br />
               Support hours: {SUPPORT.hours}
             </p>
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>

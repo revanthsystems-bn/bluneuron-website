@@ -1,7 +1,6 @@
 import PageShell from './PageShell';
 import PageHeading from './PageHeading';
 import DraftBanner from './DraftBanner';
-import Reveal from './Reveal';
 import { ROUTES } from '@/lib/routes';
 
 /**
@@ -130,10 +129,13 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
             ))}
           </div>
 
+          {/* No scroll reveal anywhere on a legal page: see
+              components/Reveal.jsx. These pages are read, not browsed, and
+              half their traffic is an in-app browser off a QR scan. */}
           {lastUpdated && (
-            <Reveal className="mt-12 max-w-[680px] border-t border-border-subtle pt-6">
+            <div className="mt-12 max-w-[680px] border-t border-border-subtle pt-6">
               <p className="text-xs text-white/40">Last updated {lastUpdated}.</p>
-            </Reveal>
+            </div>
           )}
         </div>
       </section>
