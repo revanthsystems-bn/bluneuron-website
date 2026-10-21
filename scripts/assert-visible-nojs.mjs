@@ -59,6 +59,22 @@ for (const [route, name] of ROUTES) {
   const page = await ctx.newPage();
   await page.goto(base + route, { waitUntil: 'load' });
 
+  // Let any CSS entrance animation finish before measuring.
+  //
+  // A css keyframe is NOT the bug this file hunts: it needs no bundle, it
+  // starts at first paint, and the stylesheet that defines the from-state
+  // defines the to-state in the same rule, so the two cannot be separated
+  // the way markup and a bundle can. pages-polish uses one (`.rise-in`) for
+  // exactly that reason, on the above-the-fold blocks. Measuring the instant
+  // `load` fires catches those mid-fade and reports a false `opacity=0`.
+  //
+  // Raced against a timeout because globals.css also has infinite ambient
+  // loops (halo-pulse), whose `finished` promise never resolves.
+  await page.evaluate(() => Promise.race([
+    Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))),
+    new Promise((resolve) => setTimeout(resolve, 1500)),
+  ]));
+
   const report = await page.evaluate(() => {
     const main = document.querySelector('main');
     if (!main) return { error: 'no <main> element' };
