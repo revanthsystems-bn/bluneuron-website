@@ -804,6 +804,25 @@
    * support the clip renders a solid white numeral rather than an
    * invisible one — order matters here, not preference.
    */
+  /*
+   * The card-sized variant of the numeral above.
+   *
+   * `.stat-number` runs clamp(3.75rem, 5.4vw, 4.75rem) — 60 to 76px — which
+   * is right for the three wide stat tiles under the spec boards, where the
+   * string is "500" or "5W" and has the full width of a third of the page.
+   * The Why-IRIZ cards are a six-up grid and their stats are strings, not
+   * numerals: "Android 14" at 76px wrapped onto two lines inside a 289px
+   * card and the second line landed on the heading under it.
+   *
+   * 32-44px fits the longest of them ("Android 14", ten characters) on one
+   * line at every breakpoint, down to a 375px phone. Only the size changes;
+   * the weight, tracking and the metallic fill are inherited from
+   * `.stat-number`, which this is always written beside, never instead of.
+   */
+  .stat-number-sm {
+    font-size: clamp(2rem, 3.2vw, 2.75rem);
+  }
+
   .stat-number {
     color: #ffffff;
     font-weight: 800;
