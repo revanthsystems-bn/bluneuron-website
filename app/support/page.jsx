@@ -1,6 +1,5 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
-import Reveal from '@/components/Reveal';
 import FaqAccordion from '@/components/FaqAccordion';
 import ContactForm from '@/components/ContactForm';
 import { SETUP_STEPS, FAQS, TROUBLESHOOTING } from '@/lib/iriz';
@@ -33,20 +32,21 @@ export default function SupportPage() {
 
       <section id="setup-guide" className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          {/* No scroll reveal anywhere on this page: see
+              components/Reveal.jsx. Support copy is read, not browsed, and a
+              good share of the traffic arrives from a QR scan in an in-app
+              browser where the bundle may never land. */}
+          <div className="mb-10 max-w-lg">
             <p className="eyebrow mb-3">Getting Started</p>
             <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">Setup guide</h2>
-          </Reveal>
+          </div>
 
           {/* Five steps on the 12-column board: two 6-wide pairs, then the
               last one full width so the row doesn't end on a hole. */}
           <ol className="bento-grid">
             {SETUP_STEPS.map((step, i) => (
-              <Reveal
+              <li
                 key={step.title}
-                delay={Math.min(i, 3) * 0.05}
-                y={20}
-                as="li"
                 className={`bento-tile flex-row gap-4 p-6 ${
                   i === SETUP_STEPS.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
                 }`}
@@ -58,7 +58,7 @@ export default function SupportPage() {
                   <h3 className="mb-1.5 text-sm font-semibold text-white">{step.title}</h3>
                   <p className="text-sm leading-relaxed text-white/55">{step.body}</p>
                 </div>
-              </Reveal>
+              </li>
             ))}
           </ol>
         </div>
@@ -66,10 +66,10 @@ export default function SupportPage() {
 
       <section id="faq" className="scroll-mt-24 border-b border-border-subtle bg-black-soft py-16 sm:py-20">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <div className="mb-10 max-w-lg">
             <p className="eyebrow mb-3">Common Questions</p>
             <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">FAQ</h2>
-          </Reveal>
+          </div>
 
           <FaqAccordion items={FAQS} />
         </div>
@@ -77,24 +77,22 @@ export default function SupportPage() {
 
       <section id="troubleshooting" className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <div className="mb-10 max-w-lg">
             <p className="eyebrow mb-3">Something Not Working?</p>
             <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">Troubleshooting</h2>
-          </Reveal>
+          </div>
 
           <div className="bento-grid">
             {TROUBLESHOOTING.map((item, i) => (
-              <Reveal
+              <div
                 key={item.issue}
-                delay={Math.min(i, 3) * 0.04}
-                y={20}
                 className={`bento-tile p-6 ${
                   i === TROUBLESHOOTING.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
                 }`}
               >
                 <h3 className="mb-2 text-sm font-semibold text-white">{item.issue}</h3>
                 <p className="text-sm leading-relaxed text-white/55">{item.fix}</p>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>
@@ -102,17 +100,17 @@ export default function SupportPage() {
 
       <section id="contact" className="scroll-mt-24 bg-black-soft py-16 sm:py-20">
         <div className="section-container grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
-          <Reveal className="max-w-md">
+          <div className="max-w-md">
             <p className="eyebrow mb-3">Still Stuck?</p>
             <h2 className="mb-4 text-3xl font-bold tracking-tighter text-white sm:text-4xl">Contact support</h2>
             <p className="text-sm leading-relaxed text-white/55">
               Send us a message and our team will get back to you — no bots, no ticket queue purgatory.
             </p>
-          </Reveal>
+          </div>
 
-          <Reveal delay={0.05}>
+          <div>
             <ContactForm />
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>

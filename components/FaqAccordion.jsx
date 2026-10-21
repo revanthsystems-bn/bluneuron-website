@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Reveal from './Reveal';
 
 export default function FaqAccordion({ items }) {
   const [openIndex, setOpenIndex] = useState(null);
@@ -14,7 +13,7 @@ export default function FaqAccordion({ items }) {
         const buttonId = `faq-button-${i}`;
 
         return (
-          <Reveal key={item.q} delay={i * 0.03} as="div">
+          <div key={item.q}>
             <h3>
               <button
                 id={buttonId}
@@ -42,7 +41,7 @@ export default function FaqAccordion({ items }) {
             >
               {item.a}
             </div>
-          </Reveal>
+          </div>
         );
       })}
     </div>

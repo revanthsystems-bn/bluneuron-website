@@ -1,6 +1,5 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
-import Reveal from '@/components/Reveal';
 import { pageMetadata } from '@/lib/seo';
 
 /**
@@ -59,7 +58,7 @@ export default function PrivacyPage() {
         <div className="section-container">
           {/* `max-w-[680px]` on the prose itself, not on the container, so the
               page keeps the same left gutter as every other section. */}
-          <Reveal className="max-w-[680px] text-base leading-relaxed text-white/70">
+          <div className="max-w-[680px] text-base leading-relaxed text-white/70">
             <p>
               BluNeuron (&ldquo;we&rdquo;, &ldquo;us&rdquo;) makes the IRIZ projector. This policy explains what
               information we collect on bluneuron.com and how we use it.
@@ -166,7 +165,7 @@ export default function PrivacyPage() {
             <p>
               BluNeuron, India. Email: <Mail />
             </p>
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>

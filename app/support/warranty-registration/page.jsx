@@ -1,6 +1,5 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
-import Reveal from '@/components/Reveal';
 import RegistrationForm from '@/components/warranty/RegistrationForm';
 import { pageMetadata } from '@/lib/seo';
 import { BRAND } from '@/lib/iriz';
@@ -93,7 +92,12 @@ export default function WarrantyRegistrationPage() {
               `lg:sticky` so the list of what you need stays beside the form
               while you scroll it on a desktop — it is a checklist, and a
               checklist that scrolls away is a checklist you re-scroll for. */}
-          <Reveal className="order-2 max-w-md lg:order-1 lg:sticky lg:top-28">
+          {/* No scroll reveal on this page: see components/Reveal.jsx. This
+              is the page the carton QR code lands on, which means most of its
+              traffic is an in-app browser on a phone — the form and the
+              checklist beside it are plain static markup that cannot wait on
+              a bundle. */}
+          <div className="order-2 max-w-md lg:order-1 lg:sticky lg:top-28">
             {/* Hidden below lg: the mobile subtitle already says this, and
                 repeating it here would be the first thing under the form. */}
             <p className="hidden text-sm leading-relaxed text-white/60 lg:block">
@@ -133,11 +137,11 @@ export default function WarrantyRegistrationPage() {
                 What the warranty covers
               </a>
             </p>
-          </Reveal>
+          </div>
 
-          <Reveal delay={0.05} className="order-1 lg:order-2">
+          <div className="order-1 lg:order-2">
             <RegistrationForm />
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>

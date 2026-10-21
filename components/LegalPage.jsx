@@ -1,6 +1,5 @@
 import PageShell from './PageShell';
 import PageHeading from './PageHeading';
-import Reveal from './Reveal';
 
 export default function LegalPage({ title, sections, draftDate }) {
   return (
@@ -9,12 +8,15 @@ export default function LegalPage({ title, sections, draftDate }) {
 
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container max-w-3xl">
-          <Reveal className="mb-10 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-5">
+          {/* No scroll reveal anywhere on a legal page: see
+              components/Reveal.jsx. A draft warning that waits for a bundle
+              before it warns anybody is worse than no warning. */}
+          <div className="mb-10 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-5">
             <p className="text-sm font-semibold text-amber-300">
               DRAFT — placeholder legal text, not reviewed by counsel. Replace with reviewed legal copy before
               launch.
             </p>
-          </Reveal>
+          </div>
 
           <div className="space-y-8 text-sm leading-relaxed text-white/65">
             {sections.map((s) => (

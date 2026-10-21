@@ -1,6 +1,5 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
-import Reveal from '@/components/Reveal';
 import ClaimForm from '@/components/warranty/ClaimForm';
 import { pageMetadata } from '@/lib/seo';
 import { SUPPORT, WARRANTY } from '@/lib/warranty';
@@ -61,7 +60,10 @@ export default function WarrantyClaimPage() {
 
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <Reveal className="order-2 max-w-md lg:order-1 lg:sticky lg:top-28">
+          {/* No scroll reveal on this page: see components/Reveal.jsx. A
+              customer with a broken projector is not here to watch anything
+              fade in, and half of this traffic is an in-app browser. */}
+          <div className="order-2 max-w-md lg:order-1 lg:sticky lg:top-28">
             <h2 className="text-2xl font-bold tracking-tighter text-white">
               Something not right?
             </h2>
@@ -111,11 +113,11 @@ export default function WarrantyClaimPage() {
                 </a>
               </p>
             </div>
-          </Reveal>
+          </div>
 
-          <Reveal delay={0.05} className="order-1 lg:order-2">
+          <div className="order-1 lg:order-2">
             <ClaimForm />
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>
