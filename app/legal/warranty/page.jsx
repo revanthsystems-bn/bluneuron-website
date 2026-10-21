@@ -1,6 +1,5 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
-import Reveal from '@/components/Reveal';
 import { pageMetadata } from '@/lib/seo';
 import { BRAND } from '@/lib/iriz';
 import { COMPANY, SUPPORT, WARRANTY } from '@/lib/warranty';
@@ -105,7 +104,7 @@ export default function WarrantyPolicyPage() {
         <div className="section-container">
           {/* `max-w-[680px]` on the prose itself, not on the container, so the
               page keeps the same left gutter as every other section. */}
-          <Reveal className="max-w-[680px] text-base leading-relaxed text-white/70">
+          <div className="max-w-[680px] text-base leading-relaxed text-white/70">
             <p>
               {WARRANTY.label} of manufacturer&rsquo;s cover on every genuine {BRAND.fullName},
               carried in to an authorised service centre.
@@ -237,7 +236,7 @@ export default function WarrantyPolicyPage() {
             <p>
               Email <Mail />, or see <Link href="/support">Support</Link>.
             </p>
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>
