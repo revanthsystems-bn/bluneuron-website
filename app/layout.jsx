@@ -13,6 +13,7 @@ import BuyProvider from '@/components/buy/BuyProvider';
 import MetaPixel from '@/components/MetaPixel';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL } from '@/lib/site';
+import { ANIM_GATE } from '@/lib/anim-gate';
 import { Analytics } from '@vercel/analytics/next';
 
 /**
@@ -93,50 +94,31 @@ export const metadata = {
   },
 };
 
-/**
- * The scroll-reveal gate, inlined into <head> and run before the body paints.
- *
- * `html.js-anim` is the ONLY thing that hides a <Reveal> (the single css rule
- * in app/globals.css). Nothing in the server-rendered markup is hidden, so
- * everything a visitor came to read is on the page as written and this script
- * opts them in to the animation afterwards — never the other way round.
- *
- * Three ways the class never arrives, all of them leaving a visible page:
- *
- *   1. Scripts do not run (disabled, blocked, CSP, a dead in-app webview).
- *      This script never executes, so the class is never added.
- *   2. prefers-reduced-motion: reduce. Checked here and refused outright, so
- *      there is no animation to sit through rather than a faster one.
- *   3. The bundle is slow or never lands. The class IS added, so the content
- *      is briefly hidden — then the failsafe below strips it again. That
- *      timer is the important half: without it, a chunk that 404s or a
- *      connection that stalls would leave the page blank indefinitely, which
- *      is precisely the failure this whole change exists to remove.
- *
- * components/Reveal.jsx calls `window.__bnAnimReady()` from its first effect,
- * which cancels the failsafe: by then the observer is attached and the reveal
- * is going to happen properly. The 2500ms budget is generous for a working
- * bundle on a slow connection and short enough that a broken one is not a
- * visible outage.
- *
- * Written as a string in dangerouslySetInnerHTML because it has to be inline
- * and synchronous in <head> — a <Script> component, even with
- * `strategy="beforeInteractive"`, is part of the bundle this is insuring
- * against. It is wrapped in try/catch so that nothing here can be the reason
- * a page fails to render.
- */
-const ANIM_GATE = `(function(){try{
-var d=document.documentElement;
-if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-d.classList.add('js-anim');
-var t=setTimeout(function(){d.classList.remove('js-anim');},2500);
-window.__bnAnimReady=function(){if(t){clearTimeout(t);t=0;}};
-}catch(e){}})();`;
-
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`dark ${interTight.variable} ${zenDots.variable}`}>
+    /*
+     * `suppressHydrationWarning` on <html>, and ONLY here.
+     *
+     * The inline gate below adds `js-anim` to <html> before the body paints,
+     * which is the whole point of it — so by the time React hydrates, the
+     * element's className no longer matches the one the server rendered.
+     * React logs that as a hydration mismatch ("1 Issue" in the dev
+     * overlay). It is not a bug: the class is meant to be there, and nothing
+     * in the tree reads it from React.
+     *
+     * The flag is scoped to this one element and suppresses the warning for
+     * its attributes only — it does not reach any child, so a real mismatch
+     * further down still reports.
+     */
+    <html
+      lang="en"
+      className={`dark ${interTight.variable} ${zenDots.variable}`}
+      suppressHydrationWarning
+    >
       <head>
+        {/* The scroll-reveal gate. The string lives in lib/anim-gate.js
+            because next.config.js hashes it for the Content-Security-Policy
+            and both ends must read the same bytes — see that file. */}
         {/* eslint-disable-next-line react/no-danger */}
         <script dangerouslySetInnerHTML={{ __html: ANIM_GATE }} />
       </head>
