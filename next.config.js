@@ -126,7 +126,21 @@ function contentSecurityPolicy() {
       'https://www.facebook.com',
       ...supabaseSources(),
     ],
-    'upgrade-insecure-requests': [],
+    /*
+     * NO `upgrade-insecure-requests` HERE.
+     *
+     * The spec says it is ignored when delivered in a report-only policy, and
+     * Chrome says so out loud: it logs a console error on every page, which
+     * cost a Lighthouse Best Practices point and put a permanent warning in
+     * the one place a developer looks for real ones.
+     *
+     * It is also doing no work. Strict-Transport-Security above already stops
+     * the plain-http request being made at all, and the site has no http://
+     * subresources to upgrade — the CDN allow-list in this policy is https
+     * throughout. ADD IT BACK in the same edit that renames this header to
+     * the enforcing `Content-Security-Policy`, where it starts to mean
+     * something.
+     */
   };
 
   return Object.entries(directives)
