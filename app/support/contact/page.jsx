@@ -2,7 +2,6 @@ import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import DraftBanner from '@/components/DraftBanner';
 import ContactForm from '@/components/ContactForm';
-import Reveal from '@/components/Reveal';
 import { Briefcase, Clock, Mail, Phone } from 'lucide-react';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
@@ -98,6 +97,10 @@ const TILE_SPAN = VISIBLE_CHANNELS.length === 4 ? 'lg:col-span-6' : 'lg:col-span
 export default function ContactPage() {
   return (
     <PageShell>
+      {/* No scroll reveal anywhere under /support: see components/Reveal.jsx.
+          Support pages are read, not browsed, and a good share of this traffic
+          is an in-app browser opened by a QR scan, where the bundle may never
+          land. They are plain, static, visible markup. */}
       <PageHeading
         eyebrow="Support"
         title="Talk to us."
@@ -113,10 +116,8 @@ export default function ContactPage() {
               const Icon = channel.icon;
 
               return (
-                <Reveal
+                <div
                   key={channel.label}
-                  delay={Math.min(i, 3) * 0.05}
-                  y={20}
                   className={`bento-tile p-6 ${TILE_SPAN}`}
                 >
                   <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft">
@@ -145,7 +146,7 @@ export default function ContactPage() {
                   <p className="mt-auto pt-4 text-sm leading-relaxed text-white/50">
                     {channel.note}
                   </p>
-                </Reveal>
+                </div>
               );
             })}
           </div>
@@ -154,7 +155,7 @@ export default function ContactPage() {
 
       <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
         <div className="section-container grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
-          <Reveal className="max-w-md">
+          <div className="max-w-md">
             <p className="eyebrow mb-3">Send a message</p>
             <h2 className="mb-4 text-3xl font-bold tracking-tighter text-white sm:text-4xl">
               Write to our team
@@ -170,11 +171,11 @@ export default function ContactPage() {
               </a>{' '}
               collects what we need up front and is faster.
             </p>
-          </Reveal>
+          </div>
 
-          <Reveal delay={0.05}>
+          <div>
             <ContactForm />
-          </Reveal>
+          </div>
         </div>
       </section>
 
@@ -193,7 +194,7 @@ export default function ContactPage() {
       {HAS_GRIEVANCE_OFFICER && (
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container">
-          <Reveal className="glass-panel max-w-[680px] p-8 sm:p-10">
+          <div className="glass-panel max-w-[680px] p-8 sm:p-10">
             <p className="eyebrow mb-3">Escalation</p>
             <h2 className="text-2xl font-bold tracking-tighter text-white">Grievance officer</h2>
             <p className="mt-3 text-sm leading-relaxed text-white/60">
@@ -227,7 +228,7 @@ export default function ContactPage() {
             <a href={ROUTES.grievance} className="btn-secondary mt-7 inline-flex">
               Grievance redressal policy →
             </a>
-          </Reveal>
+          </div>
         </div>
       </section>
       )}

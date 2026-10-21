@@ -1,7 +1,6 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import SupportTiles from '@/components/SupportTiles';
-import Reveal from '@/components/Reveal';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
@@ -42,6 +41,10 @@ export const metadata = {
 export default function SupportPage() {
   return (
     <PageShell>
+      {/* No scroll reveal anywhere under /support: see components/Reveal.jsx.
+          Support pages are read, not browsed, and a good share of this traffic
+          is an in-app browser opened by a QR scan, where the bundle may never
+          land. They are plain, static, visible markup. */}
       <PageHeading
         eyebrow="Support"
         title="We've got you covered."
@@ -60,7 +63,7 @@ export default function SupportPage() {
           thing on the page where they will be looking for it. */}
       <section className="bg-black-soft py-16 sm:py-20">
         <div className="section-container">
-          <Reveal className="glass-panel flex flex-col gap-6 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+          <div className="glass-panel flex flex-col gap-6 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-lg">
               <h2 className="text-2xl font-bold tracking-tighter text-white">
                 Not sure where to start?
@@ -73,7 +76,7 @@ export default function SupportPage() {
             <a href={ROUTES.contact} className="btn-primary shrink-0 justify-center">
               Contact support
             </a>
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>
