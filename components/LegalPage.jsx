@@ -1,7 +1,6 @@
 import PageShell from './PageShell';
 import PageHeading from './PageHeading';
 import DraftBanner from './DraftBanner';
-import Reveal from './Reveal';
 import PolicyToc from './legal/PolicyToc';
 import { ROUTES } from '@/lib/routes';
 
@@ -140,8 +139,11 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
 
             <div className="min-w-0">
               <div className="space-y-10 text-[15px] leading-[1.75] text-white/70">
-                {sections.map((section, i) => (
-                  <Reveal key={section.heading} as="section" y={16} delay={Math.min(i, 4) * 0.03}>
+                {/* Plain <section>s, no scroll reveal: see
+                    components/Reveal.jsx. A policy is read, and a
+                    policy that waits on a bundle is a blank page. */}
+                {sections.map((section) => (
+                  <section key={section.heading}>
                     {/*
                       `scroll-mt-24` is what makes the contents links usable:
                       the masthead is fixed, so an un-offset anchor jump puts
@@ -201,7 +203,7 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
                         {linkify(section.note)}
                       </p>
                     )}
-                  </Reveal>
+                  </section>
                 ))}
               </div>
 

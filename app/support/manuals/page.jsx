@@ -1,7 +1,6 @@
 import PageShell from '@/components/PageShell';
 import PageHero from '@/components/PageHero';
 import DraftBanner from '@/components/DraftBanner';
-import Reveal from '@/components/Reveal';
 import { Download, FileText } from 'lucide-react';
 import { SETUP_STEPS, MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
@@ -35,6 +34,10 @@ export const metadata = {
 export default function ManualsPage() {
   return (
     <PageShell>
+      {/* No scroll reveal anywhere under /support: see components/Reveal.jsx.
+          Support pages are read, not browsed, and a good share of this traffic
+          is an in-app browser opened by a QR scan, where the bundle may never
+          land. They are plain, static, visible markup. */}
       <PageHero
         eyebrow="Support"
         title="Manuals & downloads"
@@ -52,10 +55,8 @@ export default function ManualsPage() {
               const pending = isTBD(doc.file);
 
               return (
-                <Reveal
+                <div
                   key={doc.title}
-                  delay={Math.min(i, 3) * 0.05}
-                  y={20}
                   className="bento-tile p-6 lg:col-span-4"
                 >
                   <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft">
@@ -84,7 +85,7 @@ export default function ManualsPage() {
                       </a>
                     )}
                   </div>
-                </Reveal>
+                </div>
               );
             })}
           </div>
@@ -93,22 +94,19 @@ export default function ManualsPage() {
 
       <section className="bg-black-soft py-16 sm:py-20">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <div className="mb-10 max-w-lg">
             <p className="eyebrow mb-3">Getting started</p>
             <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
               Setup in five steps
             </h2>
-          </Reveal>
+          </div>
 
           {/* Five steps on the 12-column board: two 6-wide pairs, then the last
               one full width so the row doesn't end on a hole. */}
           <ol className="bento-grid">
             {SETUP_STEPS.map((step, i) => (
-              <Reveal
+              <li
                 key={step.title}
-                delay={Math.min(i, 3) * 0.05}
-                y={20}
-                as="li"
                 className={`bento-tile flex-row gap-4 p-6 ${
                   i === SETUP_STEPS.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
                 }`}
@@ -120,15 +118,15 @@ export default function ManualsPage() {
                   <h3 className="mb-1.5 text-sm font-semibold text-white">{step.title}</h3>
                   <p className="text-sm leading-relaxed text-white/55">{step.body}</p>
                 </div>
-              </Reveal>
+              </li>
             ))}
           </ol>
 
-          <Reveal delay={0.1} className="mt-8">
+          <div className="mt-8">
             <a href={ROUTES.faq} className="btn-secondary inline-flex">
               FAQ & troubleshooting →
             </a>
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>

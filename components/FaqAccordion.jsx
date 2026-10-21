@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import Reveal from './Reveal';
 
 /**
  * The FAQ accordion: grouped by topic, animated, and deep-linkable.
@@ -93,8 +92,10 @@ export default function FaqAccordion({ items, idPrefix = 'faq' }) {
 
   return (
     <div className="space-y-10">
-      {groups.map((group, gi) => (
-        <Reveal key={group.topic} y={18} delay={Math.min(gi, 4) * 0.04}>
+      {/* No scroll reveal: see components/Reveal.jsx. This accordion is
+          the body of /support/faq, which is read rather than browsed. */}
+      {groups.map((group) => (
+        <div key={group.topic}>
           {/* The topic label is a real heading, so the groups are navigable
               by heading in a screen reader and not just visually separated. */}
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
@@ -165,7 +166,7 @@ export default function FaqAccordion({ items, idPrefix = 'faq' }) {
               );
             })}
           </div>
-        </Reveal>
+        </div>
       ))}
     </div>
   );

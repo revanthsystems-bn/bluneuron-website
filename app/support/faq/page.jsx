@@ -1,7 +1,6 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import FaqAccordion from '@/components/FaqAccordion';
-import Reveal from '@/components/Reveal';
 import { FAQS, TROUBLESHOOTING } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { faqJsonLd, pageMetadata } from '@/lib/seo';
@@ -41,6 +40,10 @@ const FAQ_JSON_LD = faqJsonLd(FAQS);
 export default function FaqPage() {
   return (
     <PageShell>
+      {/* No scroll reveal anywhere under /support: see components/Reveal.jsx.
+          Support pages are read, not browsed, and a good share of this traffic
+          is an in-app browser opened by a QR scan, where the bundle may never
+          land. They are plain, static, visible markup. */}
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -54,10 +57,10 @@ export default function FaqPage() {
 
       <section id="faq" className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20">
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <div className="mb-10 max-w-lg">
             <p className="eyebrow mb-3">Common questions</p>
             <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">FAQ</h2>
-          </Reveal>
+          </div>
 
           <FaqAccordion items={FAQS} />
         </div>
@@ -66,28 +69,27 @@ export default function FaqPage() {
       <section
         id="troubleshooting"
         className="scroll-mt-24 border-b border-border-subtle bg-black-soft py-16 sm:py-20"
+
       >
         <div className="section-container">
-          <Reveal className="mb-10 max-w-lg">
+          <div className="mb-10 max-w-lg">
             <p className="eyebrow mb-3">Something not working?</p>
             <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
               Troubleshooting
             </h2>
-          </Reveal>
+          </div>
 
           <div className="bento-grid">
             {TROUBLESHOOTING.map((item, i) => (
-              <Reveal
+              <div
                 key={item.issue}
-                delay={Math.min(i, 3) * 0.04}
-                y={20}
                 className={`bento-tile p-6 ${
                   i === TROUBLESHOOTING.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
                 }`}
               >
                 <h3 className="mb-2 text-sm font-semibold text-white">{item.issue}</h3>
                 <p className="text-sm leading-relaxed text-white/55">{item.fix}</p>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>
@@ -95,7 +97,7 @@ export default function FaqPage() {
 
       <section className="bg-black py-16 text-center sm:py-20">
         <div className="section-container">
-          <Reveal>
+          <div>
             <p className="mx-auto max-w-md text-sm leading-relaxed text-white/50">
               Still stuck, or think your unit has a fault? Tell us what is happening.
             </p>
@@ -107,7 +109,7 @@ export default function FaqPage() {
                 Make a warranty claim
               </a>
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>

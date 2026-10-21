@@ -3,7 +3,6 @@ import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import DraftBanner from '@/components/DraftBanner';
 import SupportForm from '@/components/SupportForm';
-import Reveal from '@/components/Reveal';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
@@ -29,6 +28,10 @@ export const metadata = {
 export default function WarrantyRegistrationPage() {
   return (
     <PageShell>
+      {/* No scroll reveal anywhere under /support: see components/Reveal.jsx.
+          Support pages are read, not browsed, and a good share of this traffic
+          is an in-app browser opened by a QR scan, where the bundle may never
+          land. They are plain, static, visible markup. */}
       <PageHeading
         eyebrow="Support"
         title="Register your warranty"
@@ -37,7 +40,7 @@ export default function WarrantyRegistrationPage() {
 
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <Reveal className="max-w-md lg:sticky lg:top-28">
+          <div className="max-w-md lg:sticky lg:top-28">
             <DraftBanner path={ROUTES.warrantyRegistration} className="mb-8" />
 
             <h2 className="text-2xl font-bold tracking-tighter text-white">
@@ -86,9 +89,9 @@ export default function WarrantyRegistrationPage() {
               Keep your invoice regardless — it is the proof of purchase date any claim is assessed
               against, and we cannot reconstruct it from a registration alone.
             </p>
-          </Reveal>
+          </div>
 
-          <Reveal delay={0.05}>
+          <div>
             {/* `useSearchParams` inside SupportForm (the claim link from the
                 account pre-fills the unit) is a request-time API, and a
                 prerendered page containing one without a boundary pulls the
@@ -97,7 +100,7 @@ export default function WarrantyRegistrationPage() {
             <Suspense fallback={<div className="glass-panel h-96" aria-hidden="true" />}>
               <SupportForm kind="registration" />
             </Suspense>
-          </Reveal>
+          </div>
         </div>
       </section>
     </PageShell>
