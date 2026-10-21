@@ -744,95 +744,38 @@
    * ================================================================ */
 
   /*
-   * BOARD BACKGROUNDS, sampled from the images themselves rather than
-   * picked by eye.
+   * BOARD BACKGROUNDS — a fallback now, not a frame.
    *
-   * Sampled from the SIDE STRIPS specifically — the leftmost and
-   * rightmost 6 columns — because that is the part of each image that
-   * actually abuts bare tile. Both boards are height-constrained in
-   * their tiles, so the background shows as vertical bars down the two
-   * sides, not as a band top and bottom. An earlier pass averaged the
-   * outer 12% of the width instead, which pulled in artwork well inside
-   * the frame and produced a ramp visibly lighter than the real edge.
+   * Each board tile is locked to its own image's aspect ratio and the
+   * image covers it, so none of this is on screen once the art has
+   * loaded. It is what shows while a lazy image is still in flight, and
+   * it is black because that is what both files actually are where it
+   * would be seen. Sampled, not guessed:
    *
-   *   02-spec-sheet.png    0% #8f97a8    8% #575f70   20% #1f2739
-   *                       35% #141b2d   50% #0e1526   65% #050c1d
-   *                       80% #020208   92% #000000  100% #000000
-   *   07-latency.png      #000000 at every sampled height; the only
-   *                       non-zero reading is #0a0907 on the last row.
+   *   02-spec-sheet.png   #000000 along the whole bottom edge and both
+   *                       bottom corners; the top edge runs ~#5b6276,
+   *                       a steel grey that is part of the ARTWORK, not
+   *                       a ground.
+   *   07-latency.png      #000000 at every sampled height.
    *
-   * So the spec board gets that exact ramp and the latency board is
-   * flat black. The #8f97a8 at the very top is a one-pixel specular
-   * highlight along the image's edge — it is kept, because the bar
-   * beside it has to match it.
+   * The old rule painted that #5b6276 top edge as a tile gradient
+   * starting at #8f97a8, which was correct while `object-contain` left
+   * bare tile beside the art — and became the light grey band across
+   * the top of the card once the tile grew taller than the image.
+   * Matching the tile to the art removed the gap; this just stops the
+   * placeholder being grey.
    *
-   * Re-sample rather than nudge these if either image is replaced.
-   */
-  .board-spec {
-    background: linear-gradient(
-      180deg,
-      #8f97a8 0%,
-      #575f70 8%,
-      #1f2739 20%,
-      #141b2d 35%,
-      #0e1526 50%,
-      #050c1d 65%,
-      #020208 80%,
-      #000000 92%,
-      #000000 100%
-    );
-  }
-
-  /*
    * Painted as a background-IMAGE, not a background-color. `.bento-tile`
    * carries Tailwind's `bg-white/[0.035]`, and utilities outrank the
    * components layer — a `background-color` here loses to it and the
-   * tile comes out lifted grey against the image's true black, leaving
-   * exactly the rectangle this is meant to remove. An opaque gradient
-   * paints over that colour instead of competing with it. `.board-spec`
-   * above is immune for the same reason: its gradient is already an
-   * image.
+   * tile comes out lifted grey against the image's true black. An opaque
+   * gradient paints over that colour instead of competing with it.
+   *
+   * Re-sample rather than nudge these if either image is replaced.
    */
+  .board-spec,
   .board-latency {
     background-image: linear-gradient(180deg, #000000 0%, #000000 100%);
-  }
-
-  /*
-   * The soft edge mask, as an inset feather on all four edges rather
-   * than a radial.
-   *
-   * A radial cannot do this job on a rectangle. Sized to fade at the
-   * edge midpoints it is already past 1.0 at the corners, so it eats
-   * them — and the brief says use both boards whole. Sized to spare the
-   * corners it never reaches the midpoints at all, which is what the
-   * first attempt here did: `ellipse 104% 104%` with an opaque stop at
-   * 78% put the fade 452px from centre in a box only 279px tall, so the
-   * mask was inert and the artwork still had four hard edges.
-   *
-   * A single HORIZONTAL gradient, not both axes. Both boards are
-   * height-constrained in their tiles, so the artwork's top and bottom
-   * edges land exactly on the tile's own edges — there is no bare tile
-   * there to blend into, and the radius and hairline already finish
-   * that boundary. Feathering vertically only ate into the artwork, and
-   * on these files the top edge is where the headline sits. The bare
-   * tile is at the SIDES, which is the one axis that needs it.
-   */
-  .board-media {
-    --feather: 5%;
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      #000 var(--feather),
-      #000 calc(100% - var(--feather)),
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      #000 var(--feather),
-      #000 calc(100% - var(--feather)),
-      transparent 100%
-    );
   }
 
   /*
