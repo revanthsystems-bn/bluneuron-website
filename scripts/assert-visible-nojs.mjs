@@ -68,12 +68,13 @@ for (const [route, name] of ROUTES) {
   // exactly that reason, on the above-the-fold blocks. Measuring the instant
   // `load` fires catches those mid-fade and reports a false `opacity=0`.
   //
-  // Raced against a timeout because globals.css also has infinite ambient
-  // loops (halo-pulse), whose `finished` promise never resolves.
-  await page.evaluate(() => Promise.race([
-    Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))),
-    new Promise((resolve) => setTimeout(resolve, 1500)),
-  ]));
+  // Waited from the DRIVER side, not with a promise inside the page. With
+  // `javaScriptEnabled: false` the page's task queue does not run, so a
+  // page-side `setTimeout` never fires and an `animation.finished` promise
+  // never settles — an in-page wait hangs forever rather than timing out.
+  // 900ms clears the longest entrance on any branch (`.rise-in`, 0.7s, plus
+  // its largest stagger).
+  await page.waitForTimeout(900);
 
   const report = await page.evaluate(() => {
     const main = document.querySelector('main');
