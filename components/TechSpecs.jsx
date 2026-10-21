@@ -22,19 +22,20 @@ import { MEDIA } from '@/lib/iriz';
  * `SPECS[5]` would silently change what this section shows the next time
  * someone reorders that array.
  *
- * LAYOUT. Top row is two tiles, each locked to its own artwork's aspect ratio
- * and each filled edge to edge by it — no padding, no letterbox, no tile
- * background on show. They still finish level, because the columns carry the
- * ratio that makes that true (889fr/698fr; the arithmetic is on the grid
- * below). Below lg it is one column in DOM order: spec board, latency board,
- * then the three stat tiles, each board still at its own ratio.
+ * LAYOUT. Top row is two tiles, each locked to its artwork's CONTENT ratio
+ * and filled edge to edge by it — no padding, no letterbox, no baked-in black
+ * margin, no tile background on show. They still finish level, because the
+ * columns carry the ratio that makes that true (758fr/644fr; the arithmetic
+ * is on the grid below). Below lg it is one column in DOM order: spec board,
+ * latency board, then the three stat tiles, each board still at its own
+ * ratio.
  *
- * THE SECOND BOARD IS LOAD-BEARING FOR THIS LAYOUT. The column ratio is
- * derived from having exactly these two images side by side. Replace either
- * one and 889/698 has to be recomputed from the new dimensions; drop one and
- * the survivor becomes a full-width tile whose aspect ratio would render the
- * 750px artwork far above native. Either way, re-derive — do not just delete
- * a column.
+ * THE SECOND BOARD IS LOAD-BEARING FOR THIS LAYOUT. Every number here — both
+ * tile ratios, the column ratio, both object-positions — is derived from
+ * having exactly these two images side by side. Replace either one and all of
+ * them have to be re-measured from the new file; drop one and the survivor
+ * becomes a full-width tile that would render the 750px artwork far above
+ * native. Either way, re-derive — do not just delete a column.
  */
 
 const STATS = [
@@ -54,19 +55,41 @@ const STATS = [
   },
 ];
 
+/*
+ * THE TILE RATIOS ARE THE ARTWORK'S *CONTENT* BOX, NOT THE FILE'S.
+ *
+ * Both PNGs carry black padding baked in, which rendered as empty space at
+ * the foot of each card once the tiles were sized to the files. The tiles are
+ * sized to the content instead and `object-cover` takes the padding off.
+ * Measured per row as max luminance across the row, so one lit pixel keeps
+ * the row:
+ *
+ *   02-spec-sheet.png  750x698   bottom 54px at luminance 0 — pure black at
+ *                                every threshold tried, and nothing at the
+ *                                other three edges (row 0 peaks at 221).
+ *                                Content box 750x644.
+ *   07-latency.png     750x889   top 56px and bottom 75px. NOT pure black:
+ *                                these peak at 7-10, a faint vignette rather
+ *                                than true padding, which is why the trim is
+ *                                taken at a threshold of 16 and not lower.
+ *                                Invisible on a black card either way.
+ *                                Content box 750x758, offset 56 from the top.
+ *
+ * The 22px of near-black down the latency board's right edge is left alone.
+ * A single `object-cover` crops on one axis only — the one its tile is
+ * "short" on — and the vertical trim is the one that shows.
+ *
+ * Re-measure both if either file is replaced: these numbers set the tile
+ * ratios, the column ratio and the object-position below.
+ */
 const BOARDS = [
   {
     src: MEDIA.detail.specSheet,
-    // Image is 750x698, and the tile takes that ratio at EVERY breakpoint.
-    //
-    // It used to drop to `lg:aspect-auto` and inherit a 560px min-height
-    // shared with the taller latency board. The board is wider than it is
-    // tall, so `object-contain` inside that box left the artwork floating:
-    // the tile's own gradient showed as a light grey band across the top and
-    // a dead black area under the image. Matching the tile to the art is
-    // what removes both — there is no leftover box for a background to show
-    // through. The two tiles still finish level; see the grid below.
-    className: 'board-spec aspect-[750/698]',
+    // 750x644 — the content box. `object-top` anchors the crop so all 54px
+    // comes off the BOTTOM, which is where the padding is; the artwork runs
+    // to row 0 at the top and a centred crop would eat 27px of it.
+    className: 'board-spec aspect-[750/644]',
+    imgClass: 'object-top',
     alt:
       'IRIZ specification board: native 1080P (1920×1080) resolution, 3.5-inch LTPS LCD display '
       + 'technology, Allwinner H723 chipset, auto focus, 0.9m–5m projection distance, 35–200 inch '
@@ -74,8 +97,11 @@ const BOARDS = [
   },
   {
     src: MEDIA.detail.latency,
-    // Image is 750x889, and the same rule applies.
-    className: 'board-latency aspect-[750/889]',
+    // 750x758 — the content box. The crop is 889-758 = 131px, and it has to
+    // land as 56 off the top and 75 off the bottom, so the vertical
+    // object-position is 56/131 = 42.75% rather than the default 50%.
+    className: 'board-latency aspect-[750/758]',
+    imgClass: 'object-[50%_42.75%]',
     alt:
       'High definition, low latency: a 0.004s response time shown against a 2-second lag, '
       + 'illustrated by a sharp game frame beside a blurred, still-loading one.',
@@ -95,21 +121,27 @@ export default function TechSpecs({
         </Reveal>
 
         {/* TOP ROW — the two boards.
-            `889fr 698fr`, and those are not arbitrary: they are the two
-            images' heights. Each tile is locked to its own art's aspect
-            ratio, so tile height is column width x (its own height / 750).
-            Giving the columns the ratio 889:698 makes the two products
-            identical —
-              left  = W x 889/1587 x 698/750
-              right = W x 698/1587 x 889/750
-            — so the boards finish exactly level while each one is still
-            filled edge to edge by its own artwork. That is the pair of
-            constraints the old `1.3fr 1fr` plus a shared min-height could
-            not satisfy at once; 1.3 was close to 889/698 = 1.274, which is
-            why it nearly worked and still letterboxed.
+            `758fr 644fr`, and those are not arbitrary: they are the two
+            CONTENT heights from the table above. Each tile is locked to its
+            own content ratio, so tile height is column width x (its content
+            height / 750). Giving the columns the ratio 758:644 makes the two
+            products identical —
+              left  = W x 758/1402 x 644/750
+              right = W x 644/1402 x 758/750
+            — so the boards finish exactly level while each is filled edge to
+            edge by its own artwork with the padding cropped off. That is the
+            pair of constraints the original `1.3fr 1fr` plus a shared
+            min-height could not satisfy at once.
+
+            Trimming the spec sheet ALONE would want 889fr/644fr, which at the
+            1440 container takes the left column to 751.6px — past the 750px
+            source, by a hair, but past it. Trimming both keeps it at 700px.
+            That is the reason the latency board's near-black edges are
+            cropped too and not left as they were.
+
             `items-stretch` (the default) holds the two to a common height
             against sub-pixel rounding. */}
-        <div className="mt-12 grid grid-cols-1 items-stretch gap-3 sm:gap-4 lg:grid-cols-[889fr_698fr]">
+        <div className="mt-12 grid grid-cols-1 items-stretch gap-3 sm:gap-4 lg:grid-cols-[758fr_644fr]">
           {BOARDS.map((board) => (
             <Reveal
               key={board.src}
@@ -118,15 +150,16 @@ export default function TechSpecs({
               amount={0.25}
               className={`bento-tile relative overflow-hidden ${board.className}`}
             >
-              {/* `object-cover`, and it crops nothing: the tile is locked to
-                  this image's own aspect ratio, so cover and contain resolve
-                  to the same box. Cover is the one of the two that cannot
-                  leave a sliver of tile showing when sub-pixel rounding puts
-                  the two a fraction apart, which is the whole point here.
+              {/* `object-cover` with a per-board anchor. The tile is the
+                  artwork's CONTENT ratio, so cover scales to the tile width
+                  and takes the overflow off the top and bottom — which is
+                  exactly the baked-in padding, provided the anchor puts it
+                  where the padding actually is. That is what `imgClass`
+                  carries, and why neither board can use the default centre.
 
                   NOT upscaled past the source. Both files are 750px wide; the
                   container caps at 1440 and the left column takes
-                  1296 x 889/1587 = 726px of it, so neither board is ever
+                  1296 x 758/1402 = 700px of it, so neither board is ever
                   asked to render above native.
 
                   No padding and no edge feather. Both existed to dress the
@@ -140,7 +173,7 @@ export default function TechSpecs({
                 alt={board.alt}
                 fill
                 sizes="(min-width: 1024px) 55vw, 100vw"
-                className="object-cover"
+                className={`object-cover ${board.imgClass}`}
                 preload={false}
                 loading="lazy"
               />
