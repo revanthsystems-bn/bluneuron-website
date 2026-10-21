@@ -93,9 +93,53 @@ export const metadata = {
   },
 };
 
+/**
+ * The scroll-reveal gate, inlined into <head> and run before the body paints.
+ *
+ * `html.js-anim` is the ONLY thing that hides a <Reveal> (the single css rule
+ * in app/globals.css). Nothing in the server-rendered markup is hidden, so
+ * everything a visitor came to read is on the page as written and this script
+ * opts them in to the animation afterwards — never the other way round.
+ *
+ * Three ways the class never arrives, all of them leaving a visible page:
+ *
+ *   1. Scripts do not run (disabled, blocked, CSP, a dead in-app webview).
+ *      This script never executes, so the class is never added.
+ *   2. prefers-reduced-motion: reduce. Checked here and refused outright, so
+ *      there is no animation to sit through rather than a faster one.
+ *   3. The bundle is slow or never lands. The class IS added, so the content
+ *      is briefly hidden — then the failsafe below strips it again. That
+ *      timer is the important half: without it, a chunk that 404s or a
+ *      connection that stalls would leave the page blank indefinitely, which
+ *      is precisely the failure this whole change exists to remove.
+ *
+ * components/Reveal.jsx calls `window.__bnAnimReady()` from its first effect,
+ * which cancels the failsafe: by then the observer is attached and the reveal
+ * is going to happen properly. The 2500ms budget is generous for a working
+ * bundle on a slow connection and short enough that a broken one is not a
+ * visible outage.
+ *
+ * Written as a string in dangerouslySetInnerHTML because it has to be inline
+ * and synchronous in <head> — a <Script> component, even with
+ * `strategy="beforeInteractive"`, is part of the bundle this is insuring
+ * against. It is wrapped in try/catch so that nothing here can be the reason
+ * a page fails to render.
+ */
+const ANIM_GATE = `(function(){try{
+var d=document.documentElement;
+if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+d.classList.add('js-anim');
+var t=setTimeout(function(){d.classList.remove('js-anim');},2500);
+window.__bnAnimReady=function(){if(t){clearTimeout(t);t=0;}};
+}catch(e){}})();`;
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`dark ${interTight.variable} ${zenDots.variable}`}>
+      <head>
+        {/* eslint-disable-next-line react/no-danger */}
+        <script dangerouslySetInnerHTML={{ __html: ANIM_GATE }} />
+      </head>
       <body className="bg-black font-sans text-white antialiased">
         <MotionConfig reducedMotion="user">
           {/* AccountProvider wraps CartProvider, not the other way round:

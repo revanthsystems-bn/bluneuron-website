@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Reveal from './Reveal';
 import { COMPARISON } from '@/lib/iriz';
 
@@ -10,19 +9,29 @@ const DEFAULT_ROWS = COMPARISON.rows;
 function Cell({ value }) {
   if (value === true) {
     return (
-      <motion.svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="none"
-        initial={{ pathLength: 0, opacity: 0 }}
-        whileInView={{ pathLength: 1, opacity: 1 }}
-        viewport={{ once: true, amount: 0.8 }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="text-accent-soft"
-      >
-        <motion.path d="M2.5 8.5L6 12l7.5-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </motion.svg>
+      // A plain svg, and a tick that is DRAWN in the server HTML.
+      //
+      // This was a framer-motion svg with `initial={{ pathLength: 0,
+      // opacity: 0 }}`, which React serialised as an inline `opacity:0` on
+      // every tick in the table — so with no bundle the whole "IRIZ has it"
+      // column rendered blank, which is worse than no table at all: it reads
+      // as a feature the product does not have. Its viewport amount was 0.8
+      // on top of that, a fraction nothing this small reliably satisfies.
+      //
+      // The draw-on is now the `.tick-path` rule in app/globals.css, keyed
+      // off the enclosing <Reveal>'s data-reveal-in and gated behind
+      // html.js-anim like every other animation on the site. Without the
+      // class the path is simply a finished tick.
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-accent-soft">
+        <path
+          className="tick-path"
+          d="M2.5 8.5L6 12l7.5-8"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
     );
   }
   if (value === false) {
