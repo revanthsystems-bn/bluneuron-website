@@ -1,7 +1,10 @@
+import Image from 'next/image';
 import PageShell from '@/components/PageShell';
 import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
-import { FULL_SPEC_SHEET, BOX_CONTENTS, WARRANTY, SHOW_PENDING_SPECS, MEDIA } from '@/lib/iriz';
+import {
+  FULL_SPEC_SHEET, BOX_CONTENTS, WARRANTY, SHOW_PENDING_SPECS, MEDIA, THROW_RANGE,
+} from '@/lib/iriz';
 import { pageMetadata } from '@/lib/seo';
 
 // The groups this page actually renders. Everything still lives in
@@ -25,6 +28,30 @@ const GROUP_SPANS = SHOW_PENDING_SPECS
   ? ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-7', 'lg:col-span-5', 'lg:col-span-12']
   : ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-7', 'lg:col-span-5'];
 
+/**
+ * The four numbers the page opens with.
+ *
+ * Every one is already a row in FULL_SPEC_SHEET below — this is the same
+ * sheet's headline, not a second set of claims, and the `row` key names the
+ * row each is lifted from so the two cannot drift apart. Four, because that
+ * is what fits on one line of a phone in two columns without the values
+ * wrapping.
+ *
+ * `THROW_RANGE` supplies the screen range rather than a typed string, for the
+ * same reason the homepage reads it: the dial, the prose and this block must
+ * never be able to quote different sizes.
+ */
+const HEADLINE = [
+  { row: 'Brightness', value: '500', unit: 'True ANSI lumens' },
+  { row: 'Native Resolution', value: '1080p', unit: 'Native 1920x1080' },
+  {
+    row: 'Screen Size Range',
+    value: `${THROW_RANGE.max.size}"`,
+    unit: `Max, at ${THROW_RANGE.max.distance}m`,
+  },
+  { row: 'Throw Ratio', value: '1:1', unit: `${THROW_RANGE.min.distance}m-${THROW_RANGE.max.distance}m` },
+];
+
 export const metadata = pageMetadata({
   title: 'IRIZ Full Specifications — 1080p, 500 ANSI Lumens | BluNeuron',
   // Describes what the page actually lists, which the flag decides. Promising
@@ -47,10 +74,79 @@ export default function SpecsPage() {
         imagePosition="62% 50%"
       />
 
+      {/* THE HEADLINE BLOCK.
+          It is here to close a gap: the hero's copy ended well above its own
+          bottom edge, and the spec board below opens with its own padding, so
+          the page put roughly 180px of empty black between the title and the
+          first number on a 1440 screen. A page called "Every spec, in one
+          place" should not make you scroll past nothing to reach one.
+
+          The cut-out, not `heroClean`: this sits on a dark ground and
+          `heroClean` is a white product on a white seamless. See the note on
+          MEDIA.product.cutout in lib/iriz.js.
+
+          `lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]` rather than fr/fr —
+          the product is a fixed-ish object and the numbers want the rest, and
+          `minmax(0,...)` on both tracks is what stops a long value forcing
+          the grid wider than its container. */}
+      <section className="border-b border-border-subtle bg-black py-12 sm:py-14">
+        <div className="section-container grid items-center gap-10 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-16">
+          <Reveal y={20} className="relative mx-auto w-full max-w-[360px] lg:mx-0 lg:max-w-none">
+            <Image
+              src={MEDIA.product.cutout}
+              alt=""
+              aria-hidden="true"
+              width={760}
+              height={760}
+              sizes="(min-width: 1024px) 420px, 360px"
+              className="h-auto w-full"
+              priority={false}
+            />
+          </Reveal>
+
+          {/* Two columns on a phone, four from sm. `items-stretch` plus
+              `h-full` so the four tiles share a height whatever their unit
+              lines do. */}
+          <ul className="grid grid-cols-2 items-stretch gap-3 sm:grid-cols-4 sm:gap-4">
+            {HEADLINE.map((item, i) => (
+              <Reveal
+                key={item.row}
+                as="li"
+                y={20}
+                delay={Math.min(i, 3) * 0.05}
+                className="h-full"
+              >
+                <div className="bento-tile flex h-full flex-col justify-end p-5">
+                  {/* A THIRD size, below `.stat-number-sm`, and it is measured
+                      rather than picked: these tiles are a quarter of the
+                      right-hand column and only 193px wide inside their
+                      padding at 1440 — the narrowest stat on the site. At the
+                      44px `.stat-number-sm` top end "1080p" renders 205px and
+                      was clipped by the tile's own `overflow-hidden`. 36px
+                      puts it at 168px with room to spare, at every width.
+
+                      It is also why all four values here are SHORT. "Android
+                      14" needed 378px and no sane size fixes that in a 193px
+                      box; the platform is a headline on the homepage and a
+                      row in the Platform card below, and this block is the
+                      four numbers. */}
+                  <p className="stat-number whitespace-nowrap text-[clamp(1.75rem,2.4vw,2.25rem)]">
+                    {item.value}
+                  </p>
+                  <p className="mt-2 text-xs font-medium uppercase tracking-[0.14em] text-white/55">
+                    {item.unit}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* `border-b` stays with this section, not with the one below it: it is
           the hairline above the closing "View Comparison" block, and that
           block is what follows whether or not the pending section renders. */}
-      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section className="bg-black py-16 sm:py-20">
         <div className="section-container bento-grid">
           {SPEC_GROUPS.map((group, i) => {
             const span = GROUP_SPANS[i] ?? 'lg:col-span-6';
