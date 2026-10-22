@@ -66,8 +66,35 @@
     @apply mx-auto w-full max-w-container-xl px-6 md:px-10 lg:px-16;
   }
 
+  /*
+   * THE 44px FLOOR ON THE THREE BUTTON CLASSES.
+   *
+   * `min-h-[44px]` is on all three, and it is the WCAG 2.2 target-size
+   * minimum (2.5.8) measured rather than assumed — scripts/ui-audit.mjs
+   * flags any interactive element under 44x44 CSS px.
+   *
+   * At the default `py-3 text-sm` every one of them already measures exactly
+   * 44px (20px line box + 12px twice), so the floor changes NOTHING about how
+   * a default button looks. It exists for the callers that tighten the
+   * padding to fit a dense row — `px-5 py-2 text-xs` in the account panels is
+   * 32px, `px-6 py-2.5 text-xs` in the two sticky bars is 36px — which is
+   * where the real violations were. Those buttons now centre their smaller
+   * label in a 44px box instead of shrinking below the floor.
+   *
+   * IT BELONGS HERE, NOT ON THE CALLERS. Two callers had already added
+   * `min-h-[44px]` by hand (components/Header, components/ConsentNotice),
+   * which is the tell: a per-caller fix is one every new button has to
+   * remember. Setting it on the class makes 44px the thing a caller would
+   * have to deliberately override, and `min-height` is the right property
+   * because it floors the box without touching the padding, the radius or
+   * the type scale — `items-center` was already there to centre the label in
+   * whatever height results.
+   *
+   * The sticky bars grow ~8px taller as a result. They are `py-3` around a
+   * flex row with no fixed height, so they absorb it.
+   */
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-[0_8px_24px_-8px_rgba(255,255,255,0.35)] active:translate-y-0 active:scale-[0.97];
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-[0_8px_24px_-8px_rgba(255,255,255,0.35)] active:translate-y-0 active:scale-[0.97];
   }
 
   /*
@@ -78,11 +105,11 @@
    * the handover read as a colour transition rather than a different button.
    */
   .btn-primary-ink {
-    @apply inline-flex items-center justify-center rounded-full bg-black-obsidian px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black-obsidian/85 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)] active:translate-y-0 active:scale-[0.97];
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full bg-black-obsidian px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black-obsidian/85 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)] active:translate-y-0 active:scale-[0.97];
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-border-strong bg-white/[0.03] px-7 py-3 text-sm font-semibold text-white backdrop-blur-glass transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-soft/60 hover:bg-white/10 active:translate-y-0 active:scale-[0.97];
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full border border-border-strong bg-white/[0.03] px-7 py-3 text-sm font-semibold text-white backdrop-blur-glass transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-soft/60 hover:bg-white/10 active:translate-y-0 active:scale-[0.97];
   }
 
   .eyebrow {

@@ -62,9 +62,10 @@ export default function WhereToBuyPage() {
           <DraftBanner path={ROUTES.whereToBuy} className="mb-10 max-w-[680px]" />
 
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            {/* Square frame, no padding — see the comment in
-                components/BuySection for why the mask needs the element box to
-                match the 1600×1600 source. */}
+            {/* Square frame around a 1475×1038 cutout — `object-contain`
+                letterboxes it at its own ratio, so the frame's shape is a
+                card decision and not a constraint on the asset. See the
+                fuller note in components/BuySection. */}
             <Reveal className="product-stage relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl border border-border-subtle">
               <Image
                 src={MEDIA.product.cutout}

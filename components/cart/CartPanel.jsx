@@ -97,12 +97,16 @@ export default function CartPanel() {
             href={ROUTES.product}
             className="relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl border border-border-subtle bg-black sm:h-32 sm:w-32"
           >
+            {/* CONTAIN, NOT COVER — see the note in components/cart/
+                CartDrawer. A 1475x1038 cutout in a square tile loses its
+                ends to `object-cover`; contained, the whole unit is in
+                frame at its own ratio. */}
             <Image
               src={PRODUCT.image}
               alt={BRAND.fullName}
               fill
               sizes="(min-width: 640px) 128px, 92vw"
-              className="object-cover"
+              className="object-contain p-3"
             />
           </a>
 

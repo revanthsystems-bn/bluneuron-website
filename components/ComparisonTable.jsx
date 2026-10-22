@@ -73,12 +73,17 @@ function Cell({ value }) {
 function IrizMark({ name }) {
   return (
     <span className="flex items-center gap-2.5">
+      {/* The asset's real pixels (1475x1038), scaled down. The box is a
+          fixed 36x36 square and `object-contain` is what keeps the product
+          undistorted inside it — but the attributes are the asset's own
+          ratio anyway, so the intrinsic size next/image reasons about is
+          the truth rather than a square guess. */}
       <Image
         src={MEDIA.product.cutout}
         alt=""
         aria-hidden="true"
-        width={72}
-        height={72}
+        width={1475}
+        height={1038}
         sizes="36px"
         className="h-9 w-9 shrink-0 object-contain"
       />

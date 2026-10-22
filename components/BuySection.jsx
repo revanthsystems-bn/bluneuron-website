@@ -41,19 +41,20 @@ export default function BuySection() {
 
       <div className="section-container relative">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          {/* The render is a white-studio cutout with an opaque white ground,
-              so it gets the same ambient stage glow + radial mask every other
-              product shot on this site gets — without them it reads as a white
-              card pasted onto the black. `product-glow` is on the frame,
-              `product-fade` on the image.
+          {/* The render is a transparent CUTOUT, so it needs no mask: the
+              frame carries `.product-stage` for the ambient lighting and
+              nothing touches the image itself. The `product-glow` +
+              `product-fade` pair this comment used to describe is gone —
+              see the note above `.product-stage` in app/globals.css.
 
-              SQUARE frame, and no padding on the image. The source is 1600×1600
-              and `product-fade` masks the IMG ELEMENT's box, so the mask only
-              lines up with the picture when the two are the same shape — in a
-              4:3 frame (or with padding inside a square one) the ellipse falls
-              short of the artwork and leaves a hard white edge showing through
-              at the corners. The aspect ratio is declared, so nothing reflows
-              when it decodes. */}
+              The square frame is now just the card's shape, NOT a mask
+              alignment constraint, and the source is 1475×1038 rather than
+              the 1600×1600 this comment claimed. `fill` with
+              `object-contain` is what matters: the product is letterboxed
+              inside the square at its own 1.42:1 ratio, so the frame's
+              shape and the asset's shape no longer have to agree. The
+              frame declares its own aspect-square, so nothing reflows when
+              the image decodes. */}
           <Reveal className="product-stage relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl border border-border-subtle">
             <Image
               src={MEDIA.product.cutout}

@@ -23,8 +23,16 @@
  *                       target-size minimum. Inline links in a paragraph are
  *                       exempt — the criterion exempts them, and flagging
  *                       them buries the real ones.
- *   stretched images    rendered aspect ratio more than 2% off the natural
- *                       one, and images rendered far above their source size.
+ *   stretched images    an `object-fit: fill` image (the default) whose
+ *                       element box is more than 2% off the source's own
+ *                       ratio — almost always a wrong width/height attribute
+ *                       pair, since an <img> takes its ratio from those.
+ *   cropped thumbnails  an `object-fit: cover` image in a tile of 256px or
+ *                       less losing more than 10% of the source off the
+ *                       edges. Not distortion, but it is how a product shot
+ *                       in a cart tile becomes a patch of background. Bands
+ *                       and heroes are exempt: cropping one is the art
+ *                       direction, not a defect.
  *
  * Every page is scrolled end to end first, so reveal-gated content is in its
  * final state before anything is measured.
@@ -145,18 +153,57 @@ for (const [width, height] of SIZES) {
       }
       if (small.length) issues.push(`tap target <44px (${small.length}): ${small.slice(0, 3).join(', ')}`);
 
-      // Images rendered at the wrong shape, or far above their source.
+      // Images rendered at the wrong shape.
+      //
+      // IT IS THE PAINTED RATIO THAT MATTERS, NOT THE ELEMENT BOX. This
+      // compared the box to the natural ratio and exempted `object-fit:
+      // cover`, which got both halves wrong:
+      //
+      //   - `contain` and `scale-down` letterbox INSIDE a box of any shape
+      //     and never distort, so every contained image in a square frame
+      //     was reported as stretched. Five such reports per width on this
+      //     site, all false, which is exactly the noise a real one hides in.
+      //   - `cover` never distorts either, but it CROPS, and the exemption
+      //     ("cropping is the point") meant a 1.42:1 product cut into a 1:1
+      //     tile — 30% of it thrown away — was reported as nothing at all.
+      //     That is a real defect this site has shipped twice.
+      //
+      // So: derive what is actually painted, and report the two faults
+      // separately. Only `fill` (the CSS initial value, so the default for
+      // any <img> with no object-fit) can distort, and it does so whenever
+      // the element box disagrees with the source — which is what a wrong
+      // width/height attribute pair causes, since an <img> takes its aspect
+      // ratio from those attributes.
       for (const img of main.querySelectorAll('img')) {
         if (!img.naturalWidth || !img.complete) continue;
         const r = img.getBoundingClientRect();
         if (!r.width || !r.height) continue;
         const cs = getComputedStyle(img);
-        if (cs.objectFit === 'cover') continue;         // cropping is the point
+        const fit = cs.objectFit;
         const natural = img.naturalWidth / img.naturalHeight;
-        const shown = r.width / r.height;
-        if (Math.abs(natural - shown) / natural > 0.02) {
-          issues.push(`stretched image: ${img.getAttribute('src')?.slice(-40)} natural ${natural.toFixed(3)} vs shown ${shown.toFixed(3)}`);
+        const box = r.width / r.height;
+        const src = img.getAttribute('src')?.slice(-40);
+
+        if (fit === 'fill' && Math.abs(natural - box) / natural > 0.02) {
+          issues.push(`stretched image: ${src} natural ${natural.toFixed(3)} vs shown ${box.toFixed(3)}`);
           break;
+        }
+        // SMALL TILES ONLY, and that bound is the whole point of the check.
+        // `object-fit: cover` on a wide band is ART DIRECTION — every
+        // PageHero on this site crops a 1:1 render into a 4:1 strip on
+        // purpose, and reporting those buries the finding in 26 lines of
+        // intended behaviour. On a thumbnail there is no art direction to
+        // do: the tile exists to show one object, and a crop that takes a
+        // third of it leaves a patch of background where the product was.
+        // 256px is above every product tile here (80, 128, 36) and below
+        // every band.
+        const thumb = r.width <= 256 && r.height <= 256;
+        if (fit === 'cover' && thumb) {
+          const lost = box > natural ? 1 - natural / box : 1 - box / natural;
+          if (lost > 0.1) {
+            issues.push(`cropped thumbnail: ${src} ${Math.round(lost * 100)}% of a ${natural.toFixed(2)}:1 source cut to fit a ${Math.round(r.width)}x${Math.round(r.height)} tile`);
+            break;
+          }
         }
       }
 

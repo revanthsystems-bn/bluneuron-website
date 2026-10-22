@@ -17,16 +17,26 @@ const SPEC_GROUPS = FULL_SPEC_SHEET.filter((group) => SHOW_PENDING_SPECS || !gro
 // so these change in pairs — and there is one set per flag state, because the
 // group count changes with it:
 //
-//   pending shown   7+5 / 7+5 / 12 — the four dense groups pair off by size,
+//   pending shown   7+5 / 5+7 / 12 — the four dense groups pair off by size,
 //                   and "Dimensions & Weight" (two placeholder rows) closes
 //                   the board as a wide strip rather than a mostly-empty
 //                   column. `lg:col-span-12` is also what splits that group's
 //                   list into two columns, via `wide` below.
-//   pending hidden  7+5 / 7+5 — the four dense groups, two even rows, no
+//   pending hidden  7+5 / 5+7 — the four dense groups, two even rows, no
 //                   trailing cell to fill and nothing wide.
+//
+// THE SECOND ROW IS 5+7, NOT 7+5, and that is the size pairing above doing
+// its job rather than an inconsistency. The spans follow FULL_SPEC_SHEET's
+// own order — Optics, Throw, Platform, Connectivity — and the row counts are
+// 6 / 4 / 6 / 8. Connectivity & Audio became the longest group when the two
+// wireless radios and the adapter's mains rating were read off the carton
+// into it, so it takes the wide cell and Platform the narrow one. Grid items
+// stretch to their row, so the alternative was an 8-row list in a half-width
+// tile forcing matching dead space into the 6-row tile beside it. Re-check
+// these two if a group gains or loses rows again.
 const GROUP_SPANS = SHOW_PENDING_SPECS
-  ? ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-7', 'lg:col-span-5', 'lg:col-span-12']
-  : ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-7', 'lg:col-span-5'];
+  ? ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-5', 'lg:col-span-7', 'lg:col-span-12']
+  : ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-5', 'lg:col-span-7'];
 
 /**
  * The four numbers the page opens with.
@@ -92,12 +102,20 @@ export default function SpecsPage() {
       <section className="border-b border-border-subtle bg-black py-12 sm:py-14">
         <div className="section-container grid items-center gap-10 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-16">
           <Reveal y={20} className="relative mx-auto w-full max-w-[360px] lg:mx-0 lg:max-w-none">
+            {/* THE ASSET'S OWN PIXELS, 1475x1038. These two numbers were
+                760x760, which is not the shape of the file: an <img> takes
+                its aspect ratio from its width/height attributes, so
+                `h-auto w-full` resolved to a SQUARE box and the projector
+                was drawn 1.42x too tall on this route. `h-auto` now
+                resolves to the real ratio, and the reserved space it
+                reserves is the space the image actually needs. See the note
+                on MEDIA.product.cutout in lib/iriz.js. */}
             <Image
               src={MEDIA.product.cutout}
               alt=""
               aria-hidden="true"
-              width={760}
-              height={760}
+              width={1475}
+              height={1038}
               sizes="(min-width: 1024px) 420px, 360px"
               className="h-auto w-full"
               priority={false}

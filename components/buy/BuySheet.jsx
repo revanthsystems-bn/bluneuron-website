@@ -114,8 +114,9 @@ export default function BuySheet({ open, onClose }) {
               <div className="relative h-20 w-20 flex-none overflow-hidden rounded-xl border border-border bg-black-elevated">
                 {/* CONTAIN, NOT COVER, and sized for retina.
 
-                    `object-cover` centre-cropped a 1.66:1 source into a 1:1
-                    box, which threw away the product and kept background.
+                    `object-cover` centre-cropped a 1.42:1 source (1475x1038)
+                    into a 1:1 box, which threw away the product and kept
+                    background.
                     `sizes="80px"` then asked the optimiser for an 80px-wide
                     file, so a 1x screen received 80x48 of real pixels — an
                     unreadable smudge. `sizes="160px"` buys the 2x variant and

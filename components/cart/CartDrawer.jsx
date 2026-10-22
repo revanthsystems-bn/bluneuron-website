@@ -159,12 +159,20 @@ function CartDrawerPanel() {
                 <div className="flex-1 overflow-y-auto px-6 py-6">
                   <div className="flex gap-4">
                     <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-black-soft">
+                      {/* CONTAIN, NOT COVER — the same fix components/buy/
+                          BuySheet already carries, applied to the other two
+                          callers it named. PRODUCT.image is a 1475x1038
+                          transparent cutout and this tile is 1:1, so
+                          `object-cover` centre-cropped roughly 30% of the
+                          product's width away and kept empty space. And
+                          `sizes="160px"` rather than "80px", so an 80px box
+                          gets the 2x file instead of 80x56 real pixels. */}
                       <Image
                         src={PRODUCT.image}
                         alt=""
                         fill
-                        sizes="80px"
-                        className="object-cover"
+                        sizes="160px"
+                        className="object-contain p-1.5"
                       />
                     </div>
 
