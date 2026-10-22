@@ -73,10 +73,16 @@ export default function PolicyToc({ items }) {
                   : 'text-white/55 hover:bg-white/[0.03] hover:text-white/85'
               }`}
             >
+              {/* The item number. `text-white/50` is 5.2:1 at worst on these
+                  backgrounds; it was `/30` — 2.6:1 — which axe-core flagged
+                  on /legal/terms, /legal/returns and /legal/warranty. The
+                  number still reads as subordinate to the heading beside it,
+                  but by being 11px and right-aligned in its own 1rem column
+                  rather than by being too faint to read. */}
               <span
                 aria-hidden="true"
                 className={`w-4 shrink-0 text-right text-[11px] tabular-nums ${
-                  active ? 'text-accent-soft' : 'text-white/30'
+                  active ? 'text-accent-soft' : 'text-white/50'
                 }`}
               >
                 {i + 1}

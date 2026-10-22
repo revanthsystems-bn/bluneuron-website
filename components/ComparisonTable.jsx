@@ -1,43 +1,90 @@
 'use client';
 
+import Image from 'next/image';
 import Reveal from './Reveal';
-import { COMPARISON } from '@/lib/iriz';
+import { COMPARISON, MEDIA } from '@/lib/iriz';
 
 const DEFAULT_COLUMNS = COMPARISON.columns;
 const DEFAULT_ROWS = COMPARISON.rows;
 
+/**
+ * A yes/no mark, drawn rather than imported.
+ *
+ * Both glyphs are the same 16x16 box, the same 1.8 stroke and the same round
+ * caps, so the column reads as one set of marks and not as two icon families
+ * that happen to sit near each other.
+ *
+ * THE PATH IS DRAWN IN THE SERVER HTML. This used to be a framer-motion svg
+ * with `initial={{ pathLength: 0, opacity: 0 }}`, which React serialised as an
+ * inline `opacity:0` on every mark in the table — so with no bundle the whole
+ * "IRIZ has it" column rendered blank, which is worse than no table at all: it
+ * reads as a feature the product does not have. The draw-on is now the
+ * `.tick-path` rule in app/globals.css, keyed off the enclosing <Reveal>'s
+ * data-reveal-in and gated behind html.js-anim like every other animation on
+ * the site. Without the class the path is simply a finished mark.
+ *
+ * `role="img"` plus the label, because an icon is the ENTIRE content of these
+ * cells. Without it a screen reader reads an empty cell and the row's answer
+ * is lost — and "—" (what `false` used to render) is not an answer either, it
+ * is the absence of one.
+ */
+function Mark({ yes }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      role="img"
+      aria-label={yes ? 'Yes' : 'No'}
+      className={yes ? 'text-accent-soft' : 'text-white/35'}
+    >
+      <path
+        className="tick-path"
+        d={yes ? 'M2.5 8.5L6 12l7.5-8' : 'M4 4l8 8M12 4l-8 8'}
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function Cell({ value }) {
-  if (value === true) {
-    return (
-      // A plain svg, and a tick that is DRAWN in the server HTML.
-      //
-      // This was a framer-motion svg with `initial={{ pathLength: 0,
-      // opacity: 0 }}`, which React serialised as an inline `opacity:0` on
-      // every tick in the table — so with no bundle the whole "IRIZ has it"
-      // column rendered blank, which is worse than no table at all: it reads
-      // as a feature the product does not have. Its viewport amount was 0.8
-      // on top of that, a fraction nothing this small reliably satisfies.
-      //
-      // The draw-on is now the `.tick-path` rule in app/globals.css, keyed
-      // off the enclosing <Reveal>'s data-reveal-in and gated behind
-      // html.js-anim like every other animation on the site. Without the
-      // class the path is simply a finished tick.
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-accent-soft">
-        <path
-          className="tick-path"
-          d="M2.5 8.5L6 12l7.5-8"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-  if (value === false) {
-    return <span className="text-white/50">—</span>;
-  }
+  if (value === true) return <Mark yes />;
+  if (value === false) return <Mark yes={false} />;
   return <span className="text-white/75">{value}</span>;
+}
+
+/**
+ * The IRIZ column's header: the product, then its name.
+ *
+ * The cut-out, not `heroClean` — this sits on a dark ground and heroClean is
+ * a white product on a white seamless. See MEDIA.product.cutout in
+ * lib/iriz.js.
+ *
+ * IT REPLACES A "MOST POPULAR" BADGE. That badge was a popularity claim
+ * nothing on this site supports: there is one product, no sales ranking and
+ * no reviews to rank it by. The column is worth highlighting because it is
+ * ours and the page is about it — which the product's own name and picture
+ * say honestly, and a superlative does not.
+ */
+function IrizMark({ name }) {
+  return (
+    <span className="flex items-center gap-2.5">
+      <Image
+        src={MEDIA.product.cutout}
+        alt=""
+        aria-hidden="true"
+        width={72}
+        height={72}
+        sizes="36px"
+        className="h-9 w-9 shrink-0 object-contain"
+      />
+      <span>{name}</span>
+    </span>
+  );
 }
 
 export default function ComparisonTable({
@@ -47,6 +94,12 @@ export default function ComparisonTable({
   rows = DEFAULT_ROWS,
   showViewMore = true,
 }) {
+  const highlighted = columns.find((c) => c.highlight) ?? columns[0];
+  const others = columns.filter((c) => c !== highlighted);
+
+  // The tint that marks our column, on the header and on every cell under it.
+  const hl = 'bg-accent-soft/[0.055]';
+
   return (
     <section id="compare" className="border-b border-border-subtle bg-black py-20 scroll-mt-20">
       <div className="section-container">
@@ -55,22 +108,80 @@ export default function ComparisonTable({
           <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">{heading}</h2>
         </Reveal>
 
-        <Reveal delay={0.1} className="glass-panel overflow-x-auto">
+        {/* ------------------------------------------------------------- *
+         * PHONE: one card per row. No table, and no scroller either.
+         *
+         * The table below needs 640px to stay legible and a 375px phone does
+         * not have it. The usual answer is to let the table scroll sideways
+         * inside its panel, which keeps the PAGE from scrolling but still
+         * asks someone to drag a grid back and forth to read two values —
+         * and the second column is the one that falls off the edge, so the
+         * comparison is exactly the part that goes missing.
+         *
+         * A card per row puts both answers on screen at once, which is the
+         * only thing this table is for. Hidden from md up, where the real
+         * table takes over; `md:hidden` rather than a separate component so
+         * the two cannot drift apart.
+         * ------------------------------------------------------------- */}
+        <Reveal delay={0.1} as="ul" className="flex flex-col gap-3 md:hidden">
+          {rows.map((row) => (
+            <li key={row.label} className="glass-panel p-5">
+              <p className="text-sm font-semibold text-white">{row.label}</p>
+
+              {/* Label ABOVE value, not beside it. Side by side, "Typical
+                  Budget Projector" wrapped to three lines against a
+                  right-aligned value that wrapped to two, and every card came
+                  out a different ragged shape. Stacked and left-aligned, the
+                  column names sit on one line each and the values start from
+                  a common edge. */}
+              <dl className="mt-4 flex flex-col gap-2">
+                <div className={`flex flex-col gap-1 rounded-xl p-3 ${hl}`}>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-accent-soft">
+                    {highlighted.name}
+                  </dt>
+                  <dd className="text-sm text-white">
+                    <Cell value={row[highlighted.key]} />
+                  </dd>
+                </div>
+
+                {others.map((col) => (
+                  <div key={col.key} className="flex flex-col gap-1 p-3">
+                    <dt className="text-xs font-medium uppercase tracking-[0.12em] text-white/40">
+                      {col.name}
+                    </dt>
+                    <dd className="text-sm text-white/70">
+                      <Cell value={row[col.key]} />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))}
+        </Reveal>
+
+        {/* ------------------------------------------------------------- *
+         * md AND UP: the real table.
+         *
+         * `overflow-x-auto` stays as the last resort for a narrow tablet in
+         * portrait — it scrolls the PANEL, never the page, which is the
+         * distinction that matters. At md the 640px minimum already fits.
+         * ------------------------------------------------------------- */}
+        <Reveal delay={0.1} className="hidden glass-panel overflow-x-auto md:block">
           <table className="w-full min-w-[640px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th scope="col" className="p-5 font-medium text-white/55"><span className="sr-only">Feature</span></th>
+                <th scope="col" className="p-5 font-medium text-white/55">
+                  <span className="sr-only">Feature</span>
+                </th>
                 {columns.map((col) => (
                   <th
                     key={col.key}
-                    className={`p-5 font-semibold ${col.highlight ? 'text-white' : 'text-white/70'}`}
+                    scope="col"
+                    className={`p-5 font-semibold ${
+                      col.highlight ? `text-white ${hl}` : 'text-white/70'
+                    }`}
                   >
-                    {col.highlight && (
-                      <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-accent-soft">
-                        Most Popular
-                      </span>
-                    )}
-                    {col.name}
+                    {col.highlight ? <IrizMark name={col.name} /> : col.name}
                   </th>
                 ))}
               </tr>
@@ -79,7 +190,9 @@ export default function ComparisonTable({
               {rows.map((row, i) => (
                 <tr
                   key={row.label}
-                  className={`transition-colors duration-200 hover:bg-accent-soft/[0.06] ${i % 2 === 0 ? 'bg-white/[0.015]' : ''}`}
+                  className={`transition-colors duration-200 hover:bg-accent-soft/[0.06] ${
+                    i % 2 === 0 ? 'bg-white/[0.015]' : ''
+                  }`}
                 >
                   {/* A ROW HEADER, not a data cell. The left column names what
                       each row compares, which is exactly what `<th scope="row">`
@@ -93,7 +206,10 @@ export default function ComparisonTable({
                     {row.label}
                   </th>
                   {columns.map((col) => (
-                    <td key={col.key} className="border-t border-border-subtle p-5">
+                    <td
+                      key={col.key}
+                      className={`border-t border-border-subtle p-5 ${col.highlight ? hl : ''}`}
+                    >
                       <Cell value={row[col.key]} />
                     </td>
                   ))}

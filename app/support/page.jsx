@@ -2,7 +2,7 @@ import PageShell from '@/components/PageShell';
 import PageHero from '@/components/PageHero';
 import SupportTiles from '@/components/SupportTiles';
 import AnswerSearch from '@/components/support/AnswerSearch';
-import { BRAND, FAQS, MEDIA, TROUBLESHOOTING } from '@/lib/iriz';
+import { ALL_FAQS, BRAND, MEDIA, TROUBLESHOOTING } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 
@@ -64,7 +64,7 @@ export default function SupportPage() {
             "find the answer" is the commonest reason to be here, and it
             otherwise took two clicks and a page of scrolling to begin. */}
         <AnswerSearch
-          faqs={FAQS}
+          faqs={ALL_FAQS}
           fixes={TROUBLESHOOTING}
           faqHref={ROUTES.faq}
           contactHref={ROUTES.contact}

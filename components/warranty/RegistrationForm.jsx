@@ -460,7 +460,7 @@ export default function RegistrationForm() {
         </Magnetic>
       </div>
 
-      <p className="mt-5 text-xs leading-relaxed text-white/35">
+      <p className="mt-5 text-xs leading-relaxed text-white/50">
         We use these details only to register and service your warranty. They are not used for
         advertising and are never sent to any advertising platform. Trouble registering? Email{' '}
         <a

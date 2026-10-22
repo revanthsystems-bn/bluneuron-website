@@ -1,10 +1,13 @@
+import Image from 'next/image';
+import { MapPin, Package, ShieldCheck, Store, Mail } from 'lucide-react';
 import PageShell from '@/components/PageShell';
 import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { COMPANY, allKnown } from '@/lib/site-config';
-import { MEDIA } from '@/lib/iriz';
+import { COMPANY, SUPPORT, allKnown } from '@/lib/site-config';
+import { BRAND, MEDIA } from '@/lib/iriz';
+import { WARRANTY } from '@/lib/warranty';
 
 export const metadata = {
   ...pageMetadata({
@@ -15,6 +18,34 @@ export const metadata = {
   }),
   robots: routeRobots(ROUTES.about),
 };
+
+/**
+ * The four facts, each read from the file that owns it rather than typed.
+ *
+ *   one product          BRAND.model, and the "Stand behind one product"
+ *                        value below says the same thing in a sentence.
+ *   the cover period     WARRANTY from lib/warranty.js — the single source
+ *                        /legal/warranty, both warranty forms and the
+ *                        registration success screen all quote. A warranty
+ *                        whose length differs between two pages of the same
+ *                        site is not a document anyone can rely on, and this
+ *                        would have been a fifth surface to get wrong.
+ *   where to buy         the same pair the announcement bar and
+ *                        /where-to-buy name; the company section below
+ *                        already says we sell through them rather than our
+ *                        own store.
+ *   the support address  SUPPORT.email from lib/site-config.js.
+ *
+ * Nothing here is new. It is the four things someone lands on this page
+ * wanting to confirm, lifted out of three sections of prose they would
+ * otherwise have to read to find them.
+ */
+const FACTS = [
+  { icon: Package, value: `1 product`, label: `The ${BRAND.model}, and nothing else` },
+  { icon: ShieldCheck, value: `${WARRANTY.months} months`, label: 'Warranty from the invoice date' },
+  { icon: Store, value: 'Amazon & Flipkart', label: 'Where the IRIZ is sold' },
+  { icon: Mail, value: SUPPORT.email, label: 'Support, answered by us', href: `mailto:${SUPPORT.email}` },
+];
 
 const VALUES = [
   {
@@ -38,9 +69,74 @@ export default function AboutPage() {
         eyebrow="About BluNeuron"
         title="A projector brand built around one honest number."
         subtitle="We started BluNeuron because the home-projector market is full of inflated brightness claims — and we wanted to build the projector we couldn't find."
-        image={MEDIA.product.heroClean}
-        imagePosition="62% 50%"
+        image={MEDIA.product.retailBox}
+        imageAlt=""
+        imagePosition="50% 50%"
       />
+
+      {/* ----------------------------------------------------------------- *
+       * THE PLACE, AND THE FOUR FACTS.
+       *
+       * Coimbatore comes from COMPANY.registeredAddress — the same string the
+       * footer prints and the company section below reads. It is not a second
+       * claim typed in beside it.
+       *
+       * The four tiles are an index, not new information: every one is a fact
+       * the page already states further down, pulled up to where someone who
+       * came here to check one of them will actually find it.
+       * ----------------------------------------------------------------- */}
+      <section className="border-b border-border-subtle bg-black py-10 sm:py-12">
+        <div className="section-container">
+          {allKnown(COMPANY.registeredAddress) && (
+            <Reveal className="flex items-center gap-2.5 text-sm text-white/60">
+              <MapPin className="h-4 w-4 shrink-0 text-accent-soft" aria-hidden="true" />
+              <span>
+                Designed in <span className="font-semibold text-white/85">Coimbatore, India</span>
+              </span>
+            </Reveal>
+          )}
+
+          {/* Two columns on a phone, four from sm. `items-stretch` plus
+              `h-full` so the tiles share a height whatever their label does —
+              the email is the long one and wraps on a narrow screen. */}
+          <ul className="mt-8 grid grid-cols-2 items-stretch gap-3 sm:grid-cols-4 sm:gap-4">
+            {FACTS.map((fact, i) => {
+              const Icon = fact.icon;
+              const value = fact.href ? (
+                <a
+                  href={fact.href}
+                  className="underline-offset-4 transition-colors hover:text-accent-soft hover:underline"
+                >
+                  {fact.value}
+                </a>
+              ) : (
+                fact.value
+              );
+              return (
+                <Reveal
+                  key={fact.label}
+                  as="li"
+                  y={20}
+                  delay={Math.min(i, 3) * 0.05}
+                  className="h-full"
+                >
+                  <div className="bento-tile flex h-full flex-col p-5">
+                    <Icon className="mb-4 h-[18px] w-[18px] text-accent-soft" aria-hidden="true" />
+                    {/* `break-words`, because the support address is one long
+                        token and a 156px tile on a 375px phone cannot hold it
+                        otherwise — it would push the grid wider than the
+                        page. */}
+                    <p className="text-base font-semibold leading-tight text-white break-words">
+                      {value}
+                    </p>
+                    <p className="mt-2 text-xs leading-relaxed text-white/50">{fact.label}</p>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
 
       <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
         <div className="section-container max-w-2xl">
@@ -113,6 +209,35 @@ export default function AboutPage() {
           </div>
         </section>
       )}
+
+      {/* ----------------------------------------------------------------- *
+       * RESERVED: THE TEAM / OFFICE PHOTOGRAPH.
+       *
+       * Deliberately a placeholder and deliberately visible as one. A page
+       * about who we are wants a picture of the people, and we do not have
+       * one — so this marks the slot, states what belongs in it, and renders
+       * nothing that pretends to be it. A stock photograph of an office that
+       * is not ours would be a lie told in pictures, which is the one thing
+       * a page arguing for honest measurement cannot do.
+       *
+       * TO FILL IT: drop the file in public/media/company/, add it to MEDIA
+       * in lib/iriz.js, and replace this block with the <Image>. Give it real
+       * alt text — it is carrying information, not decoration. Then delete
+       * this comment.
+       * ----------------------------------------------------------------- */}
+      <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
+        <div className="section-container">
+          <Reveal className="flex min-h-[220px] flex-col items-center justify-center rounded-3xl border border-dashed border-white/15 bg-white/[0.02] p-8 text-center sm:min-h-[280px]">
+            <p className="text-sm font-semibold text-white/70">
+              Photograph of the team and the Coimbatore office goes here
+            </p>
+            <p className="mt-2 max-w-md text-xs leading-relaxed text-white/50">
+              Left empty on purpose. We would rather show nothing than a stock
+              photograph of an office that is not ours.
+            </p>
+          </Reveal>
+        </div>
+      </section>
 
       <section className="bg-black py-16 text-center sm:py-20">
         <div className="section-container">

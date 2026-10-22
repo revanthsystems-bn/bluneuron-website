@@ -1,0 +1,31 @@
+# Security headers for the files Cloudflare serves WITHOUT invoking the Worker.
+#
+# WHY THIS FILE EXISTS AT ALL. `headers()` in next.config.js sets the full set
+# on every response the Next server produces, which is every document on all
+# three hosts. On Cloudflare that is not every response: Workers Static Assets
+# answers /_next/static/** and everything from public/ at the edge, ahead of
+# the Worker, so those responses never pass through Next and carried none of
+# the headers. Measured on the preview before this file: HSTS present on the
+# document, absent on /_next/static/chunks/*.js.
+#
+# WHY NOT ROUTE THE ASSETS THROUGH THE WORKER INSTEAD. `run_worker_first` can
+# do it, and it is the wrong tool: every asset request would become a billed
+# Worker invocation and lose its edge cache, which is exactly what the narrow
+# two-path video rule in wrangler.jsonc is careful to avoid. See the Range
+# requests section in CLAUDE.md. `_headers` is the mechanism Cloudflare
+# provides for this and it costs nothing.
+#
+# WHAT IT DELIBERATELY DOES NOT CARRY. No Content-Security-Policy and no
+# X-Frame-Options: both govern how a DOCUMENT behaves, and neither means
+# anything on a script, a stylesheet or a JPEG. The two that do are here.
+#
+# THIS IS A SECOND PLACE HEADERS ARE SET. Keep it to the asset-relevant subset
+# and keep the values identical to SECURITY_HEADERS in next.config.js; if you
+# change one, change both. Cloudflare consumes this file and does not serve
+# it. Vercel and GoDaddy ignore it entirely — their asset responses already
+# come through the Next server, which applies headers() to them.
+
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

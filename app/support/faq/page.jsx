@@ -1,7 +1,7 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import FaqAccordion from '@/components/FaqAccordion';
-import { FAQS, TROUBLESHOOTING } from '@/lib/iriz';
+import { ALL_FAQS, TROUBLESHOOTING } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { faqJsonLd, pageMetadata } from '@/lib/seo';
 
@@ -20,7 +20,7 @@ export const metadata = {
 // here rather than on /support because Google requires the markup to match the
 // questions VISIBLE on the page, and /support is now a hub of tiles with no
 // questions on it at all.
-const FAQ_JSON_LD = faqJsonLd(FAQS);
+const FAQ_JSON_LD = faqJsonLd(ALL_FAQS);
 
 /**
  * FAQ and troubleshooting, on one page.
@@ -57,12 +57,13 @@ export default function FaqPage() {
 
       <section id="faq" className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20">
         <div className="section-container">
-          <div className="mb-10 max-w-lg">
-            <p className="eyebrow mb-3">Common questions</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">FAQ</h2>
-          </div>
-
-          <FaqAccordion items={FAQS} />
+          {/* NO "COMMON QUESTIONS / FAQ" HEADING HERE.
+              The PageHeading above already reads "FAQ & troubleshooting" and
+              says what the page is; a second "FAQ" eight hundred pixels
+              further down was the same word twice in two type sizes, with
+              nothing between them. The accordion's own topic headings are
+              the structure this section needs. */}
+          <FaqAccordion items={ALL_FAQS} searchable />
         </div>
       </section>
 

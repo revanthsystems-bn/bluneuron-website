@@ -57,6 +57,14 @@ const INVALID_CLASS = 'border-red-400/60';
  * The error replaces the hint rather than stacking under it: two lines of
  * small print under a red border is noise, and the error is the only one of
  * the two that is still worth reading at that point.
+ *
+ * THE HINT IS `text-white/50`, AND THAT IS A FLOOR, NOT A TASTE. At `/35` it
+ * measured 3.12:1 against this form's #0b0b0b — axe-core flagged every hint
+ * on /support/warranty-registration and /support/warranty-claim, the two
+ * pages this component renders. `/50` is 5.3:1, against the 4.5:1 WCAG AA
+ * asks of 12px body text. The label stays `/50` and keeps its `font-medium`,
+ * which is what separates the two now that the tones match. Do not dim
+ * either of them again.
  */
 function Field({ label, htmlFor, hint, error, errorId, children }) {
   return (
@@ -73,7 +81,7 @@ function Field({ label, htmlFor, hint, error, errorId, children }) {
           {error}
         </p>
       ) : (
-        hint && <p className="mt-1.5 text-xs text-white/35">{hint}</p>
+        hint && <p className="mt-1.5 text-xs text-white/50">{hint}</p>
       )}
     </div>
   );
@@ -439,7 +447,11 @@ export default function SupportForm({ kind = 'registration' }) {
         {busy ? mode.busyLabel : mode.submitLabel}
       </Magnetic>
 
-      <p className="mt-5 text-xs leading-relaxed text-white/35">
+      {/* `/50`, not `/35`: this paragraph and the link inside it are 12px,
+          and `/35` measured 3.12:1 against the form's #0b0b0b — under the
+          4.5:1 WCAG AA asks of body text, and flagged by axe-core on both
+          warranty pages. The link's hover stays `/60`. */}
+      <p className="mt-5 text-xs leading-relaxed text-white/50">
         We use these details only to handle your warranty. They are not used for advertising and
         are never sent to any advertising platform.{' '}
         <a

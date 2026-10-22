@@ -1,9 +1,9 @@
+import { Sun, MonitorPlay, Maximize2, RotateCw, Smartphone, Timer } from 'lucide-react';
 import Reveal from './Reveal';
 import { BRAND, THROW_RANGE } from '@/lib/iriz';
 
 /**
- * "Why IRIZ" — the long-form read, and the only section on the homepage that
- * is prose rather than pictures.
+ * "Why IRIZ" — the closing argument, as six cards over the long-form read.
  *
  * WHY IT EXISTS. Everything above it states the product in fragments: a
  * hero claim, six highlight tiles, a dial, a spec table, a comparison grid.
@@ -13,32 +13,101 @@ import { BRAND, THROW_RANGE } from '@/lib/iriz';
  * with no picture to read. Both need the connective tissue: not "500 ANSI
  * lumens" but what an ANSI lumen is and why the other number is bigger.
  *
- * WHERE IT SITS. After the comparison table and before the closing section
- * (the buy card or the launch-list signup). It is the closing argument —
- * last thing before the ask — and putting it any higher would make a reader
- * scroll through 800 words to reach the product photography.
+ * WHY IT IS CARDS NOW. It used to be the prose alone — seven headings and
+ * fourteen paragraphs in a two-column read. The argument was good and
+ * almost nobody reached it, because it arrived as eight hundred words at
+ * the bottom of a page the reader had already been scrolling for a while.
+ * The cards are that same argument at a glance: one claim each, the number
+ * that backs it, and two lines of why. The prose is still here in full, one
+ * tap away, for the reader who wants it and the crawler that reads
+ * everything.
  *
- * HOW IT IS BUILT TO BE SKIMMED, which is the whole design problem with
- * 800 words on a page like this:
+ * THE DISCLOSURE IS A <details>, NOT A useState. It is server-rendered
+ * openable markup: the full text is in the HTML for SEO whether or not the
+ * bundle lands, the toggle works with JavaScript disabled, and the keyboard
+ * and screen-reader behaviour come for free. A React accordion would have
+ * been none of those three. No `open` attribute, so it is collapsed on
+ * arrival every time and the section still reads as cards.
  *
- *   - A sticky left rail at lg carries the heading and the lede, so the
- *     section's subject stays on screen while the prose scrolls past it. The
- *     rail collapses to the top on narrow screens, where sticky positioning
- *     in a short viewport would eat the reading area.
- *   - Each point is an h3 and two short paragraphs, never more. A reader who
- *     only reads the seven headings still gets the argument in order.
- *   - The prose column is capped at 680px, the same measure the policy pages
- *     use for continuous text.
- *   - Numbers come from THROW_RANGE in lib/iriz.js rather than being typed
- *     into the sentence, so the dial above and the prose here cannot ever
- *     quote different distances.
- *
- * EVERY CLAIM HERE IS ALREADY IN lib/iriz.js — HERO, HIGHLIGHTS, SPECS,
- * FULL_SPEC_SHEET, FAQS, SETUP_STEPS and TROUBLESHOOTING. Nothing was
- * invented for this section, and nothing may be: it is the longest piece of
- * copy on the site and therefore the easiest place for an unsourced spec to
- * hide. If a fact is not in that file, it does not belong in this one.
+ * EVERY CLAIM HERE IS ALREADY IN lib/iriz.js OR IN `POINTS` BELOW — HERO,
+ * HIGHLIGHTS, SPECS, FULL_SPEC_SHEET, FAQS, SETUP_STEPS and TROUBLESHOOTING.
+ * Nothing was invented for this section, and nothing may be: it is the
+ * longest piece of copy on the site and therefore the easiest place for an
+ * unsourced spec to hide. Each card's `from` key names the POINT it
+ * summarises, so a card and its paragraph cannot drift apart unnoticed.
  */
+
+/**
+ * The six cards. Every number is read from lib/iriz.js or lifted from the
+ * `POINTS` entry named in `from` — none is typed fresh here.
+ *
+ * Six, from seven points: "A projector sized for the room you actually
+ * have" has no number of its own. It is the premise the section lede
+ * already states, so it stays in the prose rather than becoming a card with
+ * an empty stat line.
+ */
+const CARDS = [
+  {
+    from: 'True 500 ANSI lumens, measured the honest way',
+    icon: Sun,
+    stat: '500',
+    unit: 'true ANSI lumens',
+    heading: 'Brightness measured on the wall',
+    body:
+      'ANSI averages nine points of the projected image. "LED lumens" is measured at the bulb, '
+      + 'which is how a dimmer projector prints a bigger number on its box.',
+  },
+  {
+    from: 'Native 1080p — and what "native" is doing in that sentence',
+    icon: MonitorPlay,
+    stat: '1080p',
+    unit: 'native 1920 × 1080',
+    heading: 'A real pixel for every pixel',
+    body:
+      'A 3.5-inch LTPS LCD panel, so every pixel of a 1080p source has a physical pixel of its '
+      + 'own to land on. That is what keeps text legible at projector sizes.',
+  },
+  {
+    from: 'Screen size is just a question of where you put it',
+    icon: Maximize2,
+    stat: `${THROW_RANGE.min.size}–${THROW_RANGE.max.size}"`,
+    unit: `at ${THROW_RANGE.min.distance}–${THROW_RANGE.max.distance} m`,
+    heading: 'The room is the dial',
+    body:
+      'A 1:1 throw ratio. Pull the unit back along the table for a bigger picture, push it '
+      + 'forward for a brighter, tighter one — no lens swap, no calculator.',
+  },
+  {
+    from: 'Bedrooms, ceilings and awkward angles',
+    icon: RotateCw,
+    stat: '0–180°',
+    unit: 'stepless stand',
+    heading: 'Wall, or straight up at the ceiling',
+    body:
+      'Automatic keystone correction squares the image in hardware, and re-squares it once the '
+      + 'projector settles after you move it to another room.',
+  },
+  {
+    from: 'Everything you watch, already on it',
+    icon: Smartphone,
+    stat: 'Android 14',
+    unit: 'remote in the box',
+    heading: 'The apps are already on it',
+    body:
+      'They install onto the projector itself over Wi-Fi. No stick to buy, no second remote, and '
+      + 'no HDMI input occupied before you start.',
+  },
+  {
+    from: 'Set up in about five minutes',
+    icon: Timer,
+    stat: '~5 min',
+    unit: 'box to picture',
+    heading: 'Put it down, plug it in',
+    body:
+      'Android 14 walks you through joining Wi-Fi while the auto keystone squares the picture. '
+      + 'That is setup finished.',
+  },
+];
 
 const POINTS = [
   {
@@ -103,60 +172,112 @@ export default function WhyIriz() {
       className="scroll-mt-20 border-b border-border-subtle bg-black-soft py-20"
     >
       <div className="section-container">
-        {/* Column widths are chosen to USE the container rather than to look
-            tidy in isolation. A 22rem rail beside a 640px measure left about
-            250px of empty black against the right edge at 1440 — which reads
-            as a layout that failed to fill, not as whitespace. A wider rail
-            (26rem), a wider gap and the site's own 680px prose measure close
-            that to an ordinary margin, and all three still collapse to one
-            column below lg. */}
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-24">
-          {/* THE RAIL. `self-start` is what makes `sticky` work inside a grid
-              — a stretched grid item is already as tall as the row, so it has
-              no room to stick within. Sticky only above lg: in a phone
-              viewport this block is most of the screen, and pinning it would
-              leave a sliver to read the prose through. */}
-          <Reveal className="lg:sticky lg:top-28 lg:self-start">
-            <p className="eyebrow mb-3">Why {BRAND.model}</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
-              The case for it, in plain terms.
-            </h2>
-            <p className="mt-5 text-sm leading-relaxed text-white/55 sm:text-base">
-              Projector specifications are unusually easy to inflate, and the two numbers that
-              matter most — brightness and resolution — are the two most often quoted from the
-              wrong measurement. Here is what the {BRAND.fullName} is, how it behaves in a real
-              room, and which numbers to check on anything you compare it against.
-            </p>
-          </Reveal>
+        <Reveal className="max-w-2xl">
+          <p className="eyebrow mb-3">Why {BRAND.model}</p>
+          <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+            The case for it, in plain terms.
+          </h2>
+          <p className="mt-5 text-sm leading-relaxed text-white/55 sm:text-base">
+            Projector specifications are unusually easy to inflate, and the two numbers that
+            matter most — brightness and resolution — are the two most often quoted from the
+            wrong measurement. Here is what the {BRAND.fullName} is, how it behaves in a real
+            room, and which numbers to check on anything you compare it against.
+          </p>
+        </Reveal>
 
-          {/* THE PROSE. `max-w-[680px]` is the measure the policy pages use
-              for continuous text — 65-75 characters at this size — and
-              `gap-10` between points so each heading has air above it and
-              reads as an entry point rather than a paragraph break. */}
-          <div className="flex max-w-[680px] flex-col gap-10">
-            {POINTS.map((point, i) => (
+        {/* THE CARDS. One column, two at sm, three at lg.
+            `items-stretch` is the grid default, and `h-full` on BOTH the
+            Reveal wrapper and the card inside it is what makes that bite: a
+            grid item stretches to its row, but nothing inside it inherits
+            that height unless told to, which is the usual reason a row of
+            cards comes out ragged. The card is then a flex column, so its
+            own content can distribute inside the matched height. */}
+        <ul className="mt-12 grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+          {CARDS.map((card, i) => {
+            const Icon = card.icon;
+            return (
               <Reveal
-                key={point.heading}
-                // Capped: a stagger that keeps growing down a seven-item list
+                key={card.heading}
+                as="li"
+                y={20}
+                // Capped: a stagger that keeps growing down a six-card grid
                 // leaves the last one arriving half a second late.
                 delay={Math.min(i, 3) * 0.05}
-                y={20}
+                className="h-full"
               >
-                <h3 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
-                  {point.heading}
-                </h3>
-                {point.body.map((paragraph) => (
-                  <p
-                    key={paragraph.slice(0, 48)}
-                    className="mt-3 text-sm leading-relaxed text-white/60 sm:text-[15px]"
+                <article className="bento-tile flex h-full flex-col p-6 sm:p-7">
+                  <span
+                    className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft"
+                    aria-hidden="true"
                   >
-                    {paragraph}
+                    <Icon className="h-[18px] w-[18px]" />
+                  </span>
+
+                  {/* `whitespace-nowrap` on the stat, `flex-wrap` on the row.
+                      Together they mean a long stat keeps its own line and
+                      pushes the UNIT down instead of breaking itself in half:
+                      "Android 14" was wrapping to "Android" over "14", which
+                      doubled that one card's stat block and made its whole
+                      row taller than the one above. */}
+                  <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                    <span className="stat-number stat-number-sm whitespace-nowrap">{card.stat}</span>
+                    <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/55">
+                      {card.unit}
+                    </span>
                   </p>
-                ))}
+
+                  <h3 className="mt-4 text-base font-semibold tracking-tight text-white">
+                    {card.heading}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/60">{card.body}</p>
+                </article>
               </Reveal>
-            ))}
-          </div>
-        </div>
+            );
+          })}
+        </ul>
+
+        {/* THE FULL READ. A native <details>: the prose is in the server
+            HTML for a crawler, the toggle works with no JavaScript, and the
+            keyboard and screen-reader behaviour come for free.
+
+            `group-open:rotate-45` turns the plus into a cross, and
+            `motion-reduce:transition-none` drops the tween rather than the
+            state — reduced motion still gets the affordance, without the
+            movement. `[&::-webkit-details-marker]:hidden` plus
+            `list-none` removes the native triangle in both engines. */}
+        <Reveal y={20} delay={0.2} className="mt-10">
+          <details className="group glass-panel overflow-hidden">
+            <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-6 px-6 py-5 text-left text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-soft sm:px-8 [&::-webkit-details-marker]:hidden">
+              Read the full story
+              <span
+                aria-hidden="true"
+                className="shrink-0 text-xl text-white/40 transition-transform duration-300 group-open:rotate-45 motion-reduce:transition-none"
+              >
+                +
+              </span>
+            </summary>
+
+            {/* The 680px measure the policy pages use for continuous text —
+                65-75 characters at this size. */}
+            <div className="flex max-w-[680px] flex-col gap-10 px-6 pb-8 sm:px-8">
+              {POINTS.map((point) => (
+                <div key={point.heading}>
+                  <h3 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
+                    {point.heading}
+                  </h3>
+                  {point.body.map((paragraph) => (
+                    <p
+                      key={paragraph.slice(0, 48)}
+                      className="mt-3 text-sm leading-relaxed text-white/60 sm:text-[15px]"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </details>
+        </Reveal>
       </div>
     </section>
   );
