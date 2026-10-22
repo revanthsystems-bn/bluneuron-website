@@ -126,9 +126,25 @@ export default function ProductPage() {
       <section className="border-b border-border-subtle bg-black pb-16 pt-10 sm:pt-14">
         <div className="section-container">
           {/* A breadcrumb, not a back button: it states where this page sits
-              rather than assuming where the visitor came from. */}
-          <nav aria-label="Breadcrumb" className="mb-5 text-xs text-white/55 sm:mb-8">
-            <a href={ROUTES.shop} className="transition-colors hover:text-white/70">
+              rather than assuming where the visitor came from.
+
+              THE "Shop" LINK IS A 44px TARGET THAT DOES NOT LOOK LIKE ONE.
+              As 11px text it measured 27x16 — under the 44x44 that WCAG 2.2
+              asks of a target, and a genuinely awkward tap on a phone. The
+              link now carries `min-h-[44px] min-w-[44px]` with `-mx-2.5
+              px-2.5`, so the box it is measured and tapped by is 47x44 while
+              the glyphs stay exactly where they were: the negative margin
+              gives back the horizontal padding, and the `-mt-3.5` / reduced
+              `mb` on the nav gives back the 28px of height. Change the
+              padding and the margin together or the breadcrumb moves. */}
+          <nav
+            aria-label="Breadcrumb"
+            className="-mt-3.5 mb-1.5 flex items-center text-xs text-white/55 sm:mb-[18px]"
+          >
+            <a
+              href={ROUTES.shop}
+              className="-mx-2.5 inline-flex min-h-[44px] min-w-[44px] items-center justify-center px-2.5 transition-colors hover:text-white/70"
+            >
               Shop
             </a>
             <span className="px-2" aria-hidden="true">

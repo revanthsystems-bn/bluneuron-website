@@ -48,6 +48,14 @@ export const INVALID_CLASS = 'border-red-400/60';
  * The error REPLACES the hint rather than stacking under it: two lines of
  * small print under a red border is noise, and the error is the only one of
  * the two still worth reading at that point.
+ *
+ * THE HINT IS `text-white/50`, AND THAT IS A FLOOR, NOT A TASTE. It was
+ * `/35`, which is 3.1:1 on this background — axe-core flagged every hint on
+ * /support/warranty-registration and /support/warranty-claim. `/50` measures
+ * 5.2:1 at the darkest card background used here, against the 4.5:1 that
+ * WCAG AA asks of body text. The label stays `/50` too and keeps its
+ * `font-medium`, which is what separates the two now that the tones match.
+ * Do not dim either of them again.
  */
 export function Field({ label, htmlFor, hint, error, errorId, children }) {
   return (
@@ -64,7 +72,7 @@ export function Field({ label, htmlFor, hint, error, errorId, children }) {
           {error}
         </p>
       ) : (
-        hint && <p className="mt-1.5 text-xs text-white/35">{hint}</p>
+        hint && <p className="mt-1.5 text-xs text-white/50">{hint}</p>
       )}
     </div>
   );

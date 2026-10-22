@@ -318,7 +318,7 @@ export default function ClaimForm() {
           {!errors.description && (
             <p
               className={`mt-1.5 text-xs ${
-                described >= CLAIM_DESCRIPTION_MIN ? 'text-white/35' : 'text-white/55'
+                described >= CLAIM_DESCRIPTION_MIN ? 'text-white/50' : 'text-white/55'
               }`}
               aria-live="polite"
             >
@@ -363,7 +363,7 @@ export default function ClaimForm() {
         {busy ? 'Submitting…' : 'Submit claim'}
       </Magnetic>
 
-      <p className="mt-5 text-xs leading-relaxed text-white/35">
+      <p className="mt-5 text-xs leading-relaxed text-white/50">
         We use these details only to handle your claim. They are not used for advertising and are
         never sent to any advertising platform. Trouble submitting? Email{' '}
         <a

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { readJsonBody } from '@/lib/request-body';
 import { isValidEmail, normalizePhone } from '@/lib/web3forms';
 import {
   SUPPORT_PURCHASE_SOURCES,
@@ -20,6 +21,11 @@ import {
  * honeypot, the field-by-field revalidation, the Apps Script URL allow-list
  * and the Asia/Kolkata date check. Those are the parts that matter, and they
  * are host-independent.
+ *
+ * The body cap is now counted off the request stream rather than read off
+ * the `content-length` header, which a chunked request need not send — see
+ * lib/request-body.js for why that distinction is the difference between a
+ * cap and a suggestion.
  */
 
 const MAX_REQUEST_BYTES = 10 * 1024;
@@ -91,17 +97,17 @@ function getAppsScriptUrl(value) {
 }
 
 export async function POST(request) {
-  const contentLength = Number(request.headers.get('content-length'));
-  if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BYTES) {
-    return errorResponse('The registration form is too large.', 413);
+  // The cap is enforced WHILE the body is read, not from `content-length` —
+  // that header is optional, and a chunked request without one used to walk
+  // straight past the check into an unbounded `request.json()`. See
+  // lib/request-body.js.
+  const read = await readJsonBody(request, MAX_REQUEST_BYTES);
+  if (!read.ok) {
+    return read.status === 413
+      ? errorResponse('The registration form is too large.', 413)
+      : errorResponse('Invalid registration data.', 400);
   }
-
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return errorResponse('Invalid registration data.', 400);
-  }
+  const body = read.value;
 
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return errorResponse('Invalid registration data.', 400);

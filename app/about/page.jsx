@@ -231,7 +231,7 @@ export default function AboutPage() {
             <p className="text-sm font-semibold text-white/70">
               Photograph of the team and the Coimbatore office goes here
             </p>
-            <p className="mt-2 max-w-md text-xs leading-relaxed text-white/40">
+            <p className="mt-2 max-w-md text-xs leading-relaxed text-white/50">
               Left empty on purpose. We would rather show nothing than a stock
               photograph of an office that is not ours.
             </p>

@@ -23,7 +23,7 @@ import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
  * The budget is Google's ~580px of rendered title width, which is roughly 60-65
  * characters; past it the tail is truncated in the result, and the tail is where
  * the brand name sits. "Native" is the word that was cut to make room — the
- * distinction it draws (true 1080p DISPLAY vs. the H723's 4K DECODING, see
+ * distinction it draws (true 1080p DISPLAY vs. the H723's 8K DECODING, see
  * lib/iriz.js) still appears in the description, the og:title and the hero h1,
  * none of which are width-constrained.
  */

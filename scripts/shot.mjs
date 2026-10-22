@@ -1,10 +1,14 @@
 /**
  * Screenshot helper for this branch's UI work.
  *
- *   node shot.mjs <url> <selector|-> <name> <WxH> [WxH ...]
+ *   node scripts/shot.mjs <url> <selector|-> <name> <WxH> [WxH ...]
  *
  * `-` as the selector captures the whole page; anything else captures that
  * element.
+ *
+ * RUN IT FROM THE REPO ROOT. The output path below is relative to the
+ * working directory, not to this file, so `cd scripts && node shot.mjs`
+ * writes into `scripts/screenshots/` instead of the real one.
  *
  * TWO THINGS IT HAS TO DO THAT A NAIVE `fullPage: true` DOES NOT:
  *
