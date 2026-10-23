@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Inter_Tight, Zen_Dots } from 'next/font/google';
+import { Inter, Inter_Tight, Zen_Dots } from 'next/font/google';
 import { MotionConfig } from 'framer-motion';
 import './globals.css';
 import SmoothScroll from '@/components/SmoothScroll';
@@ -15,6 +15,51 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL } from '@/lib/site';
 import { ANIM_GATE } from '@/lib/anim-gate';
 import { Analytics } from '@vercel/analytics/next';
+
+/**
+ * THE BODY FACE, AND IT WAS MISSING FOR THE WHOLE SITE UNTIL NOW.
+ *
+ * `--font-sans` in app/globals.css has always read `'Inter', system-ui, ...`
+ * and nothing ever loaded Inter. Measured in the browser on the previous
+ * commit: `document.fonts` held seven `Inter Tight` faces and two `Zen Dots`
+ * ones and NO `Inter` face at all, and a canvas measurement of
+ * "Handgloves 1080p WMW" at 40px came back 422.148px in `Inter` and the
+ * identical 422.148px in a family that does not exist — against 450.996px in
+ * Segoe UI. Identical to a bogus family is the proof: every visitor was
+ * reading the browser's default, not Inter, and on Windows that default has a
+ * deeper descender than Inter, which is why the "p" in a big "1080p" sat
+ * outside its own line box (36px line box, 42px of ink).
+ *
+ * `variable` rather than `className`, so the existing `--font-sans` stack
+ * picks it up and NOTHING else in the codebase has to change: every
+ * `font-sans` utility, `.type-*` class and bare `font-family` inherits it
+ * through that one custom property.
+ *
+ * WEIGHTS ARE LISTED EXPLICITLY — 400/500/600/700/800 — rather than taking
+ * the variable axis. Those are the five the site actually sets (`font-medium`
+ * through `font-extrabold`, plus `.stat-number`'s 800), and naming them keeps
+ * the request to five static latin woff2 files instead of the full 100-900
+ * axis. Inter's remaining weights are unused; a weight the site does not set
+ * cannot render.
+ *
+ * `adjustFontFallback` is left at its default (true), which is what keeps
+ * this from shifting the layout: next/font emits an `Inter Fallback`
+ * @font-face with `size-adjust`, `ascent-override` and `descent-override`
+ * computed from Inter's own metrics, so the system face shown during `swap`
+ * occupies the same box as the real one. Do not add a `fallback: [...]`
+ * array — it suppresses that face, exactly as the Zen Dots note below says.
+ *
+ * Self-hosted at build time: the woff2 files are emitted into
+ * `/_next/static/media/` and the browser makes no request to Google. The CSP
+ * in next.config.js already allows them — `font-src 'self' data:` — and no
+ * header needed changing for this.
+ */
+const inter = Inter({
+  weight: ['400', '500', '600', '700', '800'],
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 /**
  * The hero display face. Inter Tight rather than the `--font-sans` stack.
@@ -112,7 +157,7 @@ export default function RootLayout({ children }) {
      */
     <html
       lang="en"
-      className={`dark ${interTight.variable} ${zenDots.variable}`}
+      className={`dark ${inter.variable} ${interTight.variable} ${zenDots.variable}`}
       suppressHydrationWarning
     >
       <head>

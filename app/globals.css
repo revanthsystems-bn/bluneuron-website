@@ -4,7 +4,25 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    /*
+     * THE BODY STACK. `--font-inter` is set on <html> by next/font in
+     * app/layout.jsx and resolves to the self-hosted family PLUS its
+     * size-adjusted `Inter Fallback` — so both the real face and the
+     * metric-matched substitute shown during `swap` come from this one var.
+     *
+     * The bare `'Inter'` after it is NOT redundant and is not the old bug
+     * either. It is the locally-installed-Inter case: a designer with Inter
+     * on the machine, or a build where the var is somehow absent. Everything
+     * from `system-ui` on is the same stack this line has always ended with.
+     *
+     * UNTIL 2026-10-24 THIS LINE WAS `'Inter', system-ui, ...` AND NOTHING
+     * LOADED INTER, so every visitor read the browser's default face. See the
+     * measurement in app/layout.jsx — `Inter` metered identical to a family
+     * that does not exist. If this var ever stops resolving, that silent
+     * fallback is what comes back; it does not look like a bug, it looks like
+     * slightly wrong typography.
+     */
+    --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   html {
@@ -871,6 +889,168 @@
 
   @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
     .stat-number {
+      -webkit-text-fill-color: #ffffff;
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * WHY IRIZ — the projector "light beam" (components/WhyIriz).
+   *
+   * Two absolutely-positioned, aria-hidden, pointer-events-none layers
+   * behind the section header: a small bright lens, and the wide wash of
+   * light it throws. Pure CSS — no image, nothing to load, nothing to
+   * decode, and it costs the Worker bundle nothing.
+   *
+   * WHY IT LIVES HERE AND NOT IN A `style={{}}` PROP. The beam changes
+   * width at 700px, and an inline style cannot carry a media query. The
+   * alternative was two stacked divs with Tailwind arbitrary values, which
+   * is the same CSS written twice and harder to read than this.
+   *
+   * ---------------------------------------------------------------------
+   * THE GRADIENT ORIGIN IS AT `50% 0%`, AND THAT IS THE FIX FOR THE FAINT
+   * BEAM IN THE MOCKUP.
+   * ---------------------------------------------------------------------
+   * The mockup centred a large soft circle on the section's top EDGE, so
+   * the brightest half of it was above the section and `overflow: hidden`
+   * threw it away — what reached the page was the dim outer skirt, and it
+   * read as a smudge rather than a beam. Anchoring the gradient's origin at
+   * the top of the box instead puts the full-strength stop ON the first
+   * visible row of pixels: nothing is cut off, and the same 0.35 alpha the
+   * brief asked for is actually seen.
+   *
+   * ---------------------------------------------------------------------
+   * THE STOPS ARE SET BY CONTRAST, NOT BY EYE. MEASURED, NOT ASSUMED.
+   * ---------------------------------------------------------------------
+   * The beam sits behind three pieces of text, and the one at risk is the
+   * eyebrow — 12px, #5b9dff, and the closest line to the bright origin.
+   * Composited over `bg-black-soft` (#0A0A0A) the beam's own alpha decides
+   * whether it passes WCAG AA (4.5:1 — 12px bold is NOT "large text", which
+   * starts at 14pt/18.66px bold, so 3:1 is not available here):
+   *
+   *   alpha   beam colour   #5b9dff on it   #9aa0a9 on it
+   *   0.20    #1a2740        5.50:1          5.86:1
+   *   0.25    #1e2f47        4.97:1          5.14:1
+   *   0.30    #22364e        4.47:1  FAIL    4.60:1
+   *   0.35    #263d60        4.13:1  FAIL    4.16:1  FAIL
+   *
+   * So 0.35 is safe only where no text sits, and the eyebrow has to land in
+   * the ≤0.25 band. The 38%/62% stops below are what put it there. MEASURED
+   * on the built site, by hiding the three lines, screenshotting, and
+   * reading the painted pixel at each line's own centre:
+   *
+   *   width   eyebrow pixel   ratio    h2 pixel   ratio    lede pixel  ratio
+   *   1440    #172131         5.94     #0d1014    19.07    #0a0a0a     7.52
+   *   1024    #172231         5.89     #0f131a    18.61    #0a0a0a     7.52
+   *    768    #172231         5.89     #10151d    18.31    #0a0a0a     7.52
+   *    390    #192537         5.67     #10141b    18.45    #0a0a0a     7.52
+   *    360    #192537         5.67     #0f141b    18.48    #0a0a0a     7.52
+   *
+   * Every line clears its threshold (4.5:1 for the 12px eyebrow and the
+   * 18px lede, 3:1 for the h2 which is large text) with the eyebrow the
+   * tightest at 5.67:1. The lede sits on untinted #0a0a0a at every width —
+   * the beam has already faded out by its depth.
+   *
+   * Re-measure if you touch a stop, a width, or this section's top padding:
+   * moving the text up the page is the same change as turning the beam up.
+   *
+   * NO ANIMATION, which the brief allows ("no animation, or a very slow
+   * fade-in only"). A static beam needs no `prefers-reduced-motion` branch,
+   * cannot be caught mid-tween by a screenshot, and the header above it is
+   * already inside a Reveal — a second fade on the backdrop would read as
+   * the page settling twice.
+   * ================================================================ */
+  .beam-wash {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 600px;
+    height: 700px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 0%,
+      rgba(91, 157, 255, 0.35) 0%,
+      rgba(91, 157, 255, 0.14) 38%,
+      rgba(91, 157, 255, 0.04) 62%,
+      rgba(91, 157, 255, 0) 78%
+    );
+  }
+
+  /* The brief's desktop width. Below 700px the beam is the 600px above, so
+     it never reaches past a phone's viewport and never widens the document
+     — the section's `overflow-hidden` is the belt, this is the braces. */
+  @media (min-width: 700px) {
+    .beam-wash {
+      width: 1100px;
+    }
+  }
+
+  /*
+   * THE LENS. 120x16 with a 5px blur, which puts its halo ~5px outside the
+   * box on every side — so it is offset 5px DOWN rather than sitting on
+   * `top: 0`. At `top: 0` the section's `overflow-hidden` shaves the halo
+   * flat and the glow stops reading as a round lens and starts reading as a
+   * clipped rectangle. 5px is the blur radius, which is the smallest offset
+   * that keeps the whole halo inside.
+   */
+  .beam-lens {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    width: 120px;
+    height: 16px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(5px);
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      #cfe1ff 0%,
+      #5b9dff 55%,
+      rgba(91, 157, 255, 0) 100%
+    );
+  }
+
+  /*
+   * The card figure. A SEPARATE class from `.stat-number`, not a size
+   * variant of it: the brief's fill is a two-stop white -> #7d8796 and
+   * `.stat-number` is a five-stop ramp ending at #58606f, so overriding it
+   * would have meant re-declaring the whole `background-image` anyway.
+   *
+   * `line-height: 1.16` IS LOAD-BEARING AND IS NOT A GUESS. `.stat-number`
+   * runs 0.92, which is tighter than Inter's own content box (ascent 0.969em
+   * + descent 0.241em = 1.210em) — the half-leading goes negative and the
+   * glyphs hang out of their line box top and bottom. For "500" that is
+   * invisible; for "1080p" the "p" descends ~0.212em past the baseline and
+   * lands outside the box, which is exactly the clipped descender this
+   * branch is fixing. Containing it needs
+   *
+   *   0.969 + (L - 1.210)/2 + 0.212 <= L   ->   L >= 1.152
+   *
+   * and 1.16 is that bound with a rounding margin. Measured after the fact:
+   * scrollHeight === clientHeight on all six cards, "1080p" included.
+   *
+   * The `@supports` fallback is not optional. `-webkit-text-fill-color:
+   * transparent` with no working `background-clip: text` is invisible text,
+   * so an engine that lacks the clip gets a flat white fill instead. Same
+   * guard as `.stat-number` above, for the same reason.
+   */
+  .beam-stat {
+    color: #ffffff;
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.16;
+    background-image: linear-gradient(180deg, #ffffff 0%, #7d8796 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .beam-stat {
       -webkit-text-fill-color: #ffffff;
     }
   }

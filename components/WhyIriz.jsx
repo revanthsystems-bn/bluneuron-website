@@ -1,9 +1,9 @@
-import { Sun, MonitorPlay, Maximize2, RotateCw, Smartphone, Timer } from 'lucide-react';
 import Reveal from './Reveal';
 import { BRAND, THROW_RANGE } from '@/lib/iriz';
 
 /**
- * "Why IRIZ" — the closing argument, as six cards over the long-form read.
+ * "Why IRIZ" — design L, "light beam": a centred header standing in a soft
+ * projector beam, over six glass cards.
  *
  * WHY IT EXISTS. Everything above it states the product in fragments: a
  * hero claim, six highlight tiles, a dial, a spec table, a comparison grid.
@@ -13,99 +13,101 @@ import { BRAND, THROW_RANGE } from '@/lib/iriz';
  * with no picture to read. Both need the connective tissue: not "500 ANSI
  * lumens" but what an ANSI lumen is and why the other number is bigger.
  *
- * WHY IT IS CARDS NOW. It used to be the prose alone — seven headings and
- * fourteen paragraphs in a two-column read. The argument was good and
- * almost nobody reached it, because it arrived as eight hundred words at
- * the bottom of a page the reader had already been scrolling for a while.
- * The cards are that same argument at a glance: one claim each, the number
- * that backs it, and two lines of why. The prose is still here in full, one
- * tap away, for the reader who wants it and the crawler that reads
- * everything.
+ * WHAT REPLACED WHAT. This was the Option-F light banner (a photograph of
+ * the product on a #eeeff1 card) over six #121317 cards. Both are gone, and
+ * with them the only photograph in this section — `why-iriz-banner.jpg` is
+ * deleted in the same commit, because this component was its only consumer
+ * and an unreferenced 147 KB asset still ships to the edge. The argument
+ * the banner carried is unchanged: it is the same H2 and the same standfirst,
+ * set centred instead of beside a photo.
+ *
+ * THE BEAM IS CSS IN app/globals.css (`.beam-lens`, `.beam-wash`), not an
+ * image and not an inline style. Read the long note over those two classes
+ * before changing a colour, a stop, or this section's top padding — the
+ * stops are set by the measured contrast ratio of the eyebrow against the
+ * beam, so moving the text nearer the lens is the same change as turning
+ * the beam up.
  *
  * THE DISCLOSURE IS A <details>, NOT A useState. It is server-rendered
  * openable markup: the full text is in the HTML for SEO whether or not the
  * bundle lands, the toggle works with JavaScript disabled, and the keyboard
  * and screen-reader behaviour come for free. A React accordion would have
  * been none of those three. No `open` attribute, so it is collapsed on
- * arrival every time and the section still reads as cards.
+ * arrival every time.
  *
  * EVERY CLAIM HERE IS ALREADY IN lib/iriz.js OR IN `POINTS` BELOW — HERO,
  * HIGHLIGHTS, SPECS, FULL_SPEC_SHEET, FAQS, SETUP_STEPS and TROUBLESHOOTING.
  * Nothing was invented for this section, and nothing may be: it is the
  * longest piece of copy on the site and therefore the easiest place for an
- * unsourced spec to hide. Each card's `from` key names the POINT it
- * summarises, so a card and its paragraph cannot drift apart unnoticed.
+ * unsourced spec to hide. Each card below names the row it came from.
+ *
+ * AUTO FOCUS IS NOT CLAIMED HERE, AND THAT IS A DECISION, NOT AN OMISSION.
+ * Card 5 is the keystone alone. dc45c7a removed auto-focus from this site
+ * everywhere — copy, specs, compare table, FAQ, meta, JSON-LD and alt text
+ * — because the carton prints "4pt Auto Keystone" and names no focus
+ * behaviour. FULL_SPEC_SHEET has no focus row, HIGHLIGHTS says "4-point
+ * Auto Keystone", COMPARISON's row is "Keystone Correction". Two mentions
+ * survive that cleanup by accident (components/TechSpecs alt text, and
+ * SETUP_STEPS in lib/iriz.js) and they are leftovers, not licence. Do not
+ * put focus back without the box in your hand.
  */
 
 /**
- * The six cards. Every number is read from lib/iriz.js or lifted from the
- * `POINTS` entry named in `from` — none is typed fresh here.
+ * The six cards. `stat` + `unit` is one figure split across two lines, so
+ * the pair is read aloud as one thing or not at all — see the aria note at
+ * the render site.
  *
- * Six, from seven points: "A projector sized for the room you actually
- * have" has no number of its own. It is the premise the section lede
- * already states, so it stays in the prose rather than becoming a card with
- * an empty stat line.
+ * `source` is not rendered. It is the FULL_SPEC_SHEET group and row each
+ * figure was taken from, written down so the next person can check a number
+ * without searching for it. All six were re-checked against the sheet when
+ * this layout was built; none changed.
  */
 const CARDS = [
   {
-    from: 'True 500 ANSI lumens, measured the honest way',
-    icon: Sun,
     stat: '500',
-    unit: 'true ANSI lumens',
-    heading: 'Brightness measured on the wall',
-    body:
-      'ANSI averages nine points of the projected image. "LED lumens" is measured at the bulb, '
-      + 'which is how a dimmer projector prints a bigger number on its box.',
+    unit: 'ANSI lumens',
+    title: 'Brightness you can see',
+    body: 'Measured on the wall, not at the bulb.',
+    source: 'Optics & Display > Brightness: "True 500 ANSI Lumens"',
   },
   {
-    from: 'Native 1080p — and what "native" is doing in that sentence',
-    icon: MonitorPlay,
     stat: '1080p',
-    unit: 'native 1920 × 1080',
-    heading: 'A real pixel for every pixel',
-    body:
-      'A 3.5-inch LTPS LCD panel, so every pixel of a 1080p source has a physical pixel of its '
-      + 'own to land on. That is what keeps text legible at projector sizes.',
+    unit: 'Native',
+    title: 'A real Full HD panel',
+    body: '1920 × 1080 — sharp and readable.',
+    source: 'Optics & Display > Native Resolution: "1080P (1920×1080)"',
   },
   {
-    from: 'Screen size is just a question of where you put it',
-    icon: Maximize2,
-    stat: `${THROW_RANGE.min.size}–${THROW_RANGE.max.size}"`,
-    unit: `at ${THROW_RANGE.min.distance}–${THROW_RANGE.max.distance} m`,
-    heading: 'The room is the dial',
-    body:
-      'A 1:1 throw ratio. Pull the unit back along the table for a bigger picture, push it '
-      + 'forward for a brighter, tighter one — no lens swap, no calculator.',
+    // Read from THROW_RANGE, not typed: the note over it in lib/iriz.js lists
+    // five places the screen-size range is written out and warns they must
+    // agree. This is a sixth consumer, not a sixth copy.
+    stat: `${THROW_RANGE.max.size}″`,
+    unit: '1:1 throw',
+    title: `${THROW_RANGE.min.size} to ${THROW_RANGE.max.size} inches`,
+    body: 'Step back for a bigger picture.',
+    source: 'Throw & Screen > Screen Size Range + Throw Ratio',
   },
   {
-    from: 'Bedrooms, ceilings and awkward angles',
-    icon: RotateCw,
-    stat: '0–180°',
-    unit: 'stepless stand',
-    heading: 'Wall, or straight up at the ceiling',
-    body:
-      'Automatic keystone correction squares the image in hardware, and re-squares it once the '
-      + 'projector settles after you move it to another room.',
+    stat: '180°',
+    unit: 'Stand',
+    title: 'Wall or ceiling',
+    body: 'Watch on the ceiling from bed.',
+    source: 'Throw & Screen > Angle Adjustment: "Stepless, 0°–180°"',
   },
   {
-    from: 'Everything you watch, already on it',
-    icon: Smartphone,
-    stat: 'Android 14',
-    unit: 'remote in the box',
-    heading: 'The apps are already on it',
-    body:
-      'They install onto the projector itself over Wi-Fi. No stick to buy, no second remote, and '
-      + 'no HDMI input occupied before you start.',
+    // KEYSTONE ONLY — see the auto-focus note in the file header.
+    stat: '4-pt',
+    unit: 'Auto keystone',
+    title: 'Squares itself',
+    body: 'Straight picture at any angle.',
+    source: 'Optics & Display > Keystone Correction: "4-point automatic"',
   },
   {
-    from: 'Set up in about five minutes',
-    icon: Timer,
-    stat: '~5 min',
-    unit: 'box to picture',
-    heading: 'Put it down, plug it in',
-    body:
-      'Android 14 walks you through joining Wi-Fi while the auto keystone squares the picture. '
-      + 'That is setup finished.',
+    stat: '14',
+    unit: 'Android',
+    title: 'Apps built in',
+    body: 'No streaming stick needed.',
+    source: 'Platform > Operating System: "Android 14"',
   },
 ];
 
@@ -167,85 +169,193 @@ const POINTS = [
 
 export default function WhyIriz() {
   return (
+    /*
+     * `relative isolate overflow-hidden`, and all three are doing work:
+     *
+     *   relative   the two beam layers are positioned against this box, so
+     *              the gradient origin lands on the section's own top edge
+     *              rather than on whatever ancestor happened to be
+     *              positioned.
+     *   isolate    a fresh stacking context, so `z-0`/`z-10` below are
+     *              local to this section and cannot interleave with the
+     *              sticky buy bar or the header.
+     *   overflow-  the beam is 1100px wide and centred, so on any viewport
+     *   hidden     narrower than that it extends past both edges. Without
+     *              the clip the DOCUMENT grows and the whole site gains a
+     *              horizontal scrollbar — the one responsive defect that a
+     *              screenshot at the same width cannot show you. It is also
+     *              why `.beam-lens` is offset 5px down; see that class.
+     */
     <section
       id="why-iriz"
-      className="scroll-mt-20 border-b border-border-subtle bg-black-soft py-20"
+      className="relative isolate scroll-mt-20 overflow-hidden border-b border-border-subtle bg-black-soft pb-20 pt-24 min-[700px]:pt-28"
     >
-      <div className="section-container">
-        <Reveal className="max-w-2xl">
-          <p className="eyebrow mb-3">Why {BRAND.model}</p>
-          <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
-            The case for it, in plain terms.
+      {/* ==================================================================
+          A) THE BEAM. Two decorative layers, behind everything (`z-0`
+          against the header's `z-10`), `aria-hidden` and non-interactive:
+          a screen reader is told nothing, and a pointer passes straight
+          through to the text. Geometry and colour live in globals.css.
+          ================================================================== */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
+        <span className="beam-wash" />
+        <span className="beam-lens" />
+      </div>
+
+      {/*
+        NOT `.section-container`. That helper is `px-6` (24px) on a phone and
+        the brief specifies 16px of side padding for this section, which is
+        what `px-4` is. Everything from 700px up matches the helper exactly
+        (`px-10`, then `px-16` at lg) and the max width is the same
+        `max-w-container-xl`, so this section aligns with every other one on
+        the site at every width a desktop or tablet sees. The 8px difference
+        exists on phones only, and it is deliberate: these cards are a single
+        column there and the extra width is the point.
+      */}
+      <div className="relative z-10 mx-auto w-full max-w-container-xl px-4 min-[700px]:px-10 lg:px-16">
+        {/* ================================================================
+            B) THE CENTRED HEADER, standing in the beam.
+
+            `max-w-[820px]` is the brief's measure and it is also the reason
+            the beam reads as a beam: the text column is narrower than the
+            1100px wash, so the light is visible either side of it rather
+            than only behind it.
+            ================================================================ */}
+        <Reveal className="mx-auto max-w-[820px] text-center">
+          {/* `uppercase` rather than a typed "WHY IRIZ": the model name stays
+              sourced from BRAND, and the capitals are presentation. A screen
+              reader reads the DOM text, "Why IRIZ", not six shouted
+              letters. */}
+          <p
+            className="text-xs font-bold uppercase tracking-[0.24em]"
+            style={{ color: '#5b9dff' }}
+          >
+            Why {BRAND.model}
+          </p>
+
+          {/* The section's only H2. The six cards below are H3s under it, as
+              are the long-form headings inside the <details>. The page's
+              single H1 is the hero's.
+
+              clamp(36px, 4.5vw, 60px): the brief's 36px on a phone and 60px
+              on a desktop, with the vw term carrying the middle. 4.5vw hits
+              36px at 800px and 60px at 1333px, so a 390px phone and a 1440px
+              desktop both land exactly on the specified figure. */}
+          <h2
+            className="mt-5 font-bold text-white"
+            style={{
+              fontSize: 'clamp(2.25rem, 4.5vw, 3.75rem)',
+              letterSpacing: '-0.035em',
+              lineHeight: 1.06,
+            }}
+          >
+            Why {BRAND.model} is the 1080p home projector to buy
           </h2>
-          <p className="mt-5 text-sm leading-relaxed text-white/55 sm:text-base">
-            Projector specifications are unusually easy to inflate, and the two numbers that
-            matter most — brightness and resolution — are the two most often quoted from the
-            wrong measurement. Here is what the {BRAND.fullName} is, how it behaves in a real
-            room, and which numbers to check on anything you compare it against.
+
+          <p
+            className="mx-auto mt-6 max-w-[680px] text-[18px] leading-relaxed"
+            style={{ color: '#9aa0a9' }}
+          >
+            {BRAND.fullName} is a native 1080p Android smart projector made for Indian
+            homes — 500 ANSI lumens, up to {THROW_RANGE.max.size} inches, apps built in.
           </p>
         </Reveal>
 
-        {/* THE CARDS. One column, two at sm, three at lg.
+        {/* ================================================================
+            C) THE SIX CARDS.
+
+            A <ul>, because these are six peers with no order to them —
+            unlike the header's argument, they are interchangeable.
+
+            ONE COLUMN, THEN TWO, THEN THREE. The brief allows two columns on
+            a tablet "if 3 looks cramped", and it is: at 700px a three-up row
+            leaves (688 − 40 gap) / 3 = 216px per card, and 30px of padding
+            each side takes the text column to 156px — narrow enough that
+            "Brightness you can see" breaks over three lines and
+            "AUTO KEYSTONE" at 0.2em tracking runs to the edge. Two columns
+            give 300px, and three arrive at 1024px where they give 301px.
+
             `items-stretch` is the grid default, and `h-full` on BOTH the
-            Reveal wrapper and the card inside it is what makes that bite: a
-            grid item stretches to its row, but nothing inside it inherits
-            that height unless told to, which is the usual reason a row of
-            cards comes out ragged. The card is then a flex column, so its
-            own content can distribute inside the matched height. */}
-        <ul className="mt-12 grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-          {CARDS.map((card, i) => {
-            const Icon = card.icon;
-            return (
-              <Reveal
-                key={card.heading}
-                as="li"
-                y={20}
-                // Capped: a stagger that keeps growing down a six-card grid
-                // leaves the last one arriving half a second late.
-                delay={Math.min(i, 3) * 0.05}
-                className="h-full"
+            Reveal wrapper and the <article> inside it is what makes it bite:
+            a grid item stretches to its row, but nothing inside it inherits
+            that height unless told to — which is the usual reason a row of
+            cards comes out ragged.
+            ================================================================ */}
+        <ul className="mt-14 grid grid-cols-1 items-stretch gap-3 min-[700px]:grid-cols-2 min-[700px]:gap-5 lg:grid-cols-3">
+          {CARDS.map((card, i) => (
+            <Reveal
+              key={card.title}
+              as="li"
+              y={20}
+              // Capped: a stagger that keeps growing down a six-card grid
+              // leaves the last one arriving half a second late.
+              delay={Math.min(i, 3) * 0.05}
+              className="h-full"
+            >
+              <article
+                className="flex h-full flex-col rounded-[22px] p-[30px]"
+                style={{
+                  background:
+                    'linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01))',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                }}
               >
-                <article className="bento-tile flex h-full flex-col p-6 sm:p-7">
-                  <span
-                    className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-accent-soft"
-                    aria-hidden="true"
-                  >
-                    <Icon className="h-[18px] w-[18px]" />
-                  </span>
+                {/*
+                  THE FIGURE AND ITS UNIT ARE ONE THING, AND BOTH ARE
+                  `aria-hidden`.
 
-                  {/* `whitespace-nowrap` on the stat, `flex-wrap` on the row.
-                      Together they mean a long stat keeps its own line and
-                      pushes the UNIT down instead of breaking itself in half:
-                      "Android 14" was wrapping to "Android" over "14", which
-                      doubled that one card's stat block and made its whole
-                      row taller than the one above. */}
-                  <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-                    <span className="stat-number stat-number-sm whitespace-nowrap">{card.stat}</span>
-                    <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/55">
-                      {card.unit}
-                    </span>
-                  </p>
+                  "500" over "ANSI LUMENS" is the H3's own number set large.
+                  Left audible, a screen reader announces "500. ANSI lumens.
+                  Brightness you can see. Measured on the wall, not at the
+                  bulb." — the figure twice, once without its noun. Hidden,
+                  the card reads as its heading and its sentence, and the
+                  numbers are still in the server HTML for a crawler.
 
-                  <h3 className="mt-4 text-base font-semibold tracking-tight text-white">
-                    {card.heading}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">{card.body}</p>
-                </article>
-              </Reveal>
-            );
-          })}
+                  `whitespace-nowrap` on the figure so "1080p" never breaks
+                  in two, which is the one string here long enough to try.
+                */}
+                <p aria-hidden="true" className="beam-stat whitespace-nowrap">
+                  {card.stat}
+                </p>
+                <p
+                  aria-hidden="true"
+                  className="mt-2 text-[11px] font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: '#8fb8ff' }}
+                >
+                  {card.unit}
+                </p>
+
+                <h3 className="mt-6 text-[18px] font-semibold tracking-tight text-white">
+                  {card.title}
+                </h3>
+                <p className="mt-2 text-[15px] leading-relaxed" style={{ color: '#8d939c' }}>
+                  {card.body}
+                </p>
+              </article>
+            </Reveal>
+          ))}
         </ul>
 
         {/* THE FULL READ. A native <details>: the prose is in the server
             HTML for a crawler, the toggle works with no JavaScript, and the
             keyboard and screen-reader behaviour come for free.
 
+            IT SURVIVED THE REDESIGN ON PURPOSE, TWICE NOW. Option F replaced
+            the banner and the cards and left this alone; design L replaces
+            Option F and leaves it alone again. It is ~800 words of indexed
+            copy and the only long-form text on the homepage. Dropping it to
+            change a layout would be an SEO regression smuggled in behind a
+            visual change.
+
+            Its seven headings are H3s, the same level as the six cards', and
+            that is correct rather than tidy: they are siblings under this
+            section's one H2, not children of a card.
+
             `group-open:rotate-45` turns the plus into a cross, and
             `motion-reduce:transition-none` drops the tween rather than the
             state — reduced motion still gets the affordance, without the
-            movement. `[&::-webkit-details-marker]:hidden` plus
-            `list-none` removes the native triangle in both engines. */}
-        <Reveal y={20} delay={0.2} className="mt-10">
+            movement. `[&::-webkit-details-marker]:hidden` plus `list-none`
+            removes the native triangle in both engines. */}
+        <Reveal y={20} delay={0.2} className="mt-5">
           <details className="group glass-panel overflow-hidden">
             <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-6 px-6 py-5 text-left text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-soft sm:px-8 [&::-webkit-details-marker]:hidden">
               Read the full story
