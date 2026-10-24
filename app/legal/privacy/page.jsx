@@ -12,6 +12,7 @@ import {
   sellersOr,
   sellersVerb,
 } from '@/lib/site-config';
+import { CLUB } from '@/lib/club';
 
 /**
  * The privacy policy — the only legal page that does not go through
@@ -75,8 +76,27 @@ const CONTACT_EMAIL = SUPPORT.email;
  * two accuracy fixes above — and a "last updated" that moves on documents
  * whose text did not change is the one line on a policy page a reader uses to
  * decide whether to re-read it.
+ *
+ * ---------------------------------------------------------------------------
+ * 24 OCTOBER 2026: THE IRIZ CLUB.
+ * ---------------------------------------------------------------------------
+ * A third store of personal data now exists — `club_members` in Supabase,
+ * holding a first name, an email, an optional phone and city, the serial used
+ * to join, and a consent timestamp. It is declared in four sections above:
+ * what we collect, how we use it, how long we keep it, and your choices.
+ *
+ * IT IS NOT JOINED TO THE WARRANTY RECORDS, and the policy says so, because
+ * a customer asking us to "delete my data" is asking about one of three
+ * things. The inventory of all three is in the header of
+ * lib/warranty-registration.js; adding a fourth means editing both.
+ *
+ * The analytics paragraph under "How we use it" is new and is a commitment,
+ * not a description: no name, email, phone or serial reaches GA4 or the Meta
+ * Pixel, in an event, a URL or a page title. The Club's pages carry no
+ * identifier at all — membership is a signed cookie, never a query string —
+ * so there is nothing for a Referer header to leak either.
  */
-const PRIVACY_LAST_UPDATED = '22 October 2026';
+const PRIVACY_LAST_UPDATED = '24 October 2026';
 
 /**
  * The contents list, and the only place section headings are written.
@@ -292,6 +312,12 @@ export default function PrivacyPage() {
                   <strong className="font-semibold text-white">Contact form:</strong> your name,
                   your email address, and your message.
                 </li>
+                <li>
+                  <strong className="font-semibold text-white">The {CLUB.name}:</strong> your first
+                  name, your email address, the serial number of the unit you joined with, and your
+                  phone number and city if you choose to give them — both are optional and the form
+                  says so. We also record that you ticked the consent box, and when.
+                </li>
                 {ACCOUNTS_ENABLED && (
                   <li>
                     <strong className="font-semibold text-white">If you create an account:</strong>{' '}
@@ -343,10 +369,26 @@ export default function PrivacyPage() {
                     we already hold.
                   </li>
                 )}
+                <li>
+                  To run the {CLUB.name}: to confirm the serial number you entered is one of ours
+                  and has not already been used, to recognise you when you sign in on another
+                  device, and to contact you about the Club — which is what the consent box on the
+                  join form is for.
+                </li>
                 <li>To understand how people use the site and improve it.</li>
                 <li>To measure and improve our advertising on Facebook and Instagram.</li>
               </ul>
-              <p className="mt-4">We do not sell your personal information.</p>
+              <p className="mt-4">
+                We do not sell your personal information, and that includes everything above — the
+                {' '}{CLUB.name} list is not shared with anyone outside BluNeuron.
+              </p>
+              <p className="mt-4">
+                Nothing you give us is sent to Google Analytics or to the Meta Pixel. Your name,
+                your email address, your phone number and your serial number are not included in
+                any analytics event, in any page address or in any page title, anywhere on this
+                site — including inside the {CLUB.name}, where the pages carry no identifier at all
+                and your membership is held in a signed cookie rather than in the URL.
+              </p>
 
               <H2 id="services-we-use" />
 
@@ -450,6 +492,13 @@ export default function PrivacyPage() {
                   <strong className="font-semibold text-white">Support and contact messages:</strong>{' '}
                   for as long as needed to resolve the matter and handle any follow-up.
                 </li>
+                <li>
+                  <strong className="font-semibold text-white">{CLUB.name} membership:</strong> for
+                  as long as you are a member. Ask us to leave and we delete your name, email,
+                  phone and city; the serial number is released so the unit could be registered
+                  again by a future owner. Email <Mail /> from the address you joined with, or with
+                  your serial number, and say you want to leave the Club.
+                </li>
                 {ACCOUNTS_ENABLED && (
                   <li>
                     <strong className="font-semibold text-white">Account data:</strong> for as long
@@ -462,6 +511,11 @@ export default function PrivacyPage() {
               </ul>
 
               <H2 id="your-choices" />
+              <p className="mb-4">
+                Leaving the {CLUB.name} is a single email to <Mail />, and it does not affect your
+                warranty: the two are separate records, and deleting your membership does not
+                delete a warranty registration or a claim. Say which you mean, or say both.
+              </p>
               <p>
                 You can ask us to show you, correct or delete the information we hold about you at
                 any time by emailing <Mail />. Deleting a warranty registration is your decision to

@@ -27,6 +27,8 @@ const outDir = process.argv[3] || 'screenshots/nojs';
 
 const ROUTES = [
   ['/', 'home'],
+  // See the note on the same entry in scripts/assert-visible-html.mjs.
+  ['/club', 'club'],
   ['/support', 'support'],
   ['/support/warranty-registration', 'warranty-registration'],
   ['/support/warranty-claim', 'warranty-claim'],

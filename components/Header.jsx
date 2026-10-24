@@ -81,6 +81,66 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(!overlay);
+
+  /**
+   * ===================================================================
+   * THE CLUB TAB, AND WHY IT IS FETCHED RATHER THAN RENDERED.
+   * ===================================================================
+   * The IRIZ Club is a members-only area reached by a QR code printed on a
+   * card inside the carton. Nothing on the public site links to it, it is
+   * noindex, and it is absent from the sitemap — so the masthead must show
+   * it to a member and be genuinely invisible to everyone else.
+   *
+   * The obvious way is to read the member cookie in app/layout.jsx and pass
+   * a flag down. That works, and `cookies()` in a layout makes the WHOLE
+   * TREE dynamic: all twenty-five prerendered pages would become a Worker
+   * render per request, losing their edge-cached copies, to show one nav
+   * item. That is a sitewide change to serve a minority.
+   *
+   * So this asks /api/club/me once, after mount.
+   *
+   * THE SERVER SENDS THE LABEL AND THE HREF. That is the part that makes
+   * this as private as server rendering. If the response were `{member:
+   * true}` and this component rendered `<a href="/club">Club</a>`, the
+   * string "/club" would sit in the JavaScript bundle every visitor
+   * downloads — and a bundle is as readable as HTML. Receiving the strings
+   * means a non-member's browser never holds the word "Club" or the path, in
+   * any file. Do not move them back into this file.
+   *
+   * A failure leaves `clubNav` null and the tab absent, which is the correct
+   * direction: the Club is reached by the printed card, so a missing tab
+   * costs a member one scan and a leaked tab costs everyone the secret.
+   */
+  const [clubNav, setClubNav] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch('/api/club/me', { credentials: 'same-origin', signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        // Both fields or nothing. A half-answer would render a nameless tab
+        // or a tab pointing at `undefined`.
+        if (data?.label && data?.href) setClubNav({ label: data.label, href: data.href });
+      })
+      .catch(() => {
+        /* Offline, aborted, or the Club is not configured. No tab. */
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  /**
+   * The nav as rendered: the four public items, plus the Club for a member.
+   *
+   * LAST, deliberately. The four public items are the site's own structure
+   * and their order is a decision (see NAV_ITEMS in lib/routes.js); the Club
+   * is an extra room that some visitors have a key to, and inserting it in
+   * the middle would reshuffle a masthead that most people see without it.
+   */
+  const navItems = clubNav
+    ? [...NAV_ITEMS, { label: clubNav.label, href: clubNav.href }]
+    : NAV_ITEMS;
   const { addItem } = useCart();
   const router = useRouter();
   const pathname = usePathname();
@@ -278,7 +338,7 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
         </motion.a>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const current = isCurrent(item);
             return (
               <a
@@ -353,7 +413,7 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
           }`}
         >
           <nav className="section-container flex flex-col gap-1 py-4">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const current = isCurrent(item);
               return (
                 <a

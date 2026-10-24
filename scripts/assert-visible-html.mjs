@@ -26,6 +26,10 @@ const base = (process.argv[2] || 'http://localhost:3000').replace(/\/+$/, '');
 
 const ROUTES = [
   '/',
+  // The Club's door. Reached by scanning the card in the carton, so it meets
+  // exactly the in-app browsers these checks exist for. /club/home is absent
+  // because it needs a member cookie — scripts/test-club-flow.mjs covers it.
+  '/club',
   '/support',
   '/support/warranty-registration',
   '/support/warranty-claim',

@@ -15,6 +15,8 @@
     "check:media": "node scripts/check-media.js",
     "check:production": "node scripts/check-production.js",
     "test:cart": "node scripts/test-cart-flow.mjs",
+    "test:club-serial": "node scripts/test-club-serial.mjs",
+    "test:club": "node scripts/test-club-flow.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "preview:upload": "opennextjs-cloudflare build && wrangler versions upload",
     "deploy": "npm run check:production && opennextjs-cloudflare build && opennextjs-cloudflare deploy",

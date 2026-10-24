@@ -53,6 +53,9 @@ const ROUTES = [
   '/legal/privacy', '/legal/terms', '/legal/returns', '/legal/shipping',
   '/legal/warranty', '/legal/grievance',
   '/sign-in', '/account', '/account/orders', '/account/products', '/account/addresses',
+  // The Club's door only. /club/home redirects without a member cookie, so
+  // auditing it here would silently measure /club twice.
+  '/club',
 ];
 
 const SIZES = [[375, 812], [768, 1024], [1440, 900]];
