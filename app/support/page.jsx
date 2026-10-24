@@ -34,8 +34,9 @@ export const metadata = {
  * So the content moved to pages that can be linked, and this page became the
  * index of them:
  *
- *   setup guide        → was /support/manuals, which is retired until the
- *                        PDFs exist — see MANUALS in lib/site-config.js
+ *   setup guide        → /support/faq, as its own leading section. It was
+ *                        on /support/manuals until that route retired; the
+ *                        PDFs there do not exist yet, the walkthrough does
  *   FAQ                → /support/faq
  *   troubleshooting    → /support/faq, alongside the FAQ (both are "my
  *                        question has an answer already")

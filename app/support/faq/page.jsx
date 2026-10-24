@@ -1,15 +1,15 @@
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import FaqAccordion from '@/components/FaqAccordion';
-import { ALL_FAQS, TROUBLESHOOTING } from '@/lib/iriz';
+import { ALL_FAQS, SETUP_STEPS, TROUBLESHOOTING } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { faqJsonLd, pageMetadata } from '@/lib/seo';
 
 export const metadata = {
   ...pageMetadata({
-    title: 'FAQ & Troubleshooting — BluNeuron IRIZ',
+    title: 'IRIZ Setup, FAQ & Troubleshooting — BluNeuron',
     description:
-      'Answers about brightness, throw distance, Wi-Fi, input lag and connectivity — plus fixes for blurry images, keystone, sound and the remote.',
+      'Set up the IRIZ in five steps, then answers on brightness, throw distance, Wi-Fi and input lag, and fixes for blurry images, keystone, sound and the remote.',
     path: ROUTES.faq,
   }),
   robots: routeRobots(ROUTES.faq),
@@ -23,12 +23,20 @@ export const metadata = {
 const FAQ_JSON_LD = faqJsonLd(ALL_FAQS);
 
 /**
- * FAQ and troubleshooting, on one page.
+ * Setup, FAQ and troubleshooting, on one page.
  *
- * Both lists answer the same kind of question — "this has an answer already" —
- * and splitting them across two routes would mean guessing, before you read
+ * All three answer the same kind of question — "this has an answer already" —
+ * and splitting them across routes would mean guessing, before you read
  * anything, whether "do I need a special screen?" is a question or a problem.
- * Two sections on one page lets Ctrl+F do that job instead.
+ * Three sections on one page lets Ctrl+F do that job instead.
+ *
+ * THE SETUP WALKTHROUGH MOVED HERE from /support/manuals when that route was
+ * retired (see app/support/_manuals/page.jsx). It was the one piece of
+ * confirmed content on that page — the three PDFs it also offered do not
+ * exist yet — and leaving it behind a 307 would have made the only
+ * first-run instructions on the site unreachable. It leads the page on
+ * purpose: someone whose box is open and whose projector is not working yet
+ * has not got a question, they have a step they have not done.
  *
  * Neither list quotes a business detail, which is why this page is NOT a draft
  * and stays indexable: every answer here comes from the manufacturer's own
@@ -51,11 +59,56 @@ export default function FaqPage() {
       />
       <PageHeading
         eyebrow="Support"
-        title="FAQ & troubleshooting"
-        subtitle="The questions that get asked most, and the fixes for the things that go wrong most."
+        title="Setup, FAQ & troubleshooting"
+        subtitle="Set it up in five steps, then the questions that get asked most and the fixes for the things that go wrong most."
       />
 
-      <section id="faq" className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20">
+      {/* SETUP — first, and an <ol>, because the steps are ordered and a
+          screen reader should say so. `scroll-mt-24` so /support/faq#setup
+          lands below the sticky masthead rather than under it.
+
+          Five steps on the 12-column board: two 6-wide pairs, then the last
+          one full width so the row does not end on a hole. Carried over from
+          the retired /support/manuals, markup and all, so the walkthrough a
+          reader may already have bookmarked looks the same. */}
+      <section
+        id="setup"
+        className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20"
+      >
+        <div className="section-container">
+          <div className="mb-10 max-w-lg">
+            <p className="eyebrow mb-3">Getting started</p>
+            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+              Setup in five steps
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">
+              Out of the box to a picture on the wall. Nothing to download — the printed
+              quick-start guide in the carton says the same thing.
+            </p>
+          </div>
+
+          <ol className="bento-grid">
+            {SETUP_STEPS.map((step, i) => (
+              <li
+                key={step.title}
+                className={`bento-tile flex-row gap-4 p-6 ${
+                  i === SETUP_STEPS.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
+                }`}
+              >
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3 className="mb-1.5 text-sm font-semibold text-white">{step.title}</h3>
+                  <p className="text-sm leading-relaxed text-white/55">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section id="faq" className="scroll-mt-24 border-b border-border-subtle bg-black-soft py-16 sm:py-20">
         <div className="section-container">
           {/* NO "COMMON QUESTIONS / FAQ" HEADING HERE.
               The PageHeading above already reads "FAQ & troubleshooting" and
@@ -67,10 +120,14 @@ export default function FaqPage() {
         </div>
       </section>
 
+      {/* `bg-black` here now. The three sections alternate ground —
+          setup (black), FAQ (soft), troubleshooting (black) — and the FAQ
+          took the soft one when setup landed above it. Two adjacent sections
+          on the same ground read as one long section with a stray hairline
+          through it. */}
       <section
         id="troubleshooting"
-        className="scroll-mt-24 border-b border-border-subtle bg-black-soft py-16 sm:py-20"
-
+        className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20"
       >
         <div className="section-container">
           <div className="mb-10 max-w-lg">
@@ -96,7 +153,7 @@ export default function FaqPage() {
         </div>
       </section>
 
-      <section className="bg-black py-16 text-center sm:py-20">
+      <section className="bg-black-soft py-16 text-center sm:py-20">
         <div className="section-container">
           <div>
             <p className="mx-auto max-w-md text-sm leading-relaxed text-white/50">
