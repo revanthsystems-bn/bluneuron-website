@@ -234,7 +234,14 @@ export default function ProductPage() {
                     {WARRANTY.label} manufacturer warranty
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-white/50">
-                    Carry-in service through an authorised centre, on every genuine unit.{' '}
+                    {/* "Return-to-base", not "carry-in through an authorised
+                        centre". There is no service-centre network to carry a
+                        unit in to: a claim is raised, we give you an address,
+                        you send it, we pay the courier back. That is what
+                        /legal/warranty now says, and a badge on the buying
+                        page describing a different process is the one a buyer
+                        would hold us to. */}
+                    Return-to-base service on every genuine unit.{' '}
                     <a
                       href={ROUTES.warranty}
                       className="underline underline-offset-2 transition-colors hover:text-white/80"
