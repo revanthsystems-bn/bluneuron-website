@@ -90,7 +90,12 @@ export default function SupportTiles() {
       </div>
 
       <div>
-        <h2 className="eyebrow mb-4">Answers &amp; documents</h2>
+        {/* "Answers & help", not "Answers & documents". The documents tile
+            (Manuals & downloads) is retired until the PDFs exist — see ROUTES
+            in lib/routes.js — and a group heading promising documents above
+            three tiles that are not documents is a dead end with a label on
+            it. Put "documents" back when the tile comes back. */}
+        <h2 className="eyebrow mb-4">Answers &amp; help</h2>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((tile, i) => (
             <Tile key={tile.href} tile={tile} index={i} />
