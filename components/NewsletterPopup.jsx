@@ -189,9 +189,17 @@ export default function NewsletterPopup({ open, source, onClose, onSubscribed })
                     <NotifyFields source={source} onSuccess={handleSuccess} emailRef={emailRef} />
 
                     {/* The consent line sits under the button, where the action is. With
-                        SHOW_PRIVACY off it falls back to the reassurance copy rather than to
-                        nothing, so the fine print never disappears entirely. */}
-                    <p className="mt-5 text-center text-[11px] leading-relaxed text-white/35">
+                        SHOW_PRIVACY off it falls back to the reassurance copy rather than
+                        to nothing, so the fine print never disappears entirely.
+                    
+                        `text-white/50`, not the /35 this was: at 11px on black /35
+                        composites to #595959 — 2.99:1, under the 4.5:1 AA minimum for
+                        text this size, while /50 is #808080 and 5.3:1. Measured with
+                        axe-core via scripts/ui-audit.mjs. The footer's copy of this
+                        same sentence carries the same value, for the same reason —
+                        see components/notify/FooterSubscribe. Consent fine print is
+                        the last text on a page that should be hard to read. */}
+                    <p className="mt-5 text-center text-[11px] leading-relaxed text-white/50">
                       {SHOW_PRIVACY ? (
                         <>
                           By signing up, you agree to our{' '}

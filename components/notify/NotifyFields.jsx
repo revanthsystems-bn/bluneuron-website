@@ -12,10 +12,11 @@
  * validation order, phone normalisation, or what counts as success. The parent
  * is told via `onSuccess` and decides what to show.
  *
- * That ownership is also why the Meta Pixel `Lead` event is fired from here
- * rather than from the two parents: there is exactly one place in the codebase
- * where a signup is known to have succeeded, so both surfaces report a Lead by
- * construction and a third surface added later cannot forget to.
+ * That ownership is also why BOTH analytics events — the Meta Pixel `Lead`
+ * and the GA4 `newsletter_signup` — are fired from here rather than from the
+ * parents: there is exactly one place in the codebase where a signup is known
+ * to have succeeded, so every surface reports both by construction and a new
+ * surface added later cannot forget to.
  *
  * ---------------------------------------------------------------------------
  * `variant` — 'stacked' (the modal and the inline form) or 'pill' (the
@@ -40,8 +41,9 @@
  */
 
 import { useId, useRef, useState } from 'react';
-import { isValidEmail, isValidPhone, submitNotifySignup } from '@/lib/web3forms';
+import { isValidEmail, isValidPhone, notifyLocation, submitNotifySignup } from '@/lib/web3forms';
 import { trackMetaPixel } from '@/lib/metaPixel';
+import { trackGaEvent } from '@/lib/googleAnalytics';
 
 export default function NotifyFields({
   source,
@@ -102,13 +104,27 @@ export default function NotifyFields({
       // submitNotifySignup, which itself only resolves on `success: true`.
       setStatus('idle');
 
-      // A real, delivered signup — the one conversion this site has. No
-      // arguments: the standard `Lead` event carries no parameters, and the
-      // email and phone number the visitor just typed must never be sent to
-      // Meta. A missing `fbq` (ad blocker, or the pixel deliberately off
-      // locally) is a silent no-op inside trackMetaPixel, so this cannot throw
-      // and cost the visitor their confirmation.
+      /*
+       * A real, delivered signup — the one conversion this site has — reported
+       * to both analytics properties, and NEITHER of them is told who it was.
+       *
+       * The Meta `Lead` takes no arguments at all: the standard event carries
+       * no parameters, and the email and phone number the visitor just typed
+       * must never reach Meta.
+       *
+       * The GA4 event takes ONE parameter, `location`, and it is a fixed
+       * label from a closed set of three (see notifyLocation in
+       * lib/web3forms.js) — not the email, not the phone number, not the
+       * `source` string, not the page URL. It answers "which surface converts"
+       * and nothing else. Do not add a parameter here that varies per
+       * visitor; see the warning on trackGaEvent in lib/googleAnalytics.js.
+       *
+       * Both helpers are no-ops when their script is missing — an ad blocker,
+       * tracking protection, no measurement ID, or localhost — so neither can
+       * throw inside this handler and cost the visitor their confirmation.
+       */
       trackMetaPixel('Lead');
+      trackGaEvent('newsletter_signup', { location: notifyLocation(source) });
 
       onSuccess?.(data);
     } catch (err) {
