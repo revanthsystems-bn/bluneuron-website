@@ -4,7 +4,14 @@ import PageHeading from '@/components/PageHeading';
 import PolicyToc from '@/components/legal/PolicyToc';
 import { ROUTES } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { ACCOUNTS_ENABLED, COMPANY, SUPPORT } from '@/lib/site-config';
+import {
+  ACCOUNTS_ENABLED,
+  COMPANY,
+  SUPPORT,
+  sellersAnd,
+  sellersOr,
+  sellersVerb,
+} from '@/lib/site-config';
 
 /**
  * The privacy policy — the only legal page that does not go through
@@ -154,7 +161,7 @@ const KEY_POINTS = [
   },
   {
     title: 'We do not take your payment details',
-    body: 'Buying an IRIZ happens on Amazon or Flipkart. We never see your card, your UPI ID or your delivery address.',
+    body: `Buying an IRIZ happens on ${sellersOr()}. We never see your card, your UPI ID or your delivery address.`,
   },
   {
     title: 'We collect only what a form asks for',
@@ -265,7 +272,7 @@ export default function PrivacyPage() {
                 removed.
               </p>
               <p className="mt-4">
-                We do not sell on this website. Buying an IRIZ happens on Amazon or Flipkart, and
+                We do not sell on this website. Buying an IRIZ happens on {sellersOr()}, and
                 the personal data in that transaction — your address, your payment details, your
                 invoice — is collected and held by the marketplace under their privacy policy, not
                 ours. We never see your card details, and we are not given your delivery address.
@@ -315,8 +322,8 @@ export default function PrivacyPage() {
                 for one.
               </p>
               <p className="mt-4">
-                We do not collect payment details at any point: the purchase happens on Amazon or
-                Flipkart, and we are not given your card, your UPI ID or your delivery address.
+                We do not collect payment details at any point: the purchase happens on{' '}
+                {sellersOr()}, and we are not given your card, your UPI ID or your delivery address.
                 {ACCOUNTS_ENABLED
                   ? ' We never ask for a password either. Signing in sends a six-digit code to your email address and that is the whole of it — there is no password for us to store or for anyone to steal.'
                   : ''}
@@ -424,8 +431,9 @@ export default function PrivacyPage() {
                 </li>
               </ul>
               <p className="mt-4">
-                Amazon and Flipkart set their own cookies on their own sites. Clicking through to a
-                listing takes you to them, and from that point their privacy policy applies.
+                {sellersAnd()} {sellersVerb('sets its', 'set their')} own cookies on{' '}
+                {sellersVerb('its', 'their')} own site. Clicking through to a listing takes you
+                there, and from that point their privacy policy applies.
               </p>
 
               <H2 id="how-long-we-keep-it" />

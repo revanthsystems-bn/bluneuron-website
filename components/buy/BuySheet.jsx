@@ -7,7 +7,7 @@ import { X } from 'lucide-react';
 import useDialogBehaviour from '@/lib/useDialogBehaviour';
 import StoreButtons from './StoreButtons';
 import { BRAND, HERO, PRODUCT } from '@/lib/iriz';
-import { MARKETPLACE, formatInr } from '@/lib/site-config';
+import { MARKETPLACE, formatInr, sellersOr } from '@/lib/site-config';
 
 /**
  * "Choose where to buy" — one surface behind every Buy button on the site.
@@ -158,7 +158,7 @@ export default function BuySheet({ open, onClose }) {
             </div>
 
             <p className="mt-4 text-center text-[13px] leading-relaxed text-white/60">
-              You&rsquo;ll complete your purchase securely on Amazon&nbsp;/&nbsp;Flipkart.{' '}
+              You&rsquo;ll complete your purchase securely on {sellersOr()}.{' '}
               <span className="text-white/85">Warranty is the same either way.</span>
             </p>
           </motion.div>

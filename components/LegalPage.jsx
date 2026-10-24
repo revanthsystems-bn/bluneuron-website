@@ -102,8 +102,23 @@ function linkify(text) {
  * lib/site-config.js — that is the point. A section may also carry `note`,
  * rendered as smaller secondary type under the body, for the "who decides
  * this" caveats that would otherwise be buried in the main prose.
+ *
+ * `effectiveFrom` IS NOT `lastUpdated`, and the warranty page needs the other
+ * one. A revision date tells a reader whether to re-read the page; an
+ * EFFECTIVE date tells them which terms apply to the unit in their hands,
+ * which is the only question a warranty's date has to answer — a unit bought
+ * under earlier terms is covered by those. Four policies pass `lastUpdated`;
+ * /legal/warranty passes this. Passing both is allowed and prints both lines,
+ * which is what a revised warranty would want.
  */
-export default function LegalPage({ title, path, sections, intro, lastUpdated }) {
+export default function LegalPage({
+  title,
+  path,
+  sections,
+  intro,
+  lastUpdated,
+  effectiveFrom,
+}) {
   // Built from the headings the page already renders, so the contents list
   // can never advertise a section that is not there.
   const toc = sections.map((section) => ({
@@ -207,9 +222,14 @@ export default function LegalPage({ title, path, sections, intro, lastUpdated })
                 ))}
               </div>
 
-              {lastUpdated && (
+              {(lastUpdated || effectiveFrom) && (
                 <div className="mt-12 border-t border-border-subtle pt-6">
-                  <p className="text-xs text-white/55">Last updated {lastUpdated}.</p>
+                  {effectiveFrom && (
+                    <p className="text-xs text-white/55">Effective from {effectiveFrom}.</p>
+                  )}
+                  {lastUpdated && (
+                    <p className="mt-1 text-xs text-white/55">Last updated {lastUpdated}.</p>
+                  )}
                 </div>
               )}
             </div>

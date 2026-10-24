@@ -58,11 +58,28 @@ const FORBIDDEN_WHEN_INDEXABLE = [
   { needle: 'lorem ipsum', label: 'lorem ipsum' },
 ];
 
-/** Forbidden on EVERY page, draft or not. A draft may be unfinished; it may not be wrong. */
+/**
+ * Forbidden on EVERY page, draft or not. A draft may be unfinished; it may not
+ * be wrong.
+ *
+ * THE THIRD ENTRY IS A PRODUCTION-ONLY ASSERTION, and it is meant to be.
+ * `+91 XXXXX` is PHONE_PLACEHOLDER from lib/site-config.js — the two
+ * unconfirmed support numbers. A production build omits those rows entirely
+ * (visibleSupportPhones(), gated on BUILD_CHANNEL), so a correct production
+ * build cannot contain the string and this check passes silently.
+ *
+ * A PREVIEW BUILD WILL TRIP IT, by design: the preview renders the rows on
+ * purpose so a reviewer can see them. So run this validator — and
+ * check-production, which calls it — against a PRODUCTION-channel build, which
+ * is the only build whose output anyone needs a guarantee about. If it fires
+ * on a build you intend to publish, a masked number reached a page and that is
+ * exactly the failure this list exists to catch.
+ */
 const FORBIDDEN_ALWAYS = [
   { needle: 'example.com', label: 'example.com' },
   { needle: 'XXXXXXXXXX', label: 'masked phone number (XXXXXXXXXX)' },
   { needle: '+91-XXXX', label: 'masked phone number (+91-XXXX)' },
+  { needle: '+91 XXXXX', label: 'unconfirmed placeholder phone (+91 XXXXX XXXXX)' },
 ];
 
 /* ------------------------------------------------------------------ *

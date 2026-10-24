@@ -1,6 +1,7 @@
 import PageShell from '@/components/PageShell';
 import Reveal from '@/components/Reveal';
 import { ROUTES } from '@/lib/routes';
+import { sellersAnd, sellersVerb } from '@/lib/site-config';
 
 export const metadata = {
   title: 'Page Not Found — BluNeuron',
@@ -30,12 +31,12 @@ const DESTINATIONS = [
   {
     href: ROUTES.whereToBuy,
     label: 'Where to buy',
-    body: 'Our Amazon and Flipkart listings, and what each handles.',
+    body: `Our ${sellersAnd()} ${sellersVerb('listing', 'listings')}, and what the marketplace handles.`,
   },
   {
     href: ROUTES.support,
     label: 'Support',
-    body: 'Warranty, claims, FAQ, manuals and contact.',
+    body: 'Warranty, claims, FAQ, and how to reach us.',
   },
   {
     href: ROUTES.warranty,

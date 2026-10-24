@@ -7,13 +7,20 @@ import Reveal from '@/components/Reveal';
 import { BRAND, HERO, MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { MARKETPLACE, SHOW_BUY, formatInr } from '@/lib/site-config';
+import {
+  MARKETPLACE,
+  SHOW_BUY,
+  formatInr,
+  sellersAnd,
+  sellersOr,
+  sellersVerb,
+} from '@/lib/site-config';
 
 export const metadata = {
   ...pageMetadata({
     title: 'Where to Buy — BluNeuron IRIZ',
     description:
-      'The BluNeuron IRIZ is sold on Amazon and Flipkart. Price, what each marketplace handles, and what we handle directly.',
+      `The BluNeuron IRIZ is sold on ${sellersAnd()}. Price, what the marketplace handles, and what we handle directly.`,
     path: ROUTES.whereToBuy,
   }),
   robots: routeRobots(ROUTES.whereToBuy),
@@ -27,7 +34,7 @@ export const metadata = {
  */
 const SPLIT = [
   {
-    title: 'Amazon and Flipkart handle',
+    title: `${sellersAnd()} ${sellersVerb('handles', 'handle')}`,
     items: [
       'Payment, invoicing and GST billing',
       'Delivery, tracking and delivery problems',
@@ -51,8 +58,11 @@ export default function WhereToBuyPage() {
     <PageShell>
       <PageHero
         eyebrow="Where to buy"
-        title={`Buy the ${BRAND.model} on Amazon or Flipkart.`}
-        subtitle="We do not sell direct. Both listings are the official BluNeuron store, and both ship the same unit with the same warranty."
+        title={`Buy the ${BRAND.model} on ${sellersOr()}.`}
+        subtitle={`We do not sell direct. ${sellersVerb(
+          'The listing is the official BluNeuron store, and it ships the unit with the manufacturer warranty.',
+          'Both listings are the official BluNeuron store, and both ship the same unit with the same warranty.'
+        )}`}
         image={MEDIA.product.boxFront}
         imagePosition="58% 50%"
       />
@@ -98,9 +108,10 @@ export default function WhereToBuyPage() {
                   for the price, and a stale number is exactly what they would
                   otherwise take away. */}
               <p className="mt-6 text-xs leading-relaxed text-white/55">
-                Amazon and Flipkart set their own prices and run their own offers, so the listing
-                price can differ from the one above. The price on the listing is the price that
-                applies to your order.
+                {sellersAnd()} {sellersVerb('sets its', 'set their')} own prices and{' '}
+                {sellersVerb('runs its', 'run their')} own offers, so the listing price can differ
+                from the one above. The price on the listing is the price that applies to your
+                order.
               </p>
             </Reveal>
           </div>

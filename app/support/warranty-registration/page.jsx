@@ -74,8 +74,10 @@ export default function WarrantyRegistrationPage() {
             </ul>
 
             <p className="mt-6 text-sm leading-relaxed text-white/50">
-              Cover runs for <span className="font-semibold text-white/80">{WARRANTY.months}</span>{' '}
-              months from the purchase date.{' '}
+              {/* `WARRANTY.label` ("1 year"), not the month count — see the
+                  note on the same line in the claim page. */}
+              Cover runs for <span className="font-semibold text-white/80">{WARRANTY.label}</span>{' '}
+              from the purchase date.{' '}
               <a
                 href={ROUTES.warranty}
                 className="underline underline-offset-2 transition-colors hover:text-white"

@@ -18,6 +18,48 @@ export const metadata = {
 };
 
 /**
+ * ===================================================================
+ * PARKED. THIS FILE IS NOT A ROUTE, AND IT WILL NOT COMPILE AS ONE.
+ * ===================================================================
+ *
+ * The folder is `_manuals`, and Next excludes an underscore-prefixed folder
+ * from the router — so nothing here is built and /support/manuals does not
+ * exist. next.config.js 307s that path to /support, because the URL has been
+ * linked and indexed and a 404 would be truthful and useless.
+ *
+ * WHY: none of the three PDFs exists. MANUALS in lib/site-config.js carries
+ * `file: TBD` for all three, so this page rendered as three cards reading
+ * "PDF [TBD] — not available for download yet" behind a nav entry, a footer
+ * link, a support tile and a sitemap entry. A support link that leads to
+ * nothing is worse than no link.
+ *
+ * IT IS KEPT, UNCHANGED, so restoring it is a rename and five one-line edits
+ * rather than a rebuild. TO RESTORE:
+ *
+ *   1. Put the PDFs in public/ and fill in `file` and `size` for each entry
+ *      in MANUALS (lib/site-config.js). Do this FIRST — the rest of the list
+ *      only un-hides the page, it does not give it anything to serve.
+ *   2. Rename this folder back to `manuals`.
+ *   3. lib/routes.js: restore `manuals: '/support/manuals'` in ROUTES, the
+ *      SUPPORT_TILES entry, the FOOTER_COLUMNS link, the SITEMAP_CANDIDATES
+ *      entry and the DRAFT_SOURCES line. All five carry a comment saying so.
+ *   4. next.config.js: delete the /support/manuals redirect.
+ *   5. scripts/ui-audit.mjs, content-audit.mjs and csp-report.mjs: add the
+ *      route back to their ROUTES lists.
+ *
+ * UNTIL THEN IT REFERENCES `ROUTES.manuals`, WHICH IS UNDEFINED. That is
+ * deliberate and it is safe only because this file is not compiled: it means
+ * a careless rename without step 3 fails loudly at build time rather than
+ * shipping a page with no canonical and no robots tag.
+ *
+ * NOTE, AND IT IS A REAL LOSS: the "Setup in five steps" walkthrough at the
+ * bottom of this page went with it. SETUP_STEPS (lib/iriz.js) is confirmed
+ * content and is now rendered nowhere. It belongs on /support/faq — the
+ * question it answers is "how do I set this up" — and moving it there is a
+ * separate change from retiring the documents.
+ *
+ * ---------------------------------------------------------------------------
+ *
  * Documents, plus the setup walkthrough that used to live on /support.
  *
  * The setup steps moved HERE rather than to /support/faq because they are not

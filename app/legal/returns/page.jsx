@@ -2,7 +2,14 @@ import LegalPage from '@/components/LegalPage';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { POLICY_LAST_UPDATED, RETURNS, SUPPORT, WARRANTY } from '@/lib/site-config';
+import {
+  POLICY_LAST_UPDATED,
+  RETURNS,
+  SUPPORT,
+  WARRANTY,
+  sellersAnd,
+  sellersOr,
+} from '@/lib/site-config';
 
 /**
  * Returns, refunds and cancellations — sections 3, 4 and 5 of the supplied
@@ -42,13 +49,13 @@ import { POLICY_LAST_UPDATED, RETURNS, SUPPORT, WARRANTY } from '@/lib/site-conf
 const SECTIONS = [
   {
     heading: 'Where a return starts',
-    body: `The ${BRAND.fullName} is sold on Amazon and Flipkart. Your order, your payment and your invoice are with the marketplace you bought from, so a return, a replacement or a refund is started in your orders list there — not here. Their window, their process and their refund timelines apply to the purchase, and they are usually wider than ours.`,
+    body: `The ${BRAND.fullName} is sold on ${sellersAnd()}. Your order, your payment and your invoice are with the marketplace you bought from, so a return, a replacement or a refund is started in your orders list there — not here. Their window, their process and their refund timelines apply to the purchase, and they are usually wider than ours.`,
     note: 'We cannot start, authorise or refund a marketplace return on your behalf, and we cannot see your order unless you give us the order ID.',
   },
   {
     heading: 'How to start a marketplace return',
     body: [
-      'Open your orders on Amazon or Flipkart and choose the return or replacement option on the IRIZ order.',
+      `Open your orders on ${sellersOr()} and choose the return or replacement option on the IRIZ order.`,
       'Follow their instructions for pickup or drop-off. Send the unit back with all original accessories and packaging.',
       `If the marketplace window has closed and the unit has a fault, use the warranty claim form at ${ROUTES.warrantyClaim} instead — the warranty runs for ${WARRANTY.label} and is separate from any return window.`,
     ],
@@ -56,17 +63,17 @@ const SECTIONS = [
   {
     heading: 'Our replacement windows, and the clock on each',
     body: [
-      `Defective or non-functioning on arrival: tell us within ${RETURNS.replacementDays} days of delivery to receive a fresh replacement unit.`,
-      `Physical damage or transit damage: report within ${RETURNS.damageReportHours} hours of delivery. A claim made after that is treated as out-of-warranty mishandling.`,
+      `Arrived damaged, or does not power on: report within ${RETURNS.damageReportHours} hours of delivery, with photographs or a short video. This is the same window and the same evidence the warranty policy asks for at ${ROUTES.warranty}.`,
+      `A unit that powers on but proves faulty inside the first ${RETURNS.replacementDays} days of use: tell us within those ${RETURNS.replacementDays} days of delivery to receive a fresh replacement unit rather than a repair.`,
       `Wrong item or a specification mismatch — the unit delivered is not what was ordered: report within ${RETURNS.damageReportHours} hours of delivery.`,
     ],
     // The two figures restated from RETURNS, the same constants the bullets
     // above interpolate. No new wording.
     highlight: {
-      label: `${RETURNS.replacementDays} days for a dead unit · ${RETURNS.damageReportHours} hours for damage`,
+      label: `${RETURNS.damageReportHours} hours for damage on arrival · ${RETURNS.replacementDays} days for an early failure`,
       value: 'Both clocks start at delivery. The marketplace you bought from also has its own window, usually wider.',
     },
-    note: 'The two clocks differ because the questions differ. Whether a unit works is answerable in a week; whether it arrived damaged stops being answerable almost immediately. Photograph the outer packaging and the unit before anything else.',
+    note: 'The two clocks differ because the questions differ. Whether a unit arrived damaged stops being answerable almost immediately, which is why that one is short and wants photographs; whether a unit is reliable is answerable over a week of use. Photograph the outer packaging and the unit before anything else.',
   },
   {
     heading: 'Condition of a returned unit',
@@ -83,7 +90,7 @@ const SECTIONS = [
   },
   {
     heading: 'Refunds',
-    body: `We do not refund for change of mind, and we do not refund a defect-free unit on the basis of its appearance or its brightness performance. Where a unit has a manufacturing defect, the remedy under our warranty is repair or replacement — see ${ROUTES.warranty}. A refund on a marketplace order, where one is due, is issued by Amazon or Flipkart under their policy and on their timeline, since they took the payment.`,
+    body: `We do not refund for change of mind, and we do not refund a defect-free unit on the basis of its appearance or its brightness performance. Where a unit has a manufacturing defect, the remedy under our warranty is repair or replacement — see ${ROUTES.warranty}. A refund on a marketplace order, where one is due, is issued by ${sellersOr()} under their policy and on their timeline, since they took the payment.`,
     note: 'Nothing in this policy limits your rights under the Consumer Protection Act, 2019 or the return and refund policy of the marketplace you purchased from.',
   },
   {
@@ -92,7 +99,7 @@ const SECTIONS = [
   },
   {
     heading: 'Cancellations',
-    body: 'An order placed on Amazon or Flipkart is cancelled through that marketplace, under their rules — generally before the order is dispatched, and not at all once it has shipped. Same-day delivery orders and orders placed during limited-time promotional or holiday sales are often non-cancellable on their side; their listing says which.',
+    body: `An order placed on ${sellersOr()} is cancelled through that marketplace, under their rules — generally before the order is dispatched, and not at all once it has shipped. Same-day delivery orders and orders placed during limited-time promotional or holiday sales are often non-cancellable on their side; their listing says which.`,
     note: 'There is no checkout on this website, so there is no order of ours for you to cancel. If we begin selling directly in future, cancellation terms for direct orders will be published here.',
   },
   {
@@ -109,7 +116,7 @@ export const metadata = {
   ...pageMetadata({
     title: 'Returns, Refunds & Cancellations — BluNeuron',
     description:
-      'Replacement windows, refunds and cancellations for the BluNeuron IRIZ, which is sold on Amazon and Flipkart.',
+      `Replacement windows, refunds and cancellations for the BluNeuron IRIZ, which is sold on ${sellersAnd()}.`,
     path: ROUTES.returns,
   }),
   robots: routeRobots(ROUTES.returns),
@@ -120,7 +127,7 @@ export default function ReturnsPage() {
     <LegalPage
       title="Returns, Refunds & Cancellations"
       path={ROUTES.returns}
-      intro="The IRIZ is sold on Amazon and Flipkart, so returns start there. Here is what that means, and where our own replacement terms apply."
+      intro={`The IRIZ is sold on ${sellersAnd()}, so returns start there. Here is what that means, and where our own replacement terms apply.`}
       sections={SECTIONS}
       lastUpdated={POLICY_LAST_UPDATED}
     />

@@ -5,7 +5,7 @@ import DraftBanner from '@/components/DraftBanner';
 import SupportForm from '@/components/SupportForm';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { WARRANTY } from '@/lib/site-config';
+import { WARRANTY, sellersPossessive } from '@/lib/site-config';
 
 export const metadata = {
   ...pageMetadata({
@@ -76,7 +76,7 @@ export default function WarrantyClaimPage() {
                   2
                 </span>
                 <span>
-                  If you are still inside Amazon or Flipkart&apos;s own return window, open a
+                  If you are still inside {sellersPossessive()} own return window, open a
                   return or replacement <strong className="font-semibold text-white/85">there</strong>{' '}
                   — it is faster than a warranty claim and they collect the unit.{' '}
                   <a
@@ -92,8 +92,12 @@ export default function WarrantyClaimPage() {
 
             <div className="mt-8 border-t border-border-subtle pt-6">
               <p className="text-sm leading-relaxed text-white/50">
+                {/* `WARRANTY.label` ("1 year"), not `${WARRANTY.months} months`.
+                    Same cover period, one vocabulary — the site said "12
+                    months" here and on /about while /legal/warranty,
+                    /shop/iriz and /shop all said "1 year". */}
                 Cover runs for{' '}
-                <span className="font-semibold text-white/80">{WARRANTY.months}</span> months from
+                <span className="font-semibold text-white/80">{WARRANTY.label}</span> from
                 the purchase date. Claims are handled{' '}
                 <span className="font-semibold text-white/80">{WARRANTY.claimRoute}</span>.{' '}
                 <a

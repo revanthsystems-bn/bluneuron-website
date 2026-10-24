@@ -101,7 +101,7 @@ export default function AddressList() {
           </h2>
           <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/55">
             Used to arrange a service pickup or return when you raise a warranty claim. Your
-            marketplace delivery address stays with Amazon or Flipkart — we are not given it.
+            marketplace delivery address stays with the marketplace — we are not given it.
           </p>
         </div>
         <button

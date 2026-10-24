@@ -48,7 +48,7 @@ const outDir = process.argv[3] || 'screenshots/ui-round3';
 const ROUTES = [
   '/', '/about', '/specs', '/compare',
   '/shop', '/shop/iriz', '/where-to-buy',
-  '/support', '/support/contact', '/support/faq', '/support/manuals',
+  '/support', '/support/contact', '/support/faq',
   '/support/warranty-registration', '/support/warranty-claim',
   '/legal/privacy', '/legal/terms', '/legal/returns', '/legal/shipping',
   '/legal/warranty', '/legal/grievance',

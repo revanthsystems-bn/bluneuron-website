@@ -5,12 +5,17 @@ import AnswerSearch from '@/components/support/AnswerSearch';
 import { ALL_FAQS, BRAND, MEDIA, TROUBLESHOOTING } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
+import {
+  SUPPORT,
+  isPlaceholderPhone,
+  visibleSupportPhones,
+} from '@/lib/site-config';
 
 export const metadata = {
   ...pageMetadata({
     title: 'IRIZ Support — Warranty, FAQs & Downloads | BluNeuron',
     description:
-      'Register a warranty, make a claim, read the FAQ and troubleshooting, download manuals, or contact BluNeuron support in India.',
+      'Register a warranty, make a claim, read the FAQ and troubleshooting, or contact BluNeuron support in India — email, phone and service hours.',
     path: ROUTES.support,
   }),
   robots: routeRobots(ROUTES.support),
@@ -22,14 +27,15 @@ export const metadata = {
  * This page used to be the whole support section on one scroll: a setup guide,
  * the FAQ, troubleshooting, and a contact form stacked five screens deep. That
  * works while support is four things. It stops working the moment warranty
- * registration, claims and manuals exist — the two things a real owner comes
+ * registration and claims exist — the two things a real owner comes
  * here to DO would have been buried below several screens of reading, and
  * neither had a URL anyone could be sent to.
  *
  * So the content moved to pages that can be linked, and this page became the
  * index of them:
  *
- *   setup guide        → /support/manuals, with the documents it belongs with
+ *   setup guide        → was /support/manuals, which is retired until the
+ *                        PDFs exist — see MANUALS in lib/site-config.js
  *   FAQ                → /support/faq
  *   troubleshooting    → /support/faq, alongside the FAQ (both are "my
  *                        question has an answer already")
@@ -38,7 +44,40 @@ export const metadata = {
  * The old in-page anchors (/support#faq, /support#contact) are gone with them.
  * Every link that used them has been repointed at the new routes — see
  * lib/routes.js, which is now the only place any of these paths is spelled.
+ *
+ * THE CHANNEL STRIP below the tiles is not a duplicate of /support/contact,
+ * and the difference is what it leaves out. That page is the full set with a
+ * note under each explaining when to use it, plus the form and the grievance
+ * escalation. This is the two addresses and the hours, on the page everyone
+ * lands on first, because "what is the email and when are you open" is the
+ * commonest question here and it should not cost a click. Both read SUPPORT
+ * and visibleSupportPhones() from lib/site-config.js, so neither can state a
+ * channel the other does not — and the phone rows obey the same one rule:
+ * a placeholder renders on a preview build and is absent on production.
  */
+
+/**
+ * The hub's channels, flattened to label + value + href.
+ *
+ * No `note` field and no icons: a strip of four short rows under a heading
+ * does not need either, and copying the notes across from /support/contact is
+ * how two pages start saying slightly different things about one inbox.
+ */
+const CHANNELS = [
+  { label: 'Support', value: SUPPORT.email, href: `mailto:${SUPPORT.email}` },
+  ...visibleSupportPhones().map((entry) => ({
+    label: entry.label,
+    value: entry.number,
+    // No `tel:` on a placeholder — it strips to "+91" and dials it. See the
+    // fuller note in app/support/contact/page.jsx.
+    href: isPlaceholderPhone(entry.number)
+      ? null
+      : `tel:${String(entry.number).replace(/[^+\d]/g, '')}`,
+  })),
+  { label: 'Sales', value: SUPPORT.salesEmail, href: `mailto:${SUPPORT.salesEmail}` },
+  { label: 'Hours', value: SUPPORT.hours, href: null },
+];
+
 export default function SupportPage() {
   return (
     <PageShell>
@@ -56,7 +95,7 @@ export default function SupportPage() {
       <PageHero
         eyebrow="Support"
         title="We've got you covered."
-        subtitle={`Everything for your ${BRAND.model} in one place — warranty, answers, documents, and a direct line to our team.`}
+        subtitle={`Everything for your ${BRAND.model} in one place — warranty, answers, and a direct line to our team.`}
         image={MEDIA.heroLoop.poster}
         imagePosition="60% 45%"
       >
@@ -74,6 +113,60 @@ export default function SupportPage() {
       <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
         <div className="section-container">
           <SupportTiles />
+
+          {/* THE CHANNELS. Addresses and hours, on the page people land on.
+
+              In the SAME section as the tiles, not one of its own: it is the
+              rest of "here is how to get help", and a section border between
+              them would read as a change of subject. `mt-12` is the gap.
+
+              A definition list, because that is what it is: four terms and
+              their values. `sm:grid-cols-2 lg:grid-cols-4` rather than a flex
+              row, so the long one — the hours string, at 48 characters —
+              wraps inside its own column instead of pushing the others off a
+              phone. */}
+          <div className="glass-panel mt-12 p-8 sm:p-10">
+            <p className="eyebrow mb-3">Reach us</p>
+            <h2 className="text-2xl font-bold tracking-tighter text-white">
+              Email us, or call during service hours
+            </h2>
+
+            <dl className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {CHANNELS.map((channel) => (
+                <div key={channel.label}>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
+                    {channel.label}
+                  </dt>
+                  {/* `break-words`: an email address is a single unbroken
+                      token and will widen a 390px column without it. */}
+                  <dd className="mt-2 break-words text-sm font-semibold text-white">
+                    {channel.href ? (
+                      <a
+                        href={channel.href}
+                        className="underline underline-offset-4 decoration-white/25 transition-colors hover:decoration-white"
+                      >
+                        {channel.value}
+                      </a>
+                    ) : (
+                      channel.value
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            <p className="mt-7 text-sm leading-relaxed text-white/55">
+              A message sent outside service hours is answered the next working day. For a hardware
+              fault, the{' '}
+              <a
+                href={ROUTES.warrantyClaim}
+                className="underline underline-offset-2 transition-colors hover:text-white"
+              >
+                warranty claim form
+              </a>{' '}
+              collects what we need up front and is faster than an email.
+            </p>
+          </div>
         </div>
       </section>
 

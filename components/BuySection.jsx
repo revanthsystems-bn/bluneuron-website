@@ -3,7 +3,7 @@ import Reveal from './Reveal';
 import StoreButtons from './buy/StoreButtons';
 import { BRAND, HERO, MEDIA } from '@/lib/iriz';
 import { BUY_ANCHOR, ROUTES } from '@/lib/routes';
-import { MARKETPLACE, formatInr } from '@/lib/site-config';
+import { MARKETPLACE, formatInr, sellersAnd, sellersVerb } from '@/lib/site-config';
 
 /**
  * The buy card — the closing section of the homepage once SHOW_BUY is on.
@@ -93,14 +93,17 @@ export default function BuySection() {
                   fake destination wearing a real button.
 
                   StoreButtons withholds the href entirely until a genuine
-                  listing URL exists and shows a short note instead. See
+                  listing URL exists, and renders only the marketplaces that
+                  HAVE one: MARKETPLACES in lib/site-config.js drops Amazon
+                  while AMAZON.url is empty, so today this is a single
+                  Flipkart button rather than one button and one apology. See
                   lib/buy-destinations.js. */}
               <StoreButtons />
             </div>
 
             <p className="mt-6 text-xs leading-relaxed text-white/55">
-              Prices on Amazon and Flipkart move with their own offers — the price shown on the
-              listing is the one that applies to your order.{' '}
+              Prices on {sellersAnd()} move with {sellersVerb('its', 'their')} own offers — the
+              price shown on the listing is the one that applies to your order.{' '}
               <a
                 href={ROUTES.whereToBuy}
                 className="underline underline-offset-2 transition-colors hover:text-white/70"

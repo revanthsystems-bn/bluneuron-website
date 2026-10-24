@@ -20,7 +20,7 @@ const base = (process.argv[2] || 'http://localhost:3000').replace(/\/+$/, '');
 
 const ROUTES = [
   '/', '/about', '/specs', '/compare', '/shop', '/shop/iriz', '/where-to-buy',
-  '/support', '/support/contact', '/support/faq', '/support/manuals',
+  '/support', '/support/contact', '/support/faq',
   '/support/warranty-registration', '/support/warranty-claim',
   '/legal/privacy', '/legal/terms', '/legal/returns', '/legal/shipping',
   '/legal/warranty', '/legal/grievance',

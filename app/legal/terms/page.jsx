@@ -2,7 +2,15 @@ import LegalPage from '@/components/LegalPage';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { COMPANY, POLICY_LAST_UPDATED, SUPPORT } from '@/lib/site-config';
+import {
+  COMPANY,
+  POLICY_LAST_UPDATED,
+  SUPPORT,
+  sellersAnd,
+  sellersOr,
+  sellersPossessive,
+  sellersVerb,
+} from '@/lib/site-config';
 
 /**
  * Terms of service — the supplied Terms & Conditions, adapted to how the
@@ -45,7 +53,7 @@ const SECTIONS = [
   },
   {
     heading: 'We do not sell on this website',
-    body: `The ${BRAND.fullName} is sold on Amazon and Flipkart. Your purchase contract, payment, invoicing, delivery and marketplace return rights are with the marketplace you bought from and are governed by their terms, not these. Nothing on this site is an offer to sell, and there is no checkout here to accept or decline an order.`,
+    body: `The ${BRAND.fullName} is sold on ${sellersAnd()}. Your purchase contract, payment, invoicing, delivery and marketplace return rights are with the marketplace you bought from and are governed by their terms, not these. Nothing on this site is an offer to sell, and there is no checkout here to accept or decline an order.`,
     note: `What we provide directly is the manufacturer's warranty on a genuine unit, and support for it — set out at ${ROUTES.warranty}. If we begin selling directly from this website in future, terms for direct sale will be published here before any order can be placed.`,
   },
   {
@@ -63,12 +71,12 @@ const SECTIONS = [
   },
   {
     heading: 'Prices shown on this site',
-    body: 'Prices are shown in Indian Rupees (INR) and are inclusive of applicable taxes unless stated otherwise. Any price on this site is indicative and published for information only: Amazon and Flipkart set their own prices and run their own offers, so the price on the listing at the time you order is the price that applies, and it may differ from the one shown here.',
+    body: `Prices are shown in Indian Rupees (INR) and are inclusive of applicable taxes unless stated otherwise. Any price on this site is indicative and published for information only: ${sellersAnd()} ${sellersVerb('sets its', 'set their')} own prices and ${sellersVerb('runs its', 'run their')} own offers, so the price on the listing at the time you order is the price that applies, and it may differ from the one shown here.`,
   },
   {
     heading: 'Cancellations, returns, refunds and warranty',
     body: [
-      `Cancellations, returns, replacements and refunds for a marketplace order are governed by Amazon's or Flipkart's policies and are handled in your orders list there. Our own replacement windows and what they cover are set out at ${ROUTES.returns}.`,
+      `Cancellations, returns, replacements and refunds for a marketplace order are governed by ${sellersPossessive()} policies and are handled in your orders list there. Our own replacement windows and what they cover are set out at ${ROUTES.returns}.`,
       `Warranty claims for manufacturing defects on IRIZ projectors are processed in accordance with the warranty policy at ${ROUTES.warranty} and the warranty card supplied in the box.`,
       `What we ship, and who pays for which leg of a service shipment, is at ${ROUTES.shipping}.`,
     ],
@@ -104,7 +112,7 @@ const SECTIONS = [
   },
   {
     heading: 'Links to other sites',
-    body: 'This site links to Amazon and Flipkart, and to the services named in our privacy policy. We do not control those sites and are not responsible for their content, their availability or their terms.',
+    body: `This site links to ${sellersAnd()}, and to the services named in our privacy policy. We do not control those sites and are not responsible for their content, their availability or their terms.`,
   },
   {
     heading: 'Limitation of liability',
@@ -144,7 +152,7 @@ export const metadata = {
   ...pageMetadata({
     title: 'Terms & Conditions — BluNeuron',
     description:
-      'Terms governing use of the BluNeuron website and our support services. The IRIZ is sold on Amazon and Flipkart under their terms.',
+      `Terms governing use of the BluNeuron website and our support services. The IRIZ is sold on ${sellersAnd()} under their terms.`,
     path: ROUTES.terms,
   }),
   robots: routeRobots(ROUTES.terms),
@@ -155,7 +163,7 @@ export default function TermsPage() {
     <LegalPage
       title="Terms & Conditions"
       path={ROUTES.terms}
-      intro="These terms cover your use of this website and our support services. The sale itself happens on Amazon or Flipkart, under their terms."
+      intro={`These terms cover your use of this website and our support services. The sale itself happens on ${sellersOr()}, under their terms.`}
       sections={SECTIONS}
       lastUpdated={POLICY_LAST_UPDATED}
     />

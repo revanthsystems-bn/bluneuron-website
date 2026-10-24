@@ -5,9 +5,8 @@ import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { COMPANY, SUPPORT, allKnown } from '@/lib/site-config';
+import { COMPANY, SUPPORT, WARRANTY, allKnown, sellersAnd } from '@/lib/site-config';
 import { BRAND, MEDIA } from '@/lib/iriz';
-import { WARRANTY } from '@/lib/warranty';
 
 export const metadata = {
   ...pageMetadata({
@@ -24,7 +23,7 @@ export const metadata = {
  *
  *   one product          BRAND.model, and the "Stand behind one product"
  *                        value below says the same thing in a sentence.
- *   the cover period     WARRANTY from lib/warranty.js — the single source
+ *   the cover period     WARRANTY from lib/site-config.js — the single source
  *                        /legal/warranty, both warranty forms and the
  *                        registration success screen all quote. A warranty
  *                        whose length differs between two pages of the same
@@ -42,8 +41,12 @@ export const metadata = {
  */
 const FACTS = [
   { icon: Package, value: `1 product`, label: `The ${BRAND.model}, and nothing else` },
-  { icon: ShieldCheck, value: `${WARRANTY.months} months`, label: 'Warranty from the invoice date' },
-  { icon: Store, value: 'Amazon & Flipkart', label: 'Where the IRIZ is sold' },
+  // `WARRANTY.label`, NOT `${WARRANTY.months} months`. This tile read
+  // "12 months" while /shop/iriz, /shop and /legal/warranty all read
+  // "1 year" — the same cover period in two vocabularies, on four pages of
+  // one site. `label` is the English form and is what prose uses, everywhere.
+  { icon: ShieldCheck, value: WARRANTY.label, label: 'Warranty from the invoice date' },
+  { icon: Store, value: sellersAnd(), label: 'Where the IRIZ is sold' },
   { icon: Mail, value: SUPPORT.email, label: 'Support, answered by us', href: `mailto:${SUPPORT.email}` },
 ];
 
@@ -195,8 +198,8 @@ export default function AboutPage() {
                 {allKnown(COMPANY.gstin) && <> under GSTIN {COMPANY.gstin}</>}.
               </p>
               <p className="mt-4 text-sm leading-relaxed text-white/60">
-                We sell through Amazon and Flipkart rather than running our own store, so every
-                order, payment and delivery is handled by them —{' '}
+                We sell through {sellersAnd()} rather than running our own store, so every
+                order, payment and delivery is handled there —{' '}
                 <a
                   href={ROUTES.whereToBuy}
                   className="underline underline-offset-2 transition-colors hover:text-white"
@@ -239,13 +242,66 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* THE CONTACT BLOCK, with both addresses in it.
+
+          It used to be one line and a button to /support/contact, which is
+          the right destination for someone with a broken unit and the wrong
+          one for a distributor, a retailer or a journalist — they read an
+          ABOUT page, and the button they were offered led to a support form.
+          So the two addresses are stated here: support for the product, sales
+          for everything commercial. Both read SUPPORT from lib/site-config.js
+          and are the same addresses /support/contact publishes.
+
+          Service hours beside them, because an address with no answer time is
+          half a promise — and this is the only place on the page that offers
+          to be contacted at all. */}
       <section className="bg-black py-16 text-center sm:py-20">
         <div className="section-container">
           <Reveal>
             <p className="mx-auto max-w-md text-sm text-white/50">
               Questions about the company or the product? We&apos;d genuinely like to hear from you.
             </p>
-            <a href={ROUTES.contact} className="btn-secondary mt-5 inline-flex">
+
+            <dl className="mx-auto mt-7 flex max-w-xl flex-col items-center gap-5 sm:flex-row sm:justify-center sm:gap-10">
+              <div>
+                {/* `text-white/55`, not /45. White at 45% over black measures 4.43:1,
+                    just under the 4.5:1 WCAG AA asks of 12px text — axe-core
+                    flags it, and it is the same token /support/contact uses
+                    for this label. */}
+                <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
+                  Support
+                </dt>
+                <dd className="mt-1.5 break-words text-sm font-semibold text-white">
+                  <a
+                    href={`mailto:${SUPPORT.email}`}
+                    className="underline underline-offset-4 decoration-white/25 transition-colors hover:decoration-white"
+                  >
+                    {SUPPORT.email}
+                  </a>
+                </dd>
+              </div>
+              <div>
+                {/* `text-white/55`, not /45. White at 45% over black measures 4.43:1,
+                    just under the 4.5:1 WCAG AA asks of 12px text — axe-core
+                    flags it, and it is the same token /support/contact uses
+                    for this label. */}
+                <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
+                  Sales &amp; partnerships
+                </dt>
+                <dd className="mt-1.5 break-words text-sm font-semibold text-white">
+                  <a
+                    href={`mailto:${SUPPORT.salesEmail}`}
+                    className="underline underline-offset-4 decoration-white/25 transition-colors hover:decoration-white"
+                  >
+                    {SUPPORT.salesEmail}
+                  </a>
+                </dd>
+              </div>
+            </dl>
+
+            <p className="mx-auto mt-5 max-w-md text-xs text-white/55">{SUPPORT.hours}</p>
+
+            <a href={ROUTES.contact} className="btn-secondary mt-7 inline-flex">
               Get in Touch →
             </a>
           </Reveal>

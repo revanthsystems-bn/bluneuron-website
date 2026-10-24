@@ -3,9 +3,15 @@ import PageShell from '@/components/PageShell';
 import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
 import {
-  FULL_SPEC_SHEET, BOX_CONTENTS, WARRANTY, SHOW_PENDING_SPECS, MEDIA, THROW_RANGE,
+  FULL_SPEC_SHEET, BOX_CONTENTS, SHOW_PENDING_SPECS, MEDIA, THROW_RANGE,
 } from '@/lib/iriz';
+import { ROUTES } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
+// WARRANTY from site-config, not from lib/iriz. The placeholder object that
+// used to live there — "Warranty terms have not been finalized for launch",
+// with an amber "placeholder only" badge — is deleted; these are the
+// published terms, and they are the same ones /legal/warranty renders.
+import { WARRANTY } from '@/lib/site-config';
 
 // The groups this page actually renders. Everything still lives in
 // FULL_SPEC_SHEET; the pending-detail groups are filtered out here rather than
@@ -203,46 +209,71 @@ export default function SpecsPage() {
         </div>
       </section>
 
-      {/* "In the Box" and "Warranty" are both unconfirmed (see
-          SHOW_PENDING_SPECS in lib/iriz.js), so the gate is on the <section>
-          itself — not on the two tiles inside it. Gating the tiles would leave
-          this section's padding and bottom hairline behind as a blank band
-          between the board above and the comparison block below. */}
-      {SHOW_PENDING_SPECS && (
-        <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
-          <div className="section-container bento-grid">
-            <Reveal y={20} className="bento-tile p-6 sm:p-8 lg:col-span-7">
-              <h2 className="mb-5 text-lg font-semibold text-white">In the Box</h2>
-              {/* BOX_CONTENTS carries rows ({ icon, title, note }), not plain
-                  strings — it is read off the printed carton now and the
-                  homepage section renders it with icon tiles. This list stays
-                  a plain bulleted one: it is a spec-sheet tile beside the
-                  warranty card, not the showcase. The sub-line is appended
-                  after an em dash rather than set on its own line, so a row
-                  here stays one row. See BOX_CONTENTS in lib/iriz.js. */}
-              <ul className="space-y-2.5 text-sm text-white/70">
-                {BOX_CONTENTS.map((item) => (
-                  <li key={item.title} className="flex items-center gap-3">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent-soft" aria-hidden="true" />
-                    <span>
-                      {item.title}
-                      {item.note && <span className="text-white/55">{' — ' + item.note}</span>}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
+      {/* NO LONGER GATED ON SHOW_PENDING_SPECS, and both halves are why.
+          "In the Box" was unconfirmed when this gate went up and is not any
+          more — BOX_CONTENTS is read off the printed carton (see the note on
+          it in lib/iriz.js), which is the most reliable source there is for a
+          packing list. The warranty was the other reason, and the terms are
+          now published. Two confirmed tiles have no business being hidden on
+          the page a buyer opens to check exactly these things.
 
-            <Reveal delay={0.05} y={20} className="bento-tile p-6 sm:p-8 lg:col-span-5">
-              <h2 className="mb-5 text-lg font-semibold text-white">Warranty</h2>
-              <p className="text-sm text-white/70">{WARRANTY.summary}</p>
-              <p className="mt-4 inline-flex rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-300">
-                {WARRANTY.note}
-              </p>
-            </Reveal>
-          </div>
-        </section>
-      )}
+          SHOW_PENDING_SPECS still gates the unmeasured spec ROWS further up
+          (Dimensions & Weight), which is the one thing left that it should. */}
+      <section className="border-b border-border-subtle bg-black-soft py-16 sm:py-20">
+        <div className="section-container bento-grid">
+          <Reveal y={20} className="bento-tile p-6 sm:p-8 lg:col-span-7">
+            <h2 className="mb-5 text-lg font-semibold text-white">In the Box</h2>
+            {/* BOX_CONTENTS carries rows ({ icon, title, note }), not plain
+                strings — it is read off the printed carton now and the
+                homepage section renders it with icon tiles. This list stays
+                a plain bulleted one: it is a spec-sheet tile beside the
+                warranty card, not the showcase. The sub-line is appended
+                after an em dash rather than set on its own line, so a row
+                here stays one row. See BOX_CONTENTS in lib/iriz.js. */}
+            <ul className="space-y-2.5 text-sm text-white/70">
+              {BOX_CONTENTS.map((item) => (
+                <li key={item.title} className="flex items-center gap-3">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent-soft" aria-hidden="true" />
+                  <span>
+                    {item.title}
+                    {item.note && <span className="text-white/55">{' — ' + item.note}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+
+          <Reveal delay={0.05} y={20} className="bento-tile p-6 sm:p-8 lg:col-span-5">
+            <h2 className="mb-5 text-lg font-semibold text-white">Warranty</h2>
+            {/* THE TENURE, THE CLOCK IT RUNS ON, AND A LINK TO THE TERMS.
+                Three lines rather than a summary paragraph, because those
+                are the three things someone checks here — and the link
+                matters most: a warranty claim on a spec sheet that cannot
+                be checked is decoration. */}
+            <p className="text-2xl font-bold tracking-tight text-white">{WARRANTY.label}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">
+              Manufacturer cover from the date on your invoice — not the delivery date, and not
+              the date you registered the unit. Return-to-base service.
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-white/55">{WARRANTY.accessories}</p>
+            {/* A 44px TARGET THAT DOES NOT LOOK LIKE ONE. As plain 14px text
+                this measured 277x20 — under the 44x44 WCAG 2.2 asks of a
+                target, and an awkward tap on a phone. It is a standalone
+                link at the end of a tile, not an inline link inside a
+                paragraph, so the criterion's inline exemption does not cover
+                it. `min-h-[44px] items-center` grows the BOX to 44 while the
+                text stays where it was; `mt-2` in place of `mt-5` and `-mb-3`
+                give back the 24px the box added, so nothing moves. Change the
+                three together or the tile reflows. */}
+            <a
+              href={ROUTES.warranty}
+              className="mt-2 -mb-3 inline-flex min-h-[44px] items-center text-sm font-medium text-white underline underline-offset-4 decoration-white/25 transition-colors hover:decoration-white"
+            >
+              Read the warranty policy →
+            </a>
+        </Reveal>
+        </div>
+      </section>
 
       <section className="bg-black py-16 text-center sm:py-20">
         <div className="section-container">

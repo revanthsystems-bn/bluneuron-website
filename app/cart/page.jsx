@@ -3,7 +3,7 @@ import PageHeading from '@/components/PageHeading';
 import CartPanel from '@/components/cart/CartPanel';
 import { redirect } from 'next/navigation';
 import { ROUTES, routeRobots } from '@/lib/routes';
-import { CART_ENABLED } from '@/lib/site-config';
+import { CART_ENABLED, sellersOr } from '@/lib/site-config';
 import { pageMetadata } from '@/lib/seo';
 
 /**
@@ -21,7 +21,7 @@ import { pageMetadata } from '@/lib/seo';
 export const metadata = {
   ...pageMetadata({
     title: 'Your cart — BluNeuron',
-    description: 'Your BluNeuron cart, and checkout on Amazon or Flipkart.',
+    description: `Your BluNeuron cart, and checkout on ${sellersOr()}.`,
     path: ROUTES.cart,
   }),
   robots: routeRobots(ROUTES.cart),
@@ -45,7 +45,7 @@ export default function CartPage() {
       <PageHeading
         eyebrow="Cart"
         title="Your cart."
-        subtitle="Choose a quantity here, then check out on Amazon or Flipkart — whichever you prefer."
+        subtitle={`Choose a quantity here, then check out on ${sellersOr()}.`}
       />
 
       <section className="bg-black py-14 sm:py-20">

@@ -18,7 +18,7 @@ import {
 } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata, productJsonLd } from '@/lib/seo';
-import { MARKETPLACE, WARRANTY, formatInr } from '@/lib/site-config';
+import { MARKETPLACE, WARRANTY, formatInr, sellersAnd } from '@/lib/site-config';
 
 /**
  * /shop/iriz — the product page.
@@ -92,7 +92,7 @@ export const metadata = {
     // picks whichever it likes — usually not the one with the buy button.
     title: 'Buy BluNeuron IRIZ Mini Projector — ₹13,999 | BluNeuron',
     description:
-      'Buy the BluNeuron IRIZ mini projector: ₹13,999 inclusive of all taxes, 1 year warranty, on Amazon and Flipkart. Native 1080p and true 500 ANSI lumens.',
+      `Buy the BluNeuron IRIZ mini projector: ₹13,999 inclusive of all taxes, ${WARRANTY.label} warranty, on ${sellersAnd()}. Native 1080p and true 500 ANSI lumens.`,
     path: ROUTES.product,
   }),
   robots: routeRobots(ROUTES.product),

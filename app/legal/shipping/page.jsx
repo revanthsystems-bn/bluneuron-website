@@ -2,7 +2,15 @@ import LegalPage from '@/components/LegalPage';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { COMPANY, POLICY_LAST_UPDATED, SUPPORT, WARRANTY } from '@/lib/site-config';
+import {
+  COMPANY,
+  POLICY_LAST_UPDATED,
+  SUPPORT,
+  WARRANTY,
+  sellersAnd,
+  sellersOr,
+  sellersVerb,
+} from '@/lib/site-config';
 
 /**
  * Shipping.
@@ -26,16 +34,16 @@ import { COMPANY, POLICY_LAST_UPDATED, SUPPORT, WARRANTY } from '@/lib/site-conf
 const SECTIONS = [
   {
     heading: 'We do not ship your order',
-    body: `The ${BRAND.fullName} is fulfilled by Amazon or Flipkart, depending on where you bought it. They pick, pack, dispatch and deliver, and their delivery estimate, shipping charge and tracking are the ones that apply to your order.`,
+    body: `The ${BRAND.fullName} is fulfilled by ${sellersOr()}. They pick, pack, dispatch and deliver, and their delivery estimate, shipping charge and tracking are the ones that apply to your order.`,
     note: 'There is no checkout on this site, so there is no order of ours to dispatch and no shipping charge of ours to quote.',
   },
   {
     heading: 'Delivery estimates and charges',
-    body: 'Shown on the product listing and at checkout on Amazon or Flipkart, before you pay. They vary by pincode, by the delivery speed you choose, and by whether you hold a marketplace membership. We do not set them and cannot change them.',
+    body: `Shown on the product listing and at checkout on ${sellersOr()}, before you pay. They vary by pincode, by the delivery speed you choose, and by whether you hold a marketplace membership. We do not set them and cannot change them.`,
   },
   {
     heading: 'Tracking your order',
-    body: 'Track the order in your Amazon or Flipkart orders list. We have no visibility of it — marketplace sellers are not given tracking numbers, delivery dates or courier details for individual orders.',
+    body: `Track the order in your ${sellersOr()} orders list. We have no visibility of it — marketplace sellers are not given tracking numbers, delivery dates or courier details for individual orders.`,
   },
   {
     heading: 'Where the IRIZ ships',
@@ -72,7 +80,7 @@ export const metadata = {
   ...pageMetadata({
     title: 'Shipping — BluNeuron',
     description:
-      'How shipping works for the BluNeuron IRIZ: Amazon and Flipkart deliver every order, and BluNeuron pays the return leg on a service repair.',
+      `How shipping works for the BluNeuron IRIZ: ${sellersAnd()} ${sellersVerb('delivers', 'deliver')} every order, and BluNeuron pays the return leg on a service repair.`,
     path: ROUTES.shipping,
   }),
   robots: routeRobots(ROUTES.shipping),
@@ -83,7 +91,7 @@ export default function ShippingPage() {
     <LegalPage
       title="Shipping"
       path={ROUTES.shipping}
-      intro="Amazon and Flipkart deliver every IRIZ order. The shipping we do handle is the service leg — a unit coming in for repair, and the repaired unit going back."
+      intro={`${sellersAnd()} ${sellersVerb('delivers', 'deliver')} every IRIZ order. The shipping we do handle is the service leg — a unit coming in for repair, and the repaired unit going back.`}
       sections={SECTIONS}
       lastUpdated={POLICY_LAST_UPDATED}
     />

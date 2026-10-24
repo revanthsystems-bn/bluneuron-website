@@ -6,7 +6,7 @@ import AddToCart from '@/components/shop/AddToCart';
 import { BRAND, GALLERY, HERO, MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { MARKETPLACE, WARRANTY, formatInr } from '@/lib/site-config';
+import { MARKETPLACE, WARRANTY, formatInr, sellersAnd } from '@/lib/site-config';
 
 /**
  * /shop — a shop landing page for a catalogue of one.
@@ -47,7 +47,7 @@ export const metadata = {
 /** The three things a shopper checks before the price. Facts, all sourced. */
 const ASSURANCES = [
   { label: 'Warranty', value: `${WARRANTY.label} manufacturer cover` },
-  { label: 'Sold by', value: 'Amazon and Flipkart' },
+  { label: 'Sold by', value: sellersAnd() },
   { label: 'Ships to', value: 'India' },
 ];
 

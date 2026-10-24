@@ -1,56 +1,94 @@
 import LegalPage from '@/components/LegalPage';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { COMPANY, GRIEVANCE_OFFICER, SUPPORT, TBD } from '@/lib/site-config';
+import {
+  COMPANY,
+  GRIEVANCE_OFFICER,
+  SUPPORT,
+  allKnown,
+  sellersOr,
+} from '@/lib/site-config';
 
 /**
  * Grievance redressal.
  *
  * Required of an e-commerce entity by India's Consumer Protection
- * (E-Commerce) Rules 2020: a named officer, a reachable address, and a stated
- * timeline for acknowledging and resolving a complaint. The officer's details
- * also appear on /support/contact — this page is the policy, that page is the
- * route to it, and both read GRIEVANCE_OFFICER from lib/site-config.js so
- * there is one name in one place.
+ * (E-Commerce) Rules, 2020: a grievance contact point, a reachable address,
+ * and published timelines for acknowledging and resolving a complaint. The
+ * same details appear on /support/contact — this page is the policy, that
+ * page is the route to it, and both read GRIEVANCE_OFFICER from
+ * lib/site-config.js so there is one disclosure in one place.
  *
- * The escalation LADDER is deliberately explicit, including the step that
+ * ================================================================
+ * A NAMED PERSON IS RECOMMENDED, AND IS NOT YET APPOINTED.
+ * ================================================================
+ * Rule 4(5) of the Consumer Protection (E-Commerce) Rules, 2020 contemplates
+ * an e-commerce entity APPOINTING a Grievance Officer and displaying that
+ * officer's NAME along with their contact details. We publish the
+ * designation, the entity, the registered address, the email and the
+ * timelines; we do not yet publish a name.
+ *
+ * So `GRIEVANCE_OFFICER.name` is EMPTY, and this page renders NO name line
+ * at all — not "Name: [TBD]", and not a placeholder person. A disclosure that
+ * names nobody is weaker than the Rules intend; a disclosure that names a
+ * fiction is worse, and one held back entirely until a name exists is worst
+ * of all, which is what used to happen here: the whole page sat `noindex`,
+ * out of the sitemap and dropped from the footer over that one blank field,
+ * so an unhappy customer had no published escalation route whatsoever.
+ *
+ * TODO(compliance): appoint a named officer and set GRIEVANCE_OFFICER.name in
+ * lib/site-config.js. The line appears here and on /support/contact with no
+ * other edit.
+ *
+ * THE ESCALATION LADDER is deliberately explicit, including the step that
  * sends people to the marketplace. A buyer whose complaint is about delivery
- * or a refund needs Amazon's or Flipkart's grievance process, not ours, and
+ * or a refund needs the marketplace's grievance process, not ours, and
  * routing them here first would only add a week to it.
  */
+
+/** The address block is omitted rather than invented if it is ever unset. */
+const HAS_ADDRESS = allKnown(COMPANY.legalName, COMPANY.registeredAddress);
+
+/**
+ * The officer block, built row by row, because two of its rows are
+ * conditional and a missing row must leave no trace.
+ *
+ * `name` first when there is one — it is the thing a reader is looking for —
+ * and simply absent when there is not. No label with nothing after it.
+ */
+const OFFICER_ROWS = [
+  ...(allKnown(GRIEVANCE_OFFICER.name) ? [`Name: ${GRIEVANCE_OFFICER.name}`] : []),
+  `Designation: ${GRIEVANCE_OFFICER.designation}`,
+  `Email: ${GRIEVANCE_OFFICER.email}`,
+  ...(HAS_ADDRESS
+    ? [`Entity: ${COMPANY.legalName}`, `Address: ${COMPANY.registeredAddress}`]
+    : []),
+  // NO phone line. Both numbers in SUPPORT_PHONES are still placeholders and
+  // render on preview builds only — a published number that does not ring is
+  // the one thing a grievance disclosure must not contain, because the person
+  // reading it has already been let down once.
+  `Hours: ${GRIEVANCE_OFFICER.hours}`,
+];
+
 const SECTIONS = [
   {
     heading: 'Who to complain to first',
     body: [
-      'A problem with delivery, payment, invoicing, a return or a refund is the marketplace\'s to resolve — raise it with Amazon or Flipkart, who hold the order and the payment.',
+      `A problem with delivery, payment, invoicing, a return or a refund is the marketplace's to resolve — raise it with ${sellersOr()}, who hold the order and the payment.`,
       `A problem with the product, the warranty, our support or anything published on this site is ours — raise it at ${ROUTES.contact} first, so it reaches the team who can fix it fastest.`,
       'If either route does not resolve it, escalate to our grievance officer below.',
     ],
   },
   {
-    // TODO(launch): appoint the officer, fill GRIEVANCE_OFFICER in
-    // lib/site-config.js, and this page stops being a draft on its own —
-    // banner off, `noindex` off, back in the sitemap, back in the footer.
-    // It is the last [TBD] holding the page, along with the two timelines
-    // below.
     heading: 'Grievance officer',
-    body: [
-      `Name: ${GRIEVANCE_OFFICER.name}`,
-      `Email: ${GRIEVANCE_OFFICER.email}`,
-      `Entity: ${COMPANY.legalName}`,
-      `Address: ${COMPANY.registeredAddress}`,
-      // NO phone line. There is no helpline yet, and the row is omitted
-      // rather than printed as "[TBD] — Monday–Saturday…", which reads as a
-      // number we are withholding rather than one that does not exist.
-      // SUPPORT.phone in lib/site-config.js is the single switch.
-      `Written to at: ${SUPPORT.email}, ${SUPPORT.hours}`,
-    ],
+    body: OFFICER_ROWS,
+    note: GRIEVANCE_OFFICER.responsePromise,
   },
   {
     heading: 'What to include',
     body: [
       'Your name, email and phone number.',
-      'Your Amazon or Flipkart order ID, and the serial number if the complaint is about a unit.',
+      `Your ${sellersOr()} order ID, and the serial number if the complaint is about a unit.`,
       'What happened, what you have already tried, and what you are asking for.',
       'Any reference number from an earlier support message, so the history is not lost.',
     ],
@@ -58,10 +96,12 @@ const SECTIONS = [
   {
     heading: 'Acknowledgement and resolution timelines',
     body: [
-      `Acknowledgement of a grievance: ${TBD}.`,
-      `Resolution, or a written explanation of the delay: ${TBD}.`,
+      'Acknowledgement of a grievance: within 48 hours of receiving it.',
+      'Resolution, or a written explanation of the delay: within 30 days.',
     ],
-    note: 'These must be set at or inside the statutory maximums — 48 hours to acknowledge and one month to resolve under the Consumer Protection (E-Commerce) Rules 2020 — before this page is published.',
+    // The statutory maximums, stated so a reader can see that the commitment
+    // above sits at or inside them rather than having to look them up.
+    note: 'These are at or inside the statutory maximums under the Consumer Protection (E-Commerce) Rules, 2020 — 48 hours to acknowledge and one month to resolve. Where a complaint needs a unit inspected, the 30 days runs from the day the unit reaches our service centre, and we will say so in the acknowledgement.',
   },
   {
     heading: 'If you are still not satisfied',
@@ -69,8 +109,8 @@ const SECTIONS = [
   },
   {
     heading: 'Records',
-    body: `How long grievance correspondence is retained, and where: ${TBD}.`,
-    note: `Must be consistent with the retention statement in the privacy policy at ${ROUTES.privacy}.`,
+    body: `Grievance correspondence is support correspondence, and is kept for as long as it takes to resolve the matter and handle any follow-up — the same basis as every other message you send us, set out under "How long we keep it" in our privacy policy at ${ROUTES.privacy}. Where the complaint concerns a registered unit, the registration and claim record it is attached to is kept for the length of the warranty and a reasonable period after it, because a later claim is assessed against it.`,
+    note: `You can ask us to show you, correct or delete what we hold about you by emailing ${SUPPORT.email}.`,
   },
 ];
 

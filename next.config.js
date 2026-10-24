@@ -290,6 +290,34 @@ const nextConfig = {
         destination: '/support/contact',
         permanent: true,
       },
+      /*
+       * `/support/manuals` is RETIRED, and this is what makes the route stop
+       * existing on all three hosts.
+       *
+       * None of the three PDFs exists yet, so the page was three cards
+       * reading "not available for download yet" behind a footer link, a
+       * support tile and a sitemap entry. The links are gone (lib/routes.js)
+       * and the page is parked at app/support/_manuals/, which Next's
+       * underscore convention keeps out of the router — so without this rule
+       * the path would simply 404.
+       *
+       * A REDIRECT RATHER THAN A 404, because the URL has been linked and
+       * indexed: /support is where someone who wanted a manual should land,
+       * and it carries the FAQ, the setup answers and a way to ask. A 404
+       * would be truthful and useless, which is the same argument /cart's
+       * redirect is built on.
+       *
+       * 307, NOT 308. This one is temporary and meant to be undone: the
+       * documents are coming, and a permanent redirect is cached hard by
+       * browsers and search engines — exactly what you do not want on a path
+       * you intend to serve again. The /warranty rule above is permanent for
+       * the opposite reason: it is printed on a carton.
+       */
+      {
+        source: '/support/manuals',
+        destination: '/support',
+        permanent: false,
+      },
     ];
   },
 };
