@@ -14,6 +14,7 @@
     "validate:seo": "node scripts/validate-seo.js",
     "check:media": "node scripts/check-media.js",
     "check:production": "node scripts/check-production.js",
+    "assert:footer-links": "node scripts/assert-footer-links.mjs",
     "test:cart": "node scripts/test-cart-flow.mjs",
     "test:club-serial": "node scripts/test-club-serial.mjs",
     "test:club": "node scripts/test-club-flow.mjs",

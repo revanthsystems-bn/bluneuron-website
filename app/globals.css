@@ -1577,6 +1577,133 @@
     filter: saturate(0.7) brightness(0.9);
   }
 
+  /* ---- The footer's subscribe pill ------------------------------ *
+   *
+   * One shell, two children: the email field and a white button sitting
+   * inside it. Deliberately NOT the blue `.notify-submit` gradient — the
+   * footer is the quietest surface on the site and a glowing blue CTA down
+   * there competes with the buy button on the page above it. White on the
+   * dark shell reads as the one action in the column without shouting.
+   *
+   * 54px SHELL, 1px border, 4px padding, 44px of content — and the 54 is
+   * arithmetic, not taste. Both children have to clear the WCAG 2.2 target
+   * floor with their REAL boxes rather than with a hit area drawn around
+   * something smaller, so the inner height has to be 44; a 52px shell leaves
+   * 42 once the border and the padding are taken out, and the <input> was
+   * measured at 215x42. 44 + 8 + 2 = 54. It also matches `.notify-submit`,
+   * which is 54px tall for the same reason.
+   */
+  .subscribe-field {
+    @apply relative flex h-[54px] w-full items-center gap-2 overflow-hidden rounded-full p-1;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  }
+
+  /* `:focus-within`, like `.notify-field`: the ring belongs to the shell the
+     input and the button both sit in, not to the bare <input>. */
+  .subscribe-field:focus-within {
+    border-color: rgba(59, 130, 246, 0.85);
+    background: rgba(59, 130, 246, 0.06);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
+  }
+
+  .subscribe-field[data-invalid='true'] {
+    border-color: rgba(248, 113, 113, 0.7);
+    background: rgba(248, 113, 113, 0.05);
+  }
+
+  .subscribe-field[data-invalid='true']:focus-within {
+    box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.16);
+  }
+
+  /* `min-w-0` is what keeps the button from being squeezed off the end: a
+     flex item's default `min-width: auto` lets an <input> claim its intrinsic
+     size, which at 360px is wider than the shell. */
+  .subscribe-input {
+    @apply h-full min-w-0 flex-1 bg-transparent pl-4 text-sm text-white outline-none;
+  }
+
+  .subscribe-input::placeholder {
+    color: rgba(255, 255, 255, 0.32);
+  }
+
+  .subscribe-input:disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+
+  .subscribe-submit {
+    @apply flex h-[44px] shrink-0 items-center justify-center rounded-full px-5 text-sm font-semibold text-black;
+    background: #ffffff;
+    transition: background-color 160ms ease, transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .subscribe-submit:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.86);
+  }
+
+  .subscribe-submit:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .subscribe-submit:disabled {
+    @apply cursor-not-allowed;
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  /* The spinner is white-on-blue everywhere else; in here it sits on the
+     white button, so it needs the opposite ink. */
+  .subscribe-submit .notify-spinner {
+    border-color: rgba(0, 0, 0, 0.25);
+    border-top-color: #000000;
+  }
+
+  /* ---- Footer links --------------------------------------------- *
+   *
+   * 15px and #c9ccd2 — a step up from the 14px white/60 these were, which
+   * measured under 4.5:1 on black and read as disabled text. #c9ccd2 on
+   * #000 is ~11.5:1, so the columns are legible rather than merely present,
+   * and the hover to pure white is still a visible change.
+   *
+   * `min-h-[44px]` on the ANCHOR with no vertical space in the list's own
+   * `space-y`: each link grows into padding it already had around it rather
+   * than pushing the column taller. `w-fit` matters — a block-level anchor
+   * would make the whole column width clickable, which is a different bug.
+   */
+  .footer-link {
+    @apply inline-flex min-h-[44px] w-fit min-w-[44px] items-center text-[15px] leading-snug transition-colors;
+    color: #c9ccd2;
+  }
+
+  .footer-link:hover {
+    color: #ffffff;
+  }
+
+  .footer-link:focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-accent-soft;
+    color: #ffffff;
+  }
+
+  /* 12px, letter-spaced, grey caps. The uppercase is CSS and not the data,
+     so lib/routes.js keeps readable titles and a screen reader is not handed
+     an acronym.
+  
+     WHITE/55 IS THE FLOOR FOR 12px ON BLACK, and it is measured, not chosen:
+     white/45 composites to #737373, which axe-core puts at 4.42:1 against
+     #000 — under the 4.5:1 AA minimum for text this size, and it failed on
+     every route the moment this heading went sitewide. /55 is #8c8c8c and
+     6.2:1. Anything muted enough to read as "grey caps" down here is close
+     enough to that line to be worth re-running scripts/ui-audit.mjs over. */
+  .footer-heading {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-white/55;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .subscribe-submit {
+      transition: none;
+    }
+  }
+
   .notify-spinner {
     @apply h-4 w-4 rounded-full border-2;
     border-color: rgba(255, 255, 255, 0.35);

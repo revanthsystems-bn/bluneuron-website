@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import BrandWordmark from './BrandWordmark';
 import Magnetic from './Magnetic';
 import AccountButton from './account/AccountButton';
 import CartButton from './cart/CartButton';
@@ -299,15 +299,14 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
         >
-          {/* TWO wordmark files, stacked and cross-faded on opacity.
-              Not a CSS filter on the one asset: the mark is white glyphs plus
-              one BRAND-BLUE word (rgb(2,109,254)), and `invert()` turns that
-              blue orange while `brightness(0)` throws it away entirely.
-              `wordmark-ink.png` is the same art with only the white
-              recoloured to #030303, so the blue survives the handover.
+          {/* TWO wordmark variants, stacked and cross-faded on opacity.
+              Why there are two files rather than one asset and a CSS filter
+              is explained once, in components/BrandWordmark — which is also
+              where the intrinsic size lives, and which the footer renders
+              too, so the two surfaces cannot drift apart on either.
 
               Stacked rather than swapped so the transition interpolates —
-              swapping `src` would pop. The second copy is absolutely
+              swapping `variant` would pop. The second copy is absolutely
               positioned and `aria-hidden`, so the accessibility tree still
               sees exactly one wordmark. */}
           <span className="relative inline-flex h-5">
@@ -318,20 +317,15 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
                 a next/image prop at all and did nothing but reach the DOM.)
                 Only the white copy gets it; the ink copy is for the light test
                 and is never the first thing painted. */}
-            <Image
-              src="/brand/wordmark-white.png"
-              alt="BluNeuron"
-              width={1715}
-              height={327}
+            <BrandWordmark
+              variant="white"
               priority
               className={`h-5 w-auto transition-opacity duration-500 ${ink ? 'opacity-0' : 'opacity-100'}`}
             />
-            <Image
-              src="/brand/wordmark-ink.png"
+            <BrandWordmark
+              variant="ink"
               alt=""
               aria-hidden="true"
-              width={1715}
-              height={327}
               className={`absolute inset-0 h-5 w-auto transition-opacity duration-500 ${ink ? 'opacity-100' : 'opacity-0'}`}
             />
           </span>

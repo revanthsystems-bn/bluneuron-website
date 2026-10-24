@@ -16,6 +16,27 @@
  * rather than from the two parents: there is exactly one place in the codebase
  * where a signup is known to have succeeded, so both surfaces report a Lead by
  * construction and a third surface added later cannot forget to.
+ *
+ * ---------------------------------------------------------------------------
+ * `variant` — 'stacked' (the modal and the inline form) or 'pill' (the
+ * footer's subscribe box).
+ * ---------------------------------------------------------------------------
+ * A PROP ON THIS COMPONENT, not a third form. The footer needed a one-line
+ * email-and-button pill, which is a different SHAPE from the modal's stacked
+ * labelled fields — but it is the same signup, to the same Web3Forms inbox,
+ * and it must count as the same conversion. Writing it as its own component
+ * would have put a second `submitNotifySignup` call and a second
+ * `trackMetaPixel('Lead')` in the codebase, and the paragraph above would
+ * stop being true the day one of them was edited and the other was not.
+ *
+ * So the variant changes the markup and nothing else. Validation order, phone
+ * normalisation, the honeypot, what counts as success, the pixel event and
+ * the error copy are all above the branch and shared by both.
+ *
+ * The pill drops the MOBILE field — it is optional everywhere (an empty one
+ * has always been valid and `submitNotifySignup` omits a blank one from the
+ * payload), and a footer is not where someone hands over a phone number. The
+ * field's validator still runs; `phone` is simply always ''.
  */
 
 import { useId, useRef, useState } from 'react';
@@ -28,7 +49,9 @@ export default function NotifyFields({
   submitLabel = 'Notify me',
   emailRef,
   disabled = false,
+  variant = 'stacked',
 }) {
+  const pill = variant === 'pill';
   const uid = useId();
   const emailId = `${uid}-email`;
   const phoneId = `${uid}-phone`;
@@ -95,6 +118,87 @@ export default function NotifyFields({
       setFormError(err?.message || 'Something went wrong. Please try again.');
     }
   };
+
+  /*
+   * THE PILL — one row: email, then the button, inside a single rounded
+   * shell. The footer's subscribe box and nothing else.
+   *
+   * The label is `sr-only` rather than absent. A placeholder is not a label:
+   * it disappears the moment someone types, so a screen reader user who tabs
+   * back into a filled field hears the value and nothing about what it is.
+   * The visible affordance is the placeholder, the accessible name is the
+   * label, and both say the same thing.
+   */
+  if (pill) {
+    return (
+      <form onSubmit={handleSubmit} noValidate className="mt-5">
+        {/* The same Web3Forms honeypot as the stacked form — see the note on
+            it below. A bot that fills every input in the DOM ticks it and the
+            submission is rejected before the request is made. */}
+        <input
+          ref={botcheckRef}
+          type="checkbox"
+          name="botcheck"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="pointer-events-none absolute left-[-9999px] h-0 w-0 opacity-0"
+        />
+
+        <div className="subscribe-field" data-invalid={Boolean(fieldErrors.email)}>
+          <label htmlFor={emailId} className="sr-only">
+            Email address
+          </label>
+          <input
+            ref={emailRef}
+            id={emailId}
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            disabled={busy}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your email"
+            aria-invalid={Boolean(fieldErrors.email)}
+            aria-describedby={
+              [fieldErrors.email ? emailErrorId : null, formError ? formErrorId : null]
+                .filter(Boolean)
+                .join(' ') || undefined
+            }
+            className="subscribe-input"
+          />
+          {/* 44px tall inside a 52px shell — the shell's own 4px padding is
+              the gap, so the target clears the touch floor without the
+              button becoming the whole box. */}
+          <button type="submit" disabled={busy} className="subscribe-submit">
+            {status === 'submitting' ? (
+              <>
+                <span className="notify-spinner" aria-hidden="true" />
+                <span className="sr-only">Submitting…</span>
+              </>
+            ) : (
+              submitLabel
+            )}
+          </button>
+        </div>
+
+        {/* Field error and submission failure read the same here: the pill has
+            one field, so there is no "which one" to answer and stacking two
+            messages under it would just push the socials down. */}
+        {fieldErrors.email && (
+          <p id={emailErrorId} className="notify-error">
+            {fieldErrors.email}
+          </p>
+        )}
+        {formError && (
+          <p id={formErrorId} role="alert" className="notify-error">
+            {formError}
+          </p>
+        )}
+      </form>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="mt-7 text-left">
