@@ -4,6 +4,7 @@ import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import {
   COMPANY,
+  DELIVERY_WINDOWS,
   SUPPORT,
   WARRANTY,
   WARRANTY_CLAIM_STEPS,
@@ -29,10 +30,12 @@ import {
  * THE COMPANION PAGE is /legal/returns, and the split is not cosmetic: "my
  * unit has failed, what now" is this page, and "it arrived broken / I want to
  * send it back" is that one. One page would bury each half in the other, and
- * this is the half someone reads two years after buying. The 48-hour
- * on-arrival window is the single clause that belongs to both, so both read
- * one constant — WARRANTY.onDelivery here, RETURNS.damageReportHours there —
- * and state the same figure.
+ * this is the half someone reads two years after buying.
+ *
+ * THE TWO DELIVERY CLOCKS BELONG TO BOTH PAGES, so neither page writes them:
+ * both interpolate DELIVERY_WINDOWS from lib/site-config.js and therefore
+ * state them in identical words. They used to be separate prose and they
+ * disagreed — 48 hours here against 7 days there, for the same dead unit.
  *
  * WHAT IS DELIBERATELY NOT HERE:
  *   - No helpline. Both numbers in SUPPORT_PHONES are still placeholders and
@@ -86,9 +89,15 @@ const SECTIONS = [
     note: 'A faulty remote, cable or adapter inside the cover period is still worth telling us about. Write to us and we will say what we can do, even where the standard warranty does not reach it.',
   },
   {
-    heading: 'On delivery',
-    body: WARRANTY.onDelivery,
-    note: `Photograph the outer packaging before you open it, and the unit before you set it up. Whether a projector arrived damaged stops being answerable almost immediately, which is why this window is short and why the photographs matter. Our own replacement windows are set out at ${ROUTES.returns}.`,
+    // THE SAME THREE STRINGS /legal/returns renders. See DELIVERY_WINDOWS in
+    // lib/site-config.js, and do not reword either of them here.
+    heading: 'On delivery, and in the first week',
+    body: [
+      DELIVERY_WINDOWS.damaged,
+      DELIVERY_WINDOWS.earlyFailure,
+      DELIVERY_WINDOWS.marketplaceNote,
+    ],
+    note: `Photograph the outer packaging before you open it, and the unit before you set it up. Whether a projector arrived damaged stops being answerable almost immediately, which is why that window is short and why the photographs matter. The full replacement terms are at ${ROUTES.returns}.`,
   },
   {
     heading: 'How to make a claim',

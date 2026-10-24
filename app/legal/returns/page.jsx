@@ -3,6 +3,7 @@ import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import {
+  DELIVERY_WINDOWS,
   POLICY_LAST_UPDATED,
   RETURNS,
   SUPPORT,
@@ -63,9 +64,14 @@ const SECTIONS = [
   {
     heading: 'Our replacement windows, and the clock on each',
     body: [
-      `Arrived damaged, or does not power on: report within ${RETURNS.damageReportHours} hours of delivery, with photographs or a short video. This is the same window and the same evidence the warranty policy asks for at ${ROUTES.warranty}.`,
-      `A unit that powers on but proves faulty inside the first ${RETURNS.replacementDays} days of use: tell us within those ${RETURNS.replacementDays} days of delivery to receive a fresh replacement unit rather than a repair.`,
+      // THE SAME TWO STRINGS /legal/warranty renders, from the same
+      // constants. Do not reword one of them here: two policy pages
+      // disagreeing about a deadline a buyer can miss is the exact bug
+      // DELIVERY_WINDOWS exists to prevent, and it is the bug that was here.
+      DELIVERY_WINDOWS.damaged,
+      DELIVERY_WINDOWS.earlyFailure,
       `Wrong item or a specification mismatch — the unit delivered is not what was ordered: report within ${RETURNS.damageReportHours} hours of delivery.`,
+      `${DELIVERY_WINDOWS.marketplaceNote} The warranty policy at ${ROUTES.warranty} states the first two in the same words.`,
     ],
     // The two figures restated from RETURNS, the same constants the bullets
     // above interpolate. No new wording.
@@ -73,7 +79,7 @@ const SECTIONS = [
       label: `${RETURNS.damageReportHours} hours for damage on arrival · ${RETURNS.replacementDays} days for an early failure`,
       value: 'Both clocks start at delivery. The marketplace you bought from also has its own window, usually wider.',
     },
-    note: 'The two clocks differ because the questions differ. Whether a unit arrived damaged stops being answerable almost immediately, which is why that one is short and wants photographs; whether a unit is reliable is answerable over a week of use. Photograph the outer packaging and the unit before anything else.',
+    note: 'The two clocks differ because the questions differ. Whether a unit ARRIVED damaged stops being answerable almost immediately, which is why that one is short and wants photographs. Whether a unit is RELIABLE is answerable over a week of use — and a failure inside that week is replaced rather than repaired, because a unit that dies in its first week should not come back mended. Photograph the outer packaging and the unit before anything else.',
   },
   {
     heading: 'Condition of a returned unit',

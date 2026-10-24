@@ -2,7 +2,7 @@ import PageShell from '@/components/PageShell';
 import PageHero from '@/components/PageHero';
 import DraftBanner from '@/components/DraftBanner';
 import { Download, FileText } from 'lucide-react';
-import { SETUP_STEPS, MEDIA } from '@/lib/iriz';
+import { MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import { MANUALS, TBD, isTBD } from '@/lib/site-config';
@@ -52,21 +52,20 @@ export const metadata = {
  * a careless rename without step 3 fails loudly at build time rather than
  * shipping a page with no canonical and no robots tag.
  *
- * NOTE, AND IT IS A REAL LOSS: the "Setup in five steps" walkthrough at the
- * bottom of this page went with it. SETUP_STEPS (lib/iriz.js) is confirmed
- * content and is now rendered nowhere. It belongs on /support/faq — the
- * question it answers is "how do I set this up" — and moving it there is a
- * separate change from retiring the documents.
+ * THE SETUP WALKTHROUGH IS NOT HERE ANY MORE, and must not come back with
+ * the documents. "Setup in five steps" was the one piece of confirmed content
+ * on this page, so it moved to /support/faq, where it now LEADS the page: the
+ * question it answers is "how do I set this up", which belongs with the other
+ * questions, and leaving it behind a 307 would have made the only first-run
+ * instructions on the site unreachable.
+ *
+ * So the section is deleted from this file rather than left commented out.
+ * Restoring this page must NOT re-add it — SETUP_STEPS would then render on
+ * two routes and the same walkthrough would be indexed twice.
  *
  * ---------------------------------------------------------------------------
  *
- * Documents, plus the setup walkthrough that used to live on /support.
- *
- * The setup steps moved HERE rather than to /support/faq because they are not
- * a question — they are the quick-start guide, written out. Putting them on
- * the same page as the PDF of the quick-start guide means the one person who
- * needs them most (a box just opened, no printer, phone in hand) does not have
- * to download anything to follow them.
+ * The documents.
  *
  * A card whose `file` is still TBD renders as a PLACEHOLDER, not as a download
  * button: a visible "not available yet" is better than a button that produces
@@ -134,43 +133,6 @@ export default function ManualsPage() {
         </div>
       </section>
 
-      <section className="bg-black-soft py-16 sm:py-20">
-        <div className="section-container">
-          <div className="mb-10 max-w-lg">
-            <p className="eyebrow mb-3">Getting started</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
-              Setup in five steps
-            </h2>
-          </div>
-
-          {/* Five steps on the 12-column board: two 6-wide pairs, then the last
-              one full width so the row doesn't end on a hole. */}
-          <ol className="bento-grid">
-            {SETUP_STEPS.map((step, i) => (
-              <li
-                key={step.title}
-                className={`bento-tile flex-row gap-4 p-6 ${
-                  i === SETUP_STEPS.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
-                }`}
-              >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white">
-                  {i + 1}
-                </span>
-                <div>
-                  <h3 className="mb-1.5 text-sm font-semibold text-white">{step.title}</h3>
-                  <p className="text-sm leading-relaxed text-white/55">{step.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-
-          <div className="mt-8">
-            <a href={ROUTES.faq} className="btn-secondary inline-flex">
-              FAQ & troubleshooting →
-            </a>
-          </div>
-        </div>
-      </section>
     </PageShell>
   );
 }
