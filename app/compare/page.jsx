@@ -1,8 +1,8 @@
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
+import PageHero from '@/components/PageHero';
 import ComparisonTable from '@/components/ComparisonTable';
 import Reveal from '@/components/Reveal';
-import { COMPARISON } from '@/lib/iriz';
+import { COMPARISON, MEDIA } from '@/lib/iriz';
 import { pageMetadata } from '@/lib/seo';
 
 export const metadata = pageMetadata({
@@ -18,7 +18,7 @@ export const metadata = pageMetadata({
 // assistant to put in the cell, and an empty one would be a comparison the
 // table cannot support.
 const EXTRA_ROWS = [
-  { label: 'App Store', iriz: '10,000+ official apps, pre-installed', other: 'Sideloading required, if supported' },
+  { label: 'Apps', iriz: 'Installed over Wi-Fi, on the device', other: 'Sideloading required, if supported' },
   { label: 'Video Decoding', iriz: 'Up to 8K (decode)', other: 'Typically 1080p or lower' },
   { label: 'Chipset', iriz: 'Allwinner H723, Quad-core Cortex-A53', other: 'Often unnamed/unspecified' },
   { label: 'Projection Distance', iriz: '0.9m – 5m', other: 'Varies, often more restrictive' },
@@ -29,10 +29,12 @@ export default function ComparePage() {
 
   return (
     <PageShell>
-      <PageHeading
+      <PageHero
         eyebrow="IRIZ vs. Others"
         title='Not all "500 lumens" are the same.'
         subtitle="A side-by-side look at where the BluNeuron IRIZ pulls ahead of a typical budget projector."
+        image={MEDIA.product.heroClean}
+        imagePosition="62% 50%"
       />
 
       <ComparisonTable

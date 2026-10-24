@@ -1,29 +1,40 @@
 import Image from 'next/image';
 import { REGION, SHOW_PRIVACY, SOCIAL_LINKS } from '@/lib/iriz';
+import { FOOTER_COLUMNS, ROUTES, isDraftRoute } from '@/lib/routes';
+import { COMPANY, allKnown } from '@/lib/site-config';
 
 /**
- * A deliberately minimal footer: wordmark, market, socials, copyright.
+ * THE LINK COLUMNS ARE BACK — Product, Support, Policies, Company.
  *
- * The four link columns (Product / Support / Company / Legal) are GONE. Every
- * route they pointed at still exists and is still reachable — /specs and
- * /compare from the masthead nav, /support and /about by URL, the legal pages
- * from the consent bar and the signup forms — they are simply not restated at
- * the bottom of every page.
+ * They were removed once, on the reasoning that every route they pointed at
+ * was reachable some other way: /specs and /compare from the masthead,
+ * /support and /about by URL, the legal pages from the consent bar and the
+ * signup forms. That held while the site was a pre-launch teaser with four
+ * destinations.
  *
- * The Privacy Policy link is BACK in the bottom row, beside the copyright.
- * It had been removed on the reasoning that the notice only has to be visible
- * where the collection happens — which it still is, in components/ConsentNotice
- * and in both signup forms' fine print. That reasoning covers consent; it does
- * not cover someone who has already signed up and simply wants to re-read the
- * policy, and the footer is the first place anyone looks for it. Both now.
+ * It stops holding the moment the product sells on Amazon and Flipkart. A
+ * marketplace buyer does not arrive at the homepage and browse down — they
+ * arrive at a policy page from a search, or at this site from a link on an
+ * invoice, already owning the thing, looking for a warranty claim or a return
+ * window. The masthead nav is about choosing the product; it has nothing for
+ * someone who already has one. The footer is where that person looks, on every
+ * page, and sixteen routes cannot be reached from a masthead with four.
  *
- * It is gated on SHOW_PRIVACY (lib/iriz.js) like every other privacy surface,
- * so the four of them can be turned off together.
+ * Column content and order come from FOOTER_COLUMNS in lib/routes.js, which is
+ * also where the paths themselves are defined — so a footer link cannot point
+ * at a page that does not exist, and a renamed route updates here for free.
  *
- * NOT a client component any more. The only thing that ever needed state here
- * was the region <select>, and a static label needs none. Both consumers
- * (app/page.jsx, components/PageShell) are server components, so dropping
- * 'use client' keeps the footer out of every page's JS bundle.
+ * THE IDENTITY LINE at the bottom (legal name, GSTIN, registered address) is a
+ * disclosure, not decoration: India's Consumer Protection (E-Commerce) Rules
+ * expect a seller's legal identity and address to be discoverable, and the
+ * footer of every page is where that belongs. It renders only once all three
+ * are real — a footer reading "GSTIN: [TBD]" looks like a broken site rather
+ * than an unfinished one, and a half-filled disclosure is worse than none.
+ * See lib/site-config.js.
+ *
+ * Still NOT a client component. Nothing here has state — the region is a
+ * static label, and both consumers (app/page.jsx, components/PageShell) are
+ * server components, so the whole footer stays out of every page's JS bundle.
  */
 
 /**
@@ -54,28 +65,51 @@ const ICONS = {
 // config object.
 const SOCIAL_ORDER = ['linkedin', 'instagram', 'youtube'];
 
-/**
- * The bottom row's links, in render order, before Privacy Policy.
+/*
+ * ===========================================================================
+ * THE BOTTOM ROW IS PRIVACY POLICY ONLY ON THIS BRANCH. Do not add Warranty,
+ * Warranty claim or Warranty registration to it here.
+ * ===========================================================================
  *
- * The warranty three are here and NOT in the masthead deliberately. They are
- * looked for, not browsed: someone reaches for them with a dead projector or
- * a carton in hand, and the footer is where a person looks for that kind of
- * link. Putting them in the nav would spend the masthead's attention budget
- * on an errand almost no visitor is on.
+ * Those three links are real, and they belong to the CLOUDFLARE branch's
+ * footer. That footer has no link columns at all — the live site is a
+ * single-product launch page, so its bottom row is the only place a warranty
+ * link can live, and a visitor with a dead projector or a carton in hand has
+ * nowhere else to look.
  *
- * The registration page is also reachable at /warranty, the short address
- * printed on the carton — see the redirect in next.config.js.
+ * This branch is the opposite case. FOOTER_COLUMNS (lib/routes.js) already
+ * carries all three, a few centimetres above this row:
  *
- * Not gated on SHOW_PRIVACY: that flag turns off the privacy SURFACES
- * together (components/ConsentNotice, the signup fine print, the link
- * below). A warranty policy is a product promise, not a privacy disclosure,
- * and must stay reachable whatever that flag says.
+ *   Support   -> Warranty registration, Warranty claim
+ *   Policies  -> Warranty
+ *
+ * so repeating them here renders each one twice in the same footer. That is
+ * exactly what the 2026-10-16 cloudflare -> launch-site merge did, and this
+ * comment exists because the merge will happen again.
+ *
+ * MERGING, IN BOTH DIRECTIONS:
+ *
+ *   cloudflare -> launch-site   The bottom-row links will conflict here
+ *                               again. Keep THIS version (`--ours` on
+ *                               launch-site). Do not take the cloudflare
+ *                               footer wholesale; it has no columns, so the
+ *                               warranty links would be the only copy there
+ *                               and the only copy here would be duplicated.
+ *
+ *   launch-site -> cloudflare   Take CLOUDFLARE's footer (`--ours` on
+ *                               cloudflare), not this one. Resolving that
+ *                               conflict in launch-site's favour would strip
+ *                               the warranty links off the live site
+ *                               entirely — this branch's columns, which are
+ *                               where they would have gone, do not exist
+ *                               there. /warranty is printed on the carton,
+ *                               so a live footer with no warranty link is
+ *                               not a cosmetic regression.
+ *
+ * In short: the two footers are deliberately different and neither is the
+ * merge winner in both directions. Resolve per branch, never by taking
+ * whichever side the tool offers first.
  */
-const BOTTOM_LINKS = [
-  { href: '/legal/warranty', label: 'Warranty' },
-  { href: '/support/warranty-claim', label: 'Warranty claim' },
-  { href: '/support/warranty-registration', label: 'Warranty registration' },
-];
 
 export default function Footer() {
   // An icon renders only when its URL is non-empty, so no icon can ever link
@@ -87,19 +121,100 @@ export default function Footer() {
     ...ICONS[key],
   }));
 
+  /**
+   * A DRAFT page is not linked from the footer of every page on the site.
+   *
+   * The three things draft state already drives — the banner, the `noindex`
+   * and the sitemap — all keep a crawler and a reader from treating an
+   * unfinished page as finished. A sitewide footer link is the fourth, and
+   * the most prominent of them: it puts "Grievance redressal" in front of
+   * every visitor and lands the ones who need it most on a page that cannot
+   * yet name its officer. The link returns on its own the moment the page
+   * stops being a draft, from the same table (lib/routes.js) the other three
+   * read. Columns that empty out entirely are dropped with it, so no heading
+   * is left standing over nothing.
+   */
+  const columns = FOOTER_COLUMNS.map((column) => ({
+    ...column,
+    links: column.links.filter((link) => !isDraftRoute(link.href)),
+  })).filter((column) => column.links.length > 0);
+
+  // GSTIN is NOT part of this test. The disclosure that matters under the
+  // Consumer Protection (E-Commerce) Rules is who the seller is and where
+  // they are; the GSTIN is an extra line that renders when we have one and
+  // is simply absent when we do not (COMPANY.gstin is '' — see the note on
+  // it in lib/site-config.js). Requiring all three meant one unset field
+  // suppressed the legal name and the address as well, which is the opposite
+  // of what the test is for.
+  const showIdentity = allKnown(COMPANY.legalName, COMPANY.registeredAddress);
+
   return (
     <footer className="border-t border-border-subtle bg-black">
       {/* `pb-28` below lg, not plain `py`: StickyBuyBar is `fixed bottom-0
-          lg:hidden`, so on a phone it sits over whatever the footer puts last —
-          which is now the copyright line. Same offset-for-the-bar precedent as
-          components/ConsentNotice. Pages without the buy bar just get a little
-          extra air under the footer, which costs nothing. */}
-      <div className="section-container pb-28 pt-10 sm:pt-12 lg:pb-12">
-        {/* One compact row. The columns that used to sit above this are gone,
-            so the old `mt-14 ... border-t pt-8` that separated them from it
-            went with them — kept, it would hold open the exact gap removing
-            them was meant to close. */}
-        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+          lg:hidden`, so on a phone it sits over whatever the footer puts last.
+          Same offset-for-the-bar precedent as components/ConsentNotice. Pages
+          without the buy bar just get a little extra air under the footer,
+          which costs nothing. */}
+      <div className="section-container pb-28 pt-14 sm:pt-16 lg:pb-12">
+        {/*
+          Two columns at 390px rather than four or one: four is unreadable at
+          that width, and one turns a 17-link footer into a very long scroll
+          past the end of the content.
+
+          CSS MULTI-COLUMN below lg, not a 2-up grid. In a grid every row is as
+          tall as its tallest cell, so "Product" (4 links) beside "Support" (6)
+          leaves two links' worth of dead space before the next row starts —
+          about 200px of empty black in the middle of the footer on a phone.
+          Multi-column flows the four blocks into two balanced columns instead
+          and packs them with no gaps. `break-inside-avoid` is what keeps a
+          column's own links from being split across the fold.
+
+          At lg it goes back to a real four-column grid, where each heading
+          gets its own column and the balancing multi-column does is not wanted.
+        */}
+        <nav
+          aria-label="Footer"
+          className="columns-2 gap-x-6 lg:grid lg:grid-cols-4 lg:gap-x-6 lg:[column-count:auto]"
+        >
+          {columns.map((column) => (
+            <div key={column.title} className="mb-10 break-inside-avoid lg:mb-0">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
+                {column.title}
+              </h2>
+              {/*
+                THE TARGET IS 44px TALL; THE TEXT STILL LOOKS THE SAME SIZE.
+
+                These rows were ~20px high — the smallest tap targets on the
+                site, and there are 19 of them on every page. The fix is
+                `inline-flex` + `min-h-[44px]` on the ANCHOR with the vertical
+                space taken out of the list's own `space-y`, so each link grows
+                into padding it already had around it rather than pushing the
+                column taller. Measured at 390: the footer's height is within
+                a few pixels of what it was.
+
+                `w-fit` matters — a block-level anchor would make the whole
+                column width clickable, which is a different bug.
+              */}
+              <ul className="mt-2 space-y-0">
+                {column.links.map((link) => (
+                  <li key={`${column.title}-${link.href}-${link.label}`}>
+                    <a
+                      href={link.href}
+                      className="inline-flex min-h-[44px] w-fit min-w-[44px] items-center text-sm text-white/60 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        {/* `mt-4` not `mt-14`: each column block already carries `mb-10` for
+            the multi-column flow, so the gap below the last one is mostly
+            there already. */}
+        <div className="mt-4 flex flex-col items-start justify-between gap-6 border-t border-border-subtle pt-10 sm:flex-row sm:items-center lg:mt-14">
           <Image
             src="/brand/wordmark-white.png"
             alt="BluNeuron"
@@ -135,62 +250,105 @@ export default function Footer() {
                 region label with nothing in it. See SOCIAL_LINKS in
                 lib/iriz.js. */}
             {socials.length > 0 && (
-            <ul className="flex items-center gap-2">
-              {socials.map((social) => (
-                <li key={social.key}>
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`BluNeuron on ${social.label}`}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle text-white/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-[15px] w-[15px]"
-                      fill="currentColor"
-                      aria-hidden="true"
+              <ul className="flex items-center gap-2">
+                {socials.map((social) => (
+                  <li key={social.key}>
+                    <a
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`BluNeuron on ${social.label}`}
+                      // The RING stays 32px — `before:` draws the 44px target
+                      // around it. Growing the circle itself would have made
+                      // three small marks into three heavy buttons; growing
+                      // the hit area leaves the design alone.
+                      className="group flex h-11 w-11 items-center justify-center rounded-full text-white/50 transition-colors duration-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     >
-                      <path d={social.path} />
-                    </svg>
-                  </a>
-                </li>
-              ))}
-            </ul>
+                      {/* The RING is 32px and the TARGET is 44px. Growing
+                          the ring itself would turn three small marks into
+                          three heavy buttons; this keeps the design and
+                          gives the thumb something to hit. */}
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-white/20 group-hover:bg-white/5">
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="h-[15px] w-[15px]"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path d={social.path} />
+                        </svg>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
 
-        {/* The row machinery is back with the link: stacked below sm so the
-            two never crowd on a phone, side by side above it. With
-            SHOW_PRIVACY off there is a single child again, and `gap` on a
-            one-child flex row reserves nothing — so this lays out identically
-            either way. */}
-        <div className="mt-8 flex flex-col gap-2 border-t border-border-subtle pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-          <p>© {new Date().getFullYear()} BluNeuron. All rights reserved.</p>
-          {/* `flex-wrap` plus `gap-x-4 gap-y-2`, not a single-line row: four
-              links plus Privacy Policy is wider than a 390px phone, so they
-              wrap onto a second line rather than pushing the page into a
-              horizontal scroll. */}
-          <nav className="flex flex-wrap items-center gap-x-4 gap-y-2" aria-label="Legal and warranty">
-            {BOTTOM_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="underline underline-offset-2 transition-colors hover:text-white"
-              >
-                {link.label}
-              </a>
-            ))}
-            {SHOW_PRIVACY && (
-              <a
-                href="/legal/privacy"
-                className="underline underline-offset-2 transition-colors hover:text-white"
-              >
-                Privacy Policy
-              </a>
+        {/*
+          THE LEGAL BLOCK: identity and copyright as ONE unit.
+
+          These used to be two sibling rows with their own spacing, which
+          read as two unrelated afterthoughts — the registered entity, a
+          gap, then the copyright. They are the same statement ("who
+          publishes this site"), so they are now three lines of one block:
+          legal name, registered address, copyright.
+
+          `items-end` on the row, not `items-center`: the left column is
+          three lines tall and the right is one, and the requirement is that
+          the privacy link sits on the COPYRIGHT's line — the last one — not
+          floating halfway up the address. Aligning the bottom edges puts
+          the two single-line boxes on the same baseline, because both end
+          with the same `leading-relaxed` text.
+
+          Below sm it stacks and the link simply follows the copyright,
+          where `items-end` has no effect on a one-column flex.
+        */}
+        <div className="mt-8 flex flex-col gap-3 border-t border-border-subtle pt-6 text-xs leading-relaxed text-white/55 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+          <div className="min-w-0">
+            {showIdentity && (
+              <>
+                <p className="font-medium text-white/55">{COMPANY.legalName}</p>
+                <p className="mt-1">{COMPANY.registeredAddress}</p>
+                {allKnown(COMPANY.gstin) && <p className="mt-1">GSTIN: {COMPANY.gstin}</p>}
+              </>
             )}
-          </nav>
+            <p className={showIdentity ? 'mt-1 text-white/55' : 'text-white/55'}>
+              © {new Date().getFullYear()} BluNeuron. All rights reserved.
+            </p>
+            {/*
+              THE ANDROID TRADEMARK ATTRIBUTION.
+
+              The site states "Android 14" as a spec and the chipset board
+              carries the Android robot, so the mark is used here and the
+              attribution has to appear with it. The wording is copied from
+              the printed IRIZ carton rather than written fresh, so the site
+              and the box say the same sentence.
+
+              It sits in the legal block, muted and last, because that is
+              what an attribution is — not a claim about the product, and
+              not something to give the weight of a feature line.
+            */}
+            <p className="mt-1 text-white/55">
+              Android is a trademark of Google LLC.
+            </p>
+          </div>
+
+          {/* Privacy Policy, right-aligned, on the copyright's line. It is
+              the one link down here: the warranty links belong to the
+              cloudflare footer — see "THE BOTTOM ROW IS PRIVACY POLICY ONLY
+              ON THIS BRANCH" above — and everything else is in the columns.
+              This repeats the Policies column entry on purpose; a privacy
+              link beside the copyright is where people look for it. */}
+          {SHOW_PRIVACY && (
+            <a
+              href={ROUTES.privacy}
+              className="inline-flex min-h-[44px] w-fit shrink-0 items-center text-white/55 underline underline-offset-2 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft sm:text-right"
+            >
+              Privacy Policy
+            </a>
+          )}
         </div>
       </div>
     </footer>

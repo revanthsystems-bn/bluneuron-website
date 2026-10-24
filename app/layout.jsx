@@ -1,17 +1,65 @@
 import { Suspense } from 'react';
-import { Inter_Tight, Zen_Dots } from 'next/font/google';
+import { Inter, Inter_Tight, Zen_Dots } from 'next/font/google';
 import { MotionConfig } from 'framer-motion';
 import './globals.css';
 import SmoothScroll from '@/components/SmoothScroll';
 import PageIntro from '@/components/PageIntro';
 import ConsentNotice from '@/components/ConsentNotice';
+import { AccountProvider } from '@/components/account/AccountContext';
 import { CartProvider } from '@/components/cart/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import NotifyProvider from '@/components/notify/NotifyProvider';
+import BuyProvider from '@/components/buy/BuyProvider';
 import MetaPixel from '@/components/MetaPixel';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL } from '@/lib/site';
+import { ANIM_GATE } from '@/lib/anim-gate';
 import { Analytics } from '@vercel/analytics/next';
+
+/**
+ * THE BODY FACE, AND IT WAS MISSING FOR THE WHOLE SITE UNTIL NOW.
+ *
+ * `--font-sans` in app/globals.css has always read `'Inter', system-ui, ...`
+ * and nothing ever loaded Inter. Measured in the browser on the previous
+ * commit: `document.fonts` held seven `Inter Tight` faces and two `Zen Dots`
+ * ones and NO `Inter` face at all, and a canvas measurement of
+ * "Handgloves 1080p WMW" at 40px came back 422.148px in `Inter` and the
+ * identical 422.148px in a family that does not exist — against 450.996px in
+ * Segoe UI. Identical to a bogus family is the proof: every visitor was
+ * reading the browser's default, not Inter, and on Windows that default has a
+ * deeper descender than Inter, which is why the "p" in a big "1080p" sat
+ * outside its own line box (36px line box, 42px of ink).
+ *
+ * `variable` rather than `className`, so the existing `--font-sans` stack
+ * picks it up and NOTHING else in the codebase has to change: every
+ * `font-sans` utility, `.type-*` class and bare `font-family` inherits it
+ * through that one custom property.
+ *
+ * WEIGHTS ARE LISTED EXPLICITLY — 400/500/600/700/800 — rather than taking
+ * the variable axis. Those are the five the site actually sets (`font-medium`
+ * through `font-extrabold`, plus `.stat-number`'s 800), and naming them keeps
+ * the request to five static latin woff2 files instead of the full 100-900
+ * axis. Inter's remaining weights are unused; a weight the site does not set
+ * cannot render.
+ *
+ * `adjustFontFallback` is left at its default (true), which is what keeps
+ * this from shifting the layout: next/font emits an `Inter Fallback`
+ * @font-face with `size-adjust`, `ascent-override` and `descent-override`
+ * computed from Inter's own metrics, so the system face shown during `swap`
+ * occupies the same box as the real one. Do not add a `fallback: [...]`
+ * array — it suppresses that face, exactly as the Zen Dots note below says.
+ *
+ * Self-hosted at build time: the woff2 files are emitted into
+ * `/_next/static/media/` and the browser makes no request to Google. The CSP
+ * in next.config.js already allows them — `font-src 'self' data:` — and no
+ * header needed changing for this.
+ */
+const inter = Inter({
+  weight: ['400', '500', '600', '700', '800'],
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 /**
  * The hero display face. Inter Tight rather than the `--font-sans` stack.
@@ -52,7 +100,7 @@ const zenDots = Zen_Dots({
 const TITLE = 'BluNeuron IRIZ — Mini Projector for Home';
 const DESCRIPTION =
   'The BluNeuron IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, '
-  + 'and built-in Android 14 with 10,000+ apps.';
+  + 'and built-in Android 14 — your apps over Wi-Fi, with no streaming stick.';
 
 export const metadata = {
   // Resolves every root-relative URL in this file and in `pageMetadata` —
@@ -91,64 +139,58 @@ export const metadata = {
   },
 };
 
-/**
- * The scroll-reveal gate, inlined into <head> and run before the body paints.
- *
- * `html.js-anim` is the ONLY thing that hides a <Reveal> (the single css rule
- * in app/globals.css). Nothing in the server-rendered markup is hidden, so
- * everything a visitor came to read is on the page as written and this script
- * opts them in to the animation afterwards — never the other way round.
- *
- * Three ways the class never arrives, all of them leaving a visible page:
- *
- *   1. Scripts do not run (disabled, blocked, CSP, a dead in-app webview).
- *      This script never executes, so the class is never added.
- *   2. prefers-reduced-motion: reduce. Checked here and refused outright, so
- *      there is no animation to sit through rather than a faster one.
- *   3. The bundle is slow or never lands. The class IS added, so the content
- *      is briefly hidden — then the failsafe below strips it again. That
- *      timer is the important half: without it, a chunk that 404s or a
- *      connection that stalls would leave the page blank indefinitely, which
- *      is precisely the failure this whole change exists to remove.
- *
- * components/Reveal.jsx calls `window.__bnAnimReady()` from its first effect,
- * which cancels the failsafe: by then the observer is attached and the reveal
- * is going to happen properly. The 2500ms budget is generous for a working
- * bundle on a slow connection and short enough that a broken one is not a
- * visible outage.
- *
- * Written as a string in dangerouslySetInnerHTML because it has to be inline
- * and synchronous in <head> — a <Script> component, even with
- * `strategy="beforeInteractive"`, is part of the bundle this is insuring
- * against. It is wrapped in try/catch so that nothing here can be the reason
- * a page fails to render.
- */
-const ANIM_GATE = `(function(){try{
-var d=document.documentElement;
-if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-d.classList.add('js-anim');
-var t=setTimeout(function(){d.classList.remove('js-anim');},2500);
-window.__bnAnimReady=function(){if(t){clearTimeout(t);t=0;}};
-}catch(e){}})();`;
-
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`dark ${interTight.variable} ${zenDots.variable}`}>
+    /*
+     * `suppressHydrationWarning` on <html>, and ONLY here.
+     *
+     * The inline gate below adds `js-anim` to <html> before the body paints,
+     * which is the whole point of it — so by the time React hydrates, the
+     * element's className no longer matches the one the server rendered.
+     * React logs that as a hydration mismatch ("1 Issue" in the dev
+     * overlay). It is not a bug: the class is meant to be there, and nothing
+     * in the tree reads it from React.
+     *
+     * The flag is scoped to this one element and suppresses the warning for
+     * its attributes only — it does not reach any child, so a real mismatch
+     * further down still reports.
+     */
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${interTight.variable} ${zenDots.variable}`}
+      suppressHydrationWarning
+    >
       <head>
+        {/* The scroll-reveal gate. The string lives in lib/anim-gate.js
+            because next.config.js hashes it for the Content-Security-Policy
+            and both ends must read the same bytes — see that file. */}
         {/* eslint-disable-next-line react/no-danger */}
         <script dangerouslySetInnerHTML={{ __html: ANIM_GATE }} />
       </head>
       <body className="bg-black font-sans text-white antialiased">
         <MotionConfig reducedMotion="user">
-          <CartProvider>
-            <NotifyProvider>
-              <SmoothScroll />
-              <PageIntro />
-              {children}
-              <ConsentNotice />
-              <CartDrawer />
-            </NotifyProvider>
-          </CartProvider>
+          {/* AccountProvider wraps CartProvider, not the other way round:
+              Phase 2 syncs the basket to the signed-in account, so the cart
+              needs to be able to read the session and never the reverse. */}
+          <AccountProvider>
+            <CartProvider>
+              <NotifyProvider>
+                {/* ONE "choose where to buy" sheet for the whole document.
+                    Every Buy button on the site opens this instance rather
+                    than mounting its own — a page carries up to four Buy
+                    affordances, and four sheets would mean four focus traps
+                    and four colliding `aria-labelledby` ids. It renders
+                    nothing until opened. See components/buy/BuyProvider. */}
+                <BuyProvider>
+                <SmoothScroll />
+                <PageIntro />
+                {children}
+                <ConsentNotice />
+                <CartDrawer />
+                </BuyProvider>
+              </NotifyProvider>
+            </CartProvider>
+          </AccountProvider>
         </MotionConfig>
         {/* VERCEL-ONLY. @vercel/analytics reports to the Vercel dashboard of
             the deployment serving the page; there is no dashboard behind it

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { readJsonBody } from '@/lib/request-body';
 import { isValidEmail, normalizePhone } from '@/lib/web3forms';
 import {
   CLAIM_DESCRIPTION_MIN,
@@ -31,9 +32,10 @@ import {
  * success screen over nothing. See the note on `delivered` below.
  *
  * Same security as the registration route, for the same reasons: a 10 KB
- * body cap, the honeypot, server-side revalidation of every field, and an
- * allow-list on the Apps Script URL so a misconfigured env var cannot turn
- * this into an open proxy for customer data.
+ * body cap enforced while the body is read (lib/request-body.js), the
+ * honeypot, server-side revalidation of every field, and an allow-list on
+ * the Apps Script URL so a misconfigured env var cannot turn this into an
+ * open proxy for customer data.
  */
 
 const MAX_REQUEST_BYTES = 10 * 1024;
@@ -189,17 +191,16 @@ async function sendByEmail(claim) {
 }
 
 export async function POST(request) {
-  const contentLength = Number(request.headers.get('content-length'));
-  if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BYTES) {
-    return errorResponse('The claim form is too large.', 413);
+  // Counted off the stream, not taken from `content-length` — same cap, same
+  // 10 KB, but a chunked request with no length header can no longer skip
+  // it. See lib/request-body.js.
+  const read = await readJsonBody(request, MAX_REQUEST_BYTES);
+  if (!read.ok) {
+    return read.status === 413
+      ? errorResponse('The claim form is too large.', 413)
+      : errorResponse('Invalid claim data.', 400);
   }
-
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return errorResponse('Invalid claim data.', 400);
-  }
+  const body = read.value;
 
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return errorResponse('Invalid claim data.', 400);

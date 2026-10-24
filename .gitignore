@@ -71,3 +71,9 @@ _archive/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Source policy documents (content/source-policies/*.pdf) — the originals the
+# published /legal pages were written from. Kept out of the repo on purpose:
+# they are internal working documents, not site content, and they must never
+# be served from public/. The published text in app/legal/ is the deliverable.
+content/source-policies/

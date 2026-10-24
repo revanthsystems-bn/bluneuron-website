@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mock — /shop/iriz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+/*
+ * MOCK ONLY. This is a picture of the proposed /shop/iriz, not the page.
+ * Nothing here ships; the real build is React + Tailwind using the same
+ * tokens (../tokens.css, copied from tailwind.config.js).
+ *
+ * What it is proposing, versus what /shop/iriz does today:
+ *   - the gallery grows a thumbnail rail and a 4:3 stage instead of a
+ *     3:2 box that letterboxes a square render
+ *   - "Add to cart" and the qty stepper are gone (CART_ENABLED=false);
+ *     one "Buy" opens the choose-where sheet
+ *   - specs become a 6-tile grid WITH ICONS rather than a bare table
+ *   - "In the box" and a warranty band are new, both from data already in
+ *     lib/iriz.js (BOX_CONTENTS, WARRANTY)
+ *   - FAQs move onto the product page as an accordion
+ */
+.bar { background: var(--obsidian); border-bottom: 1px solid var(--line-subtle); padding: 10px 0; text-align: center; font-size: 12px; color: var(--ink-3); }
+.nav { position: sticky; top: 0; z-index: 10; background: rgba(0,0,0,.85); backdrop-filter: blur(14px) saturate(1.2); border-bottom: 1px solid var(--line-subtle); }
+.nav-in { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.logo { font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
+.logo span { color: var(--brand); }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a { color: var(--ink-3); text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 16px; border-radius: var(--radius-pill); min-height: 44px; display: inline-flex; align-items: center; }
+.nav-links a.on { background: rgba(255,255,255,.1); color: #fff; }
+
+.crumb { font-size: 12px; color: var(--ink-4); padding: 24px 0 0; }
+.crumb a { color: var(--ink-4); text-decoration: none; }
+
+/* ---- Gallery + buy panel --------------------------------------- */
+.top { display: grid; grid-template-columns: 1fr; gap: 40px; padding: 24px 0 64px; }
+@media (min-width: 1024px) { .top { grid-template-columns: 1.08fr 1fr; gap: 56px; } }
+
+.stage { position: relative; aspect-ratio: 4/3; border-radius: var(--radius-card); border: 1px solid var(--line-subtle); background:
+  radial-gradient(ellipse 65% 60% at 50% 45%, rgba(214,226,245,.16) 0%, rgba(3,3,3,0) 70%), var(--soft);
+  display: grid; place-items: center; overflow: hidden; }
+.stage img { width: 88%; height: auto;
+  /* .product-fade from app/globals.css: the render arrives on a white
+     seamless and there is no clean key (white product, white ground), so
+     its own bounds are feathered into the stage light instead. */
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 52%, #000 46%, transparent 92%);
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 52%, #000 46%, transparent 92%);
+  filter: contrast(1.06) brightness(.99); }
+.rail { display: flex; gap: 12px; margin-top: 14px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.rail::-webkit-scrollbar { display: none; }
+/* The thumbnail is a 64px mark inside a 64px box — but the BUTTON is the
+   target and is never below 44px in either axis. */
+.thumb { flex: 0 0 auto; width: 72px; height: 72px; border-radius: 12px; border: 1px solid var(--line); background: var(--soft); display: grid; place-items: center; cursor: pointer; padding: 6px; }
+.thumb.on { border-color: var(--accent-soft); box-shadow: 0 0 0 1px var(--accent-soft); }
+.thumb img { max-width: 100%; max-height: 100%; }
+.thumb.fade img { -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 52%, #000 44%, transparent 92%); mask-image: radial-gradient(ellipse 60% 60% at 50% 52%, #000 44%, transparent 92%); }
+
+.buy h1 { font-size: 40px; font-weight: 700; margin: 10px 0 0; }
+.lede { color: var(--ink-3); font-size: 15px; line-height: 1.6; margin: 12px 0 0; max-width: 46ch; }
+.price { font-size: 38px; font-weight: 700; letter-spacing: -.03em; margin: 26px 0 0; }
+.price small { display: block; font-size: 12px; font-weight: 400; color: var(--ink-4); letter-spacing: 0; margin-top: 6px; }
+.cta { display: flex; gap: 12px; margin-top: 22px; }
+.cta .btn-primary { flex: 1; }
+.trust { margin-top: 22px; border-top: 1px solid var(--line-subtle); padding-top: 18px; display: grid; gap: 12px; }
+.trust div { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--ink-3); }
+.trust strong { color: #fff; font-weight: 600; display: block; font-size: 13px; }
+.ico { width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent-soft); margin-top: 1px; }
+
+/* ---- Sections ---------------------------------------------------- */
+section { border-top: 1px solid var(--line-subtle); padding: 72px 0; }
+.sec-head { max-width: 46ch; margin-bottom: 36px; }
+.sec-head h2 { font-size: 34px; font-weight: 700; margin-top: 12px; }
+
+.specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line-subtle); border: 1px solid var(--line-subtle); border-radius: var(--radius-tile); overflow: hidden; }
+@media (min-width: 900px) { .specs { grid-template-columns: repeat(3, 1fr); } }
+.spec { background: var(--black); padding: 24px 22px; }
+.spec .ico { color: var(--accent-soft); margin-bottom: 14px; width: 22px; height: 22px; }
+.spec dt { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-4); font-weight: 600; }
+.spec dd { margin: 8px 0 0; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+.spec .sub { font-size: 12px; color: var(--ink-4); font-weight: 400; margin-top: 4px; letter-spacing: 0; }
+
+.box-grid { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: center; }
+@media (min-width: 900px) { .box-grid { grid-template-columns: 1fr 1fr; gap: 56px; } }
+.box-photo { border-radius: var(--radius-card); border: 1px solid var(--line-subtle); overflow: hidden; background: var(--soft); }
+.box-photo img { width: 100%; display: block; }
+.box-list { display: grid; gap: 2px; }
+.box-item { display: flex; gap: 14px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--line-subtle); }
+.box-item:last-child { border-bottom: 0; }
+.box-item strong { font-size: 15px; font-weight: 600; }
+.box-item span { display: block; font-size: 13px; color: var(--ink-4); margin-top: 3px; }
+
+.warr { border-radius: var(--radius-card); border: 1px solid var(--line-subtle); background: linear-gradient(135deg, rgba(59,130,246,.10), rgba(59,130,246,0) 60%), var(--soft); padding: 36px; display: grid; gap: 24px; align-items: center; }
+@media (min-width: 900px) { .warr { grid-template-columns: 1fr auto; } }
+.warr h3 { font-size: 26px; font-weight: 700; }
+.warr p { color: var(--ink-3); font-size: 14px; line-height: 1.65; margin: 10px 0 0; max-width: 58ch; }
+
+.faq { border: 1px solid var(--line-subtle); border-radius: var(--radius-card); overflow: hidden; background: rgba(18,18,18,.6); }
+.q { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 20px 28px; font-size: 15px; font-weight: 600; border-bottom: 1px solid var(--line-subtle); cursor: pointer; min-height: 44px; }
+.q .pm { color: var(--ink-4); font-size: 20px; }
+.a { padding: 0 28px 22px; font-size: 14px; line-height: 1.7; color: var(--ink-3); border-bottom: 1px solid var(--line-subtle); max-width: 70ch; }
+
+/* ---- Mobile sticky buy bar -------------------------------------- */
+.sticky { position: relative; background: rgba(0,0,0,.95); backdrop-filter: blur(14px); border-top: 1px solid var(--line-subtle); padding: 12px 0; }
+.sticky-in { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.sticky .p { font-size: 15px; font-weight: 600; }
+.sticky .p span { display: block; font-size: 11px; color: var(--ink-4); font-weight: 400; }
+
+.note { font-size: 11px; color: var(--accent-soft); text-align: center; padding: 10px; background: rgba(59,130,246,.08); border-bottom: 1px solid var(--line-subtle); }
+</style>
+</head>
+<body>
+
+<div class="note">MOCK — proposed /shop/iriz. Real photos, real copy, real tokens. Not a shipped page.</div>
+<div class="bar">IRIZ is now available on Amazon &amp; Flipkart.</div>
+
+<div class="nav"><div class="container nav-in">
+  <div class="logo">blu<span>neuron</span></div>
+  <div class="nav-links"><a href="#">Shop</a><a href="#" class="on">IRIZ</a><a href="#">Compare</a><a href="#">Support</a></div>
+  <a class="btn btn-primary" href="#" style="padding:10px 22px">Buy</a>
+</div></div>
+
+<div class="container">
+  <div class="crumb"><a href="#">Shop</a> / IRIZ</div>
+
+  <div class="top">
+    <!-- GALLERY: 4:3 stage + thumbnail rail. The rail scrolls INSIDE the
+         column; today's `-mx-6` bleed is what pushes 54px of overflow onto
+         the document at 390px. -->
+    <div>
+      <div class="stage"><img src="../../public/media/iriz/product/hero-clean.png" alt="IRIZ, front three-quarter"></div>
+      <div class="rail">
+        <button class="thumb on fade"><img src="../../public/media/iriz/product/hero-clean.png" alt=""></button>
+        <button class="thumb"><img src="../../public/media/iriz/box/iriz-box-front.png" alt=""></button>
+        <button class="thumb"><img src="../../public/media/iriz/video/iriz-loop-poster.jpg" alt="" style="object-fit:cover;width:100%;height:100%;border-radius:8px"></button>
+        <button class="thumb"><img src="../../public/media/iriz/detail/09-screen-size.png" alt=""></button>
+        <button class="thumb"><img src="../../public/media/iriz/detail/08-keystone.png" alt=""></button>
+      </div>
+    </div>
+
+    <!-- BUY PANEL. One action. No qty stepper, no "Add to cart". -->
+    <div class="buy">
+      <p class="eyebrow">Mini projector for home</p>
+      <h1>BluNeuron IRIZ</h1>
+      <p class="lede">500 ANSI Lumens, measured honestly. Native 1080P. A 200-inch screen wherever you point it.</p>
+
+      <div class="price">₹13,999<small>Inclusive of all taxes</small></div>
+
+      <div class="cta"><a class="btn btn-primary" href="#">Buy</a></div>
+
+      <div class="trust">
+        <div><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg><div><strong>1 year manufacturer warranty</strong>Carry-in service through an authorised centre, on every genuine unit.</div></div>
+        <div><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><div><strong>Sold on Amazon &amp; Flipkart</strong>Payment, invoicing and delivery are handled by the marketplace.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section><div class="container">
+  <div class="sec-head"><p class="eyebrow">Specifications</p><h2>The numbers that matter.</h2></div>
+  <dl class="specs">
+    <div class="spec"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg><dt>Brightness</dt><dd>500<div class="sub">True ANSI Lumens</div></dd></div>
+    <div class="spec"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8"/></svg><dt>Resolution</dt><dd>1080P<div class="sub">Native 1920×1080</div></dd></div>
+    <div class="spec"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></svg><dt>Chipset</dt><dd>H723<div class="sub">Allwinner, Quad-core Cortex-A53</div></dd></div>
+    <div class="spec"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h18"/><path d="M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg><dt>Throw Ratio</dt><dd>1:1<div class="sub">0.9m–5m · 40"–200" screen</div></dd></div>
+    <div class="spec"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><dt>Low-latency mode</dt><dd>0.004s<div class="sub">Response time</div></dd></div>
+    <div class="spec"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9.5a3.5 3.5 0 0 1 0 5"/></svg><dt>Audio</dt><dd>5W<div class="sub">4Ω built-in speaker</div></dd></div>
+  </dl>
+</div></section>
+
+<section><div class="container">
+  <div class="sec-head"><p class="eyebrow">In the box</p><h2>What ships.</h2></div>
+  <div class="box-grid">
+    <div class="box-photo"><img src="../../public/media/iriz/box/iriz-box-front.png" alt="The IRIZ retail box"></div>
+    <div class="box-list">
+      <div class="box-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="7" width="20" height="10" rx="2"/><circle cx="8" cy="12" r="2.5"/></svg><div><strong>IRIZ projector</strong><span>Model BNA-510SH, with stand</span></div></div>
+      <div class="box-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="2" width="8" height="20" rx="2"/><circle cx="12" cy="7" r="1"/></svg><div><strong>Remote</strong></div></div>
+      <div class="box-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg><div><strong>Power adapter</strong><span>AC 90–240 V</span></div></div>
+      <div class="box-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h7a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-7a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h7z"/></svg><div><strong>Quick start guide</strong></div></div>
+      <div class="box-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3 2.4V14"/><path d="M12 17.5h.01"/></svg><div><strong>FAQ card</strong></div></div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="container">
+  <div class="warr">
+    <div><h3>1 year manufacturer warranty</h3><p>Carry-in service through an authorised centre, on every genuine unit. Register your purchase and we will have your serial on file before you ever need it.</p></div>
+    <a class="btn btn-secondary" href="#">Register warranty</a>
+  </div>
+</div></section>
+
+<section><div class="container">
+  <div class="sec-head"><p class="eyebrow">Questions</p><h2>Before you buy.</h2></div>
+  <div class="faq">
+    <div class="q">Is 500 ANSI lumens bright enough for my room?<span class="pm">−</span></div>
+    <div class="a">In a dark or dim room, yes — comfortably, up to about 120 inches. In a bright room with daylight on the wall, every projector at this size struggles; 500 true ANSI is roughly what a 2,000 "LED lumen" budget projector actually measures.</div>
+    <div class="q">Do I need a streaming stick?<span class="pm">+</span></div>
+    <div class="a">No. Android 14 is built in.</div>
+    <div class="q">How far back do I need to sit?<span class="pm">+</span></div>
+    <div class="a">The throw ratio is 1:1 — roughly another 40 inches of screen for every metre you step back, from 40" at 0.9m to 200" at 5m.</div>
+  </div>
+</div></section>
+
+<div class="sticky" title="Mobile only — shown here at the foot so it appears in a desktop capture"><div class="container sticky-in">
+  <div class="p">₹13,999<span>Inclusive of all taxes</span></div>
+  <a class="btn btn-primary" href="#">Buy</a>
+</div></div>
+
+</body>
+</html>

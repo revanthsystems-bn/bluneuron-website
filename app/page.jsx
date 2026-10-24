@@ -5,13 +5,17 @@ import ThrowRange from '@/components/ThrowRange';
 import TechSpecs from '@/components/TechSpecs';
 import ProductShowcase from '@/components/ProductShowcase';
 import ComparisonTable from '@/components/ComparisonTable';
+import WhyIriz from '@/components/WhyIriz';
 import Hero from '@/components/Hero';
 import Newsletter from '@/components/Newsletter';
+import BuySection from '@/components/BuySection';
 import Footer from '@/components/Footer';
 import StickyBuyBar from '@/components/StickyBuyBar';
 import { COMMERCE_ENABLED } from '@/lib/launch';
 import { resolveHeroTheme } from '@/lib/heroTheme';
-import { ORGANIZATION_JSON_LD, pageMetadata, productJsonLd } from '@/lib/seo';
+import { ROUTES } from '@/lib/routes';
+import { SHOW_BUY } from '@/lib/site-config';
+import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
 
 /**
  * Homepage title, at 65 characters.
@@ -19,35 +23,52 @@ import { ORGANIZATION_JSON_LD, pageMetadata, productJsonLd } from '@/lib/seo';
  * The budget is Google's ~580px of rendered title width, which is roughly 60-65
  * characters; past it the tail is truncated in the result, and the tail is where
  * the brand name sits. "Native" is the word that was cut to make room — the
- * distinction it draws (true 1080p DISPLAY vs. the H723's 4K DECODING, see
+ * distinction it draws (true 1080p DISPLAY vs. the H723's 8K DECODING, see
  * lib/iriz.js) still appears in the description, the og:title and the hero h1,
  * none of which are width-constrained.
  */
-const TITLE = 'IRIZ Mini Projector for Home — 1080p, 500 ANSI Lumens | BluNeuron';
+const TITLE = 'IRIZ Mini Projector for Home — True Brightness, Android 14 | BluNeuron';
 
-// 145 characters. Under the ~155 Google renders, and carries the three terms
-// this page is meant to rank for: "mini projector for home", "1080p", "India".
+
+/*
+ * THE STORY PAGE, not the buying page.
+ *
+ * This description and the one on /shop/iriz are deliberately aimed at
+ * different searches: "mini projector for home" and what the thing IS here;
+ * "buy IRIZ projector" and what it COSTS there. They used to be near
+ * paraphrases of each other, which is two pages asking Google the same
+ * question — it answers once, picks one, and the one it picks is as likely
+ * to be the page without the buy button. No price in this description, on
+ * purpose: a price is a transactional signal and belongs to the page that
+ * can act on it.
+ */
 const DESCRIPTION =
-  'The IRIZ mini projector for home: native 1080p, true 500 ANSI lumens, and built-in '
-  + 'Android 14 with 10,000+ apps. Designed and supported in India.';
+  'What the IRIZ mini projector for home actually is: true 500 ANSI lumens measured honestly, '
+  + 'native 1080p, and built-in Android 14. Designed and supported in India.';
+
 
 export const metadata = pageMetadata({
   title: TITLE,
   description: DESCRIPTION,
-  path: '/',
+  path: ROUTES.home,
   // No width budget on an OG card, so the fuller claim goes here.
-  ogTitle: 'BluNeuron IRIZ — Mini Projector for Home, Native 1080p, 500 ANSI Lumens',
+  ogTitle: 'BluNeuron IRIZ — The Mini Projector for Home, Measured Honestly',
 });
 
-/**
- * Product structured data, or `null` while there is no confirmed price.
+/*
+ * PRODUCT STRUCTURED DATA HAS MOVED to app/shop/iriz/page.jsx.
  *
- * The whole decision lives in productJsonLd() (lib/seo.js) — including why a
- * price-free Product is not emitted at all rather than emitted without
- * `offers`. Resolved once at module scope: it depends only on constants, so
- * there is nothing per-request about it.
+ * It was emitted here because this page was the only one describing the
+ * product. Now that there is a real product page, a Product block on the
+ * homepage describes something this page is not primarily about, and its
+ * `url` resolved to the origin — so a rich result would have led to the
+ * marketing page rather than to the offer. The decision about WHETHER to
+ * emit it at all (only with a confirmed price) is unchanged and still lives
+ * in productJsonLd(), lib/seo.js.
+ *
+ * ORGANIZATION stays here, and only here: it describes the site as a whole,
+ * so a copy on every page would be duplicate markup.
  */
-const PRODUCT_JSON_LD = productJsonLd();
 
 /**
  * `searchParams` is a Promise in Next 16 and is a request-time API, so reading
@@ -65,23 +86,9 @@ export default async function Home({ searchParams }) {
 
   return (
     <>
-      {/* Separate <script> blocks rather than one @graph array. Both spellings
-          are valid; separate blocks mean a syntax error in one can't
-          invalidate the other, and Google's Rich Results Test reports them
-          independently — which also lets Product drop out on its own below
-          without touching Organization.
-
-          Product renders only when it is VALID (a confirmed price, so it can
-          carry `offers`). Organization is emitted HERE and only here: it
-          describes the site as a whole, so a copy on every page would be
-          duplicate markup. */}
-      {PRODUCT_JSON_LD && (
-        <script
-          type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(PRODUCT_JSON_LD) }}
-        />
-      )}
+      {/* Organization, and only Organization: it describes the site as a
+          whole, so a copy on every page would be duplicate markup. Product
+          lives on the product page now — see the note above. */}
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -113,7 +120,21 @@ export default async function Home({ searchParams }) {
         <TechSpecs />
         <ProductShowcase />
         <ComparisonTable />
-        <Newsletter />
+        {/* The long-form read, last before the ask. It is deliberately the
+            only prose section on the page and deliberately at the bottom:
+            everything above states the product in fragments, and this is
+            where the fragments are joined up for the reader who is still
+            deciding — and for a crawler, which cannot read the photography
+            the rest of the page argues with. See components/WhyIriz. */}
+        <WhyIriz />
+        {/* The closing section is EITHER the marketplace buy card or the
+            launch-list signup — never both, and never neither. They share the
+            `#buy` id (BUY_ANCHOR in lib/routes.js), which is what the masthead
+            CTA, the mobile sticky bar and ConsentNotice's landmark list all
+            point at, so that anchor resolves in both states and none of those
+            three has to know which one is mounted.
+            See SHOW_BUY in lib/site-config.js. */}
+        {SHOW_BUY ? <BuySection /> : <Newsletter />}
       </main>
       <Footer />
     </>

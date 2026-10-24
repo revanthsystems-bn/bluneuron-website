@@ -4,7 +4,25 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    /*
+     * THE BODY STACK. `--font-inter` is set on <html> by next/font in
+     * app/layout.jsx and resolves to the self-hosted family PLUS its
+     * size-adjusted `Inter Fallback` — so both the real face and the
+     * metric-matched substitute shown during `swap` come from this one var.
+     *
+     * The bare `'Inter'` after it is NOT redundant and is not the old bug
+     * either. It is the locally-installed-Inter case: a designer with Inter
+     * on the machine, or a build where the var is somehow absent. Everything
+     * from `system-ui` on is the same stack this line has always ended with.
+     *
+     * UNTIL 2026-10-24 THIS LINE WAS `'Inter', system-ui, ...` AND NOTHING
+     * LOADED INTER, so every visitor read the browser's default face. See the
+     * measurement in app/layout.jsx — `Inter` metered identical to a family
+     * that does not exist. If this var ever stops resolving, that silent
+     * fallback is what comes back; it does not look like a bug, it looks like
+     * slightly wrong typography.
+     */
+    --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   html {
@@ -14,6 +32,36 @@
   body {
     background-color: #000000;
     color: #ffffff;
+  }
+
+  /*
+   * EXACTLY ONE DIVIDER ABOVE THE FOOTER.
+   *
+   * Section components across this site each carry their own
+   * `border-b border-border-subtle` (35 of them), which is how consecutive
+   * sections are separated. <footer> carries a matching `border-t`, because
+   * most pages end with a section that has no bottom border and would
+   * otherwise run straight into the footer with no division at all.
+   *
+   * Those two rules collide on whichever page happens to end with a bordered
+   * section. Measured on this build: /, /where-to-buy and /support/contact
+   * each painted a 1px border-bottom ending at exactly the y where the
+   * footer's 1px border-top began — zero gap, two hairlines, reading as one
+   * thick or smudged line rather than the single clean rule every other page
+   * gets.
+   *
+   * Fixing it here rather than in the three components is deliberate. The
+   * offending border is only wrong because of WHERE the section landed, not
+   * what it is: BuySection is correct mid-page on /shop/iriz and wrong only
+   * as the last child on /. A `:last-child` rule says exactly that, and it
+   * keeps being true for pages added later — whereas deleting the border
+   * from those three components would remove a divider they need elsewhere.
+   *
+   * The footer's own border-t stays the single source of the line, so the
+   * 18 pages that already relied on it are untouched.
+   */
+  main > :last-child {
+    border-bottom-width: 0;
   }
 }
 
@@ -36,8 +84,35 @@
     @apply mx-auto w-full max-w-container-xl px-6 md:px-10 lg:px-16;
   }
 
+  /*
+   * THE 44px FLOOR ON THE THREE BUTTON CLASSES.
+   *
+   * `min-h-[44px]` is on all three, and it is the WCAG 2.2 target-size
+   * minimum (2.5.8) measured rather than assumed — scripts/ui-audit.mjs
+   * flags any interactive element under 44x44 CSS px.
+   *
+   * At the default `py-3 text-sm` every one of them already measures exactly
+   * 44px (20px line box + 12px twice), so the floor changes NOTHING about how
+   * a default button looks. It exists for the callers that tighten the
+   * padding to fit a dense row — `px-5 py-2 text-xs` in the account panels is
+   * 32px, `px-6 py-2.5 text-xs` in the two sticky bars is 36px — which is
+   * where the real violations were. Those buttons now centre their smaller
+   * label in a 44px box instead of shrinking below the floor.
+   *
+   * IT BELONGS HERE, NOT ON THE CALLERS. Two callers had already added
+   * `min-h-[44px]` by hand (components/Header, components/ConsentNotice),
+   * which is the tell: a per-caller fix is one every new button has to
+   * remember. Setting it on the class makes 44px the thing a caller would
+   * have to deliberately override, and `min-height` is the right property
+   * because it floors the box without touching the padding, the radius or
+   * the type scale — `items-center` was already there to centre the label in
+   * whatever height results.
+   *
+   * The sticky bars grow ~8px taller as a result. They are `py-3` around a
+   * flex row with no fixed height, so they absorb it.
+   */
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-[0_8px_24px_-8px_rgba(255,255,255,0.35)] active:translate-y-0 active:scale-[0.97];
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-[0_8px_24px_-8px_rgba(255,255,255,0.35)] active:translate-y-0 active:scale-[0.97];
   }
 
   /*
@@ -48,11 +123,11 @@
    * the handover read as a colour transition rather than a different button.
    */
   .btn-primary-ink {
-    @apply inline-flex items-center justify-center rounded-full bg-black-obsidian px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black-obsidian/85 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)] active:translate-y-0 active:scale-[0.97];
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full bg-black-obsidian px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black-obsidian/85 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)] active:translate-y-0 active:scale-[0.97];
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-border-strong bg-white/[0.03] px-7 py-3 text-sm font-semibold text-white backdrop-blur-glass transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-soft/60 hover:bg-white/10 active:translate-y-0 active:scale-[0.97];
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full border border-border-strong bg-white/[0.03] px-7 py-3 text-sm font-semibold text-white backdrop-blur-glass transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-soft/60 hover:bg-white/10 active:translate-y-0 active:scale-[0.97];
   }
 
   .eyebrow {
@@ -714,95 +789,38 @@
    * ================================================================ */
 
   /*
-   * BOARD BACKGROUNDS, sampled from the images themselves rather than
-   * picked by eye.
+   * BOARD BACKGROUNDS — a fallback now, not a frame.
    *
-   * Sampled from the SIDE STRIPS specifically — the leftmost and
-   * rightmost 6 columns — because that is the part of each image that
-   * actually abuts bare tile. Both boards are height-constrained in
-   * their tiles, so the background shows as vertical bars down the two
-   * sides, not as a band top and bottom. An earlier pass averaged the
-   * outer 12% of the width instead, which pulled in artwork well inside
-   * the frame and produced a ramp visibly lighter than the real edge.
+   * Each board tile is locked to its own image's aspect ratio and the
+   * image covers it, so none of this is on screen once the art has
+   * loaded. It is what shows while a lazy image is still in flight, and
+   * it is black because that is what both files actually are where it
+   * would be seen. Sampled, not guessed:
    *
-   *   02-spec-sheet.png    0% #8f97a8    8% #575f70   20% #1f2739
-   *                       35% #141b2d   50% #0e1526   65% #050c1d
-   *                       80% #020208   92% #000000  100% #000000
-   *   07-latency.png      #000000 at every sampled height; the only
-   *                       non-zero reading is #0a0907 on the last row.
+   *   02-spec-sheet.png   #000000 along the whole bottom edge and both
+   *                       bottom corners; the top edge runs ~#5b6276,
+   *                       a steel grey that is part of the ARTWORK, not
+   *                       a ground.
+   *   07-latency.png      #000000 at every sampled height.
    *
-   * So the spec board gets that exact ramp and the latency board is
-   * flat black. The #8f97a8 at the very top is a one-pixel specular
-   * highlight along the image's edge — it is kept, because the bar
-   * beside it has to match it.
+   * The old rule painted that #5b6276 top edge as a tile gradient
+   * starting at #8f97a8, which was correct while `object-contain` left
+   * bare tile beside the art — and became the light grey band across
+   * the top of the card once the tile grew taller than the image.
+   * Matching the tile to the art removed the gap; this just stops the
+   * placeholder being grey.
    *
-   * Re-sample rather than nudge these if either image is replaced.
-   */
-  .board-spec {
-    background: linear-gradient(
-      180deg,
-      #8f97a8 0%,
-      #575f70 8%,
-      #1f2739 20%,
-      #141b2d 35%,
-      #0e1526 50%,
-      #050c1d 65%,
-      #020208 80%,
-      #000000 92%,
-      #000000 100%
-    );
-  }
-
-  /*
    * Painted as a background-IMAGE, not a background-color. `.bento-tile`
    * carries Tailwind's `bg-white/[0.035]`, and utilities outrank the
    * components layer — a `background-color` here loses to it and the
-   * tile comes out lifted grey against the image's true black, leaving
-   * exactly the rectangle this is meant to remove. An opaque gradient
-   * paints over that colour instead of competing with it. `.board-spec`
-   * above is immune for the same reason: its gradient is already an
-   * image.
+   * tile comes out lifted grey against the image's true black. An opaque
+   * gradient paints over that colour instead of competing with it.
+   *
+   * Re-sample rather than nudge these if either image is replaced.
    */
+  .board-spec,
   .board-latency {
     background-image: linear-gradient(180deg, #000000 0%, #000000 100%);
-  }
-
-  /*
-   * The soft edge mask, as an inset feather on all four edges rather
-   * than a radial.
-   *
-   * A radial cannot do this job on a rectangle. Sized to fade at the
-   * edge midpoints it is already past 1.0 at the corners, so it eats
-   * them — and the brief says use both boards whole. Sized to spare the
-   * corners it never reaches the midpoints at all, which is what the
-   * first attempt here did: `ellipse 104% 104%` with an opaque stop at
-   * 78% put the fade 452px from centre in a box only 279px tall, so the
-   * mask was inert and the artwork still had four hard edges.
-   *
-   * A single HORIZONTAL gradient, not both axes. Both boards are
-   * height-constrained in their tiles, so the artwork's top and bottom
-   * edges land exactly on the tile's own edges — there is no bare tile
-   * there to blend into, and the radius and hairline already finish
-   * that boundary. Feathering vertically only ate into the artwork, and
-   * on these files the top edge is where the headline sits. The bare
-   * tile is at the SIDES, which is the one axis that needs it.
-   */
-  .board-media {
-    --feather: 5%;
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      #000 var(--feather),
-      #000 calc(100% - var(--feather)),
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      #000 var(--feather),
-      #000 calc(100% - var(--feather)),
-      transparent 100%
-    );
   }
 
   /*
@@ -831,6 +849,25 @@
    * support the clip renders a solid white numeral rather than an
    * invisible one — order matters here, not preference.
    */
+  /*
+   * The card-sized variant of the numeral above.
+   *
+   * `.stat-number` runs clamp(3.75rem, 5.4vw, 4.75rem) — 60 to 76px — which
+   * is right for the three wide stat tiles under the spec boards, where the
+   * string is "500" or "5W" and has the full width of a third of the page.
+   * The Why-IRIZ cards are a six-up grid and their stats are strings, not
+   * numerals: "Android 14" at 76px wrapped onto two lines inside a 289px
+   * card and the second line landed on the heading under it.
+   *
+   * 32-44px fits the longest of them ("Android 14", ten characters) on one
+   * line at every breakpoint, down to a 375px phone. Only the size changes;
+   * the weight, tracking and the metallic fill are inherited from
+   * `.stat-number`, which this is always written beside, never instead of.
+   */
+  .stat-number-sm {
+    font-size: clamp(2rem, 3.2vw, 2.75rem);
+  }
+
   .stat-number {
     color: #ffffff;
     font-weight: 800;
@@ -852,6 +889,168 @@
 
   @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
     .stat-number {
+      -webkit-text-fill-color: #ffffff;
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * WHY IRIZ — the projector "light beam" (components/WhyIriz).
+   *
+   * Two absolutely-positioned, aria-hidden, pointer-events-none layers
+   * behind the section header: a small bright lens, and the wide wash of
+   * light it throws. Pure CSS — no image, nothing to load, nothing to
+   * decode, and it costs the Worker bundle nothing.
+   *
+   * WHY IT LIVES HERE AND NOT IN A `style={{}}` PROP. The beam changes
+   * width at 700px, and an inline style cannot carry a media query. The
+   * alternative was two stacked divs with Tailwind arbitrary values, which
+   * is the same CSS written twice and harder to read than this.
+   *
+   * ---------------------------------------------------------------------
+   * THE GRADIENT ORIGIN IS AT `50% 0%`, AND THAT IS THE FIX FOR THE FAINT
+   * BEAM IN THE MOCKUP.
+   * ---------------------------------------------------------------------
+   * The mockup centred a large soft circle on the section's top EDGE, so
+   * the brightest half of it was above the section and `overflow: hidden`
+   * threw it away — what reached the page was the dim outer skirt, and it
+   * read as a smudge rather than a beam. Anchoring the gradient's origin at
+   * the top of the box instead puts the full-strength stop ON the first
+   * visible row of pixels: nothing is cut off, and the same 0.35 alpha the
+   * brief asked for is actually seen.
+   *
+   * ---------------------------------------------------------------------
+   * THE STOPS ARE SET BY CONTRAST, NOT BY EYE. MEASURED, NOT ASSUMED.
+   * ---------------------------------------------------------------------
+   * The beam sits behind three pieces of text, and the one at risk is the
+   * eyebrow — 12px, #5b9dff, and the closest line to the bright origin.
+   * Composited over `bg-black-soft` (#0A0A0A) the beam's own alpha decides
+   * whether it passes WCAG AA (4.5:1 — 12px bold is NOT "large text", which
+   * starts at 14pt/18.66px bold, so 3:1 is not available here):
+   *
+   *   alpha   beam colour   #5b9dff on it   #9aa0a9 on it
+   *   0.20    #1a2740        5.50:1          5.86:1
+   *   0.25    #1e2f47        4.97:1          5.14:1
+   *   0.30    #22364e        4.47:1  FAIL    4.60:1
+   *   0.35    #263d60        4.13:1  FAIL    4.16:1  FAIL
+   *
+   * So 0.35 is safe only where no text sits, and the eyebrow has to land in
+   * the ≤0.25 band. The 38%/62% stops below are what put it there. MEASURED
+   * on the built site, by hiding the three lines, screenshotting, and
+   * reading the painted pixel at each line's own centre:
+   *
+   *   width   eyebrow pixel   ratio    h2 pixel   ratio    lede pixel  ratio
+   *   1440    #172131         5.94     #0d1014    19.07    #0a0a0a     7.52
+   *   1024    #172231         5.89     #0f131a    18.61    #0a0a0a     7.52
+   *    768    #172231         5.89     #10151d    18.31    #0a0a0a     7.52
+   *    390    #192537         5.67     #10141b    18.45    #0a0a0a     7.52
+   *    360    #192537         5.67     #0f141b    18.48    #0a0a0a     7.52
+   *
+   * Every line clears its threshold (4.5:1 for the 12px eyebrow and the
+   * 18px lede, 3:1 for the h2 which is large text) with the eyebrow the
+   * tightest at 5.67:1. The lede sits on untinted #0a0a0a at every width —
+   * the beam has already faded out by its depth.
+   *
+   * Re-measure if you touch a stop, a width, or this section's top padding:
+   * moving the text up the page is the same change as turning the beam up.
+   *
+   * NO ANIMATION, which the brief allows ("no animation, or a very slow
+   * fade-in only"). A static beam needs no `prefers-reduced-motion` branch,
+   * cannot be caught mid-tween by a screenshot, and the header above it is
+   * already inside a Reveal — a second fade on the backdrop would read as
+   * the page settling twice.
+   * ================================================================ */
+  .beam-wash {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 600px;
+    height: 700px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 0%,
+      rgba(91, 157, 255, 0.35) 0%,
+      rgba(91, 157, 255, 0.14) 38%,
+      rgba(91, 157, 255, 0.04) 62%,
+      rgba(91, 157, 255, 0) 78%
+    );
+  }
+
+  /* The brief's desktop width. Below 700px the beam is the 600px above, so
+     it never reaches past a phone's viewport and never widens the document
+     — the section's `overflow-hidden` is the belt, this is the braces. */
+  @media (min-width: 700px) {
+    .beam-wash {
+      width: 1100px;
+    }
+  }
+
+  /*
+   * THE LENS. 120x16 with a 5px blur, which puts its halo ~5px outside the
+   * box on every side — so it is offset 5px DOWN rather than sitting on
+   * `top: 0`. At `top: 0` the section's `overflow-hidden` shaves the halo
+   * flat and the glow stops reading as a round lens and starts reading as a
+   * clipped rectangle. 5px is the blur radius, which is the smallest offset
+   * that keeps the whole halo inside.
+   */
+  .beam-lens {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    width: 120px;
+    height: 16px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(5px);
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      #cfe1ff 0%,
+      #5b9dff 55%,
+      rgba(91, 157, 255, 0) 100%
+    );
+  }
+
+  /*
+   * The card figure. A SEPARATE class from `.stat-number`, not a size
+   * variant of it: the brief's fill is a two-stop white -> #7d8796 and
+   * `.stat-number` is a five-stop ramp ending at #58606f, so overriding it
+   * would have meant re-declaring the whole `background-image` anyway.
+   *
+   * `line-height: 1.16` IS LOAD-BEARING AND IS NOT A GUESS. `.stat-number`
+   * runs 0.92, which is tighter than Inter's own content box (ascent 0.969em
+   * + descent 0.241em = 1.210em) — the half-leading goes negative and the
+   * glyphs hang out of their line box top and bottom. For "500" that is
+   * invisible; for "1080p" the "p" descends ~0.212em past the baseline and
+   * lands outside the box, which is exactly the clipped descender this
+   * branch is fixing. Containing it needs
+   *
+   *   0.969 + (L - 1.210)/2 + 0.212 <= L   ->   L >= 1.152
+   *
+   * and 1.16 is that bound with a rounding margin. Measured after the fact:
+   * scrollHeight === clientHeight on all six cards, "1080p" included.
+   *
+   * The `@supports` fallback is not optional. `-webkit-text-fill-color:
+   * transparent` with no working `background-clip: text` is invisible text,
+   * so an engine that lacks the clip gets a flat white fill instead. Same
+   * guard as `.stat-number` above, for the same reason.
+   */
+  .beam-stat {
+    color: #ffffff;
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.16;
+    background-image: linear-gradient(180deg, #ffffff 0%, #7d8796 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .beam-stat {
       -webkit-text-fill-color: #ffffff;
     }
   }
@@ -1485,6 +1684,89 @@
       font-size: clamp(2.4rem, 7.5vw, 7.5rem);
     }
   } /* <--- Check if this outer bracket or an inner one is missing */
+}
+
+@layer components {
+  /* ================================================================ *
+   * ABOVE-THE-FOLD ENTRANCE — a CSS keyframe, not a hydrated one.
+   *
+   * components/Reveal is framer-motion with `initial={{opacity: 0}}`:
+   * the element is SERVER-RENDERED INVISIBLE and only fades in once the
+   * bundle has downloaded, parsed, hydrated and run an
+   * IntersectionObserver. Below the fold that is free — nobody is
+   * looking. Above it, it is the page's largest paint waiting on
+   * JavaScript.
+   *
+   * Measured on this build before the change: the homepage's LCP was
+   * its hero tagline at 4.3s with 89% render delay, /shop/iriz was the
+   * gallery image at 4.1s with 89% render delay, and both images had
+   * finished downloading inside the first second.
+   *
+   * A keyframe starts at first paint. No observer, no bundle, and the
+   * element is a real painted LCP candidate the moment it is in the DOM.
+   * `--rise-delay` staggers a group without needing a component each.
+   * ================================================================ */
+  .rise-in {
+    animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 16px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /*
+   * Reduced motion gets the END STATE immediately — not `animation:
+   * none` on a rule whose from-state is `opacity: 0`, which would leave
+   * the content permanently invisible for exactly the people who cannot
+   * be shown a fallback.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .rise-in {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer components {
+  /* ================================================================ *
+   * .product-stage — the dark card a CUT-OUT product sits on.
+   *
+   * It replaces the `.product-glow` + `.product-fade` pair on every
+   * surface that shows the projector against the dark page.
+   *
+   * WHY THAT PAIR HAD TO GO. The source was a white product on a white
+   * seamless, and `.product-fade` hid the photo's rectangular bounds
+   * behind a radial mask. A radial mask is an ellipse; a projector is
+   * not. So what actually reached the screen was a glowing white
+   * lozenge with the corners of the frame left over as dark bars down
+   * either side — which is how it was reported, and it was right.
+   *
+   * The product is a real transparent cutout now
+   * (design-src/cutout.mjs -> MEDIA.product.cutout), so there are no
+   * bounds to hide. This is just the lighting: a soft off-centre key
+   * so the card reads as a lit space rather than a flat panel, over
+   * the page's own near-black.
+   * ================================================================ */
+  .product-stage {
+    background:
+      radial-gradient(
+        ellipse 62% 58% at 50% 42%,
+        rgba(214, 226, 245, 0.13) 0%,
+        rgba(140, 170, 215, 0.05) 42%,
+        rgba(5, 7, 11, 0) 74%
+      ),
+      linear-gradient(165deg, #141922 0%, #0b0e14 58%, #07090d 100%);
+  }
 }
 
 /* ==================================================================== *

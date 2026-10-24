@@ -101,16 +101,26 @@ export default function HighlightCarousel() {
 
       <div className="mt-5 flex items-center justify-center gap-2">
         {HIGHLIGHT_BOARDS.map((board, i) => (
+          /* THE DOT IS THE MARK, THE BUTTON IS THE TARGET.
+             These were 6x6px controls — the smallest tappable things on the
+             site by a wide margin. The button is now 44px tall with real
+             horizontal padding and the dot is an inner span, so the mark
+             keeps its size and the target clears the touch floor. */
           <button
             key={board.image}
             type="button"
             onClick={() => goTo(i)}
             aria-label={`Go to highlight ${i + 1}`}
             aria-current={i === active}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === active ? 'w-5 bg-white/80' : 'w-1.5 bg-white/25'
-            }`}
-          />
+            className="group flex h-11 min-w-[28px] items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
+          >
+            <span
+              aria-hidden="true"
+              className={`block h-1.5 rounded-full transition-all duration-300 ${
+                i === active ? 'w-5 bg-white/80' : 'w-1.5 bg-white/25 group-hover:bg-white/45'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>

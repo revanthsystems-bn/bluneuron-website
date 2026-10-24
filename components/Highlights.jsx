@@ -9,7 +9,7 @@ import { HIGHLIGHT_BANNERS, HIGHLIGHT_BOARDS } from '@/lib/iriz';
  *
  * Each of the four images carries its own headline in the pixels, which is why
  * there is no tile copy anywhere in here: an eyebrow and a headline beside a
- * board that already says "Access to 10,000+ Apps" is the same sentence twice.
+ * board that already says "Your apps. Built in." is the same sentence twice.
  * `HIGHLIGHTS` in lib/iriz.js is untouched and still on disk; it is simply no
  * longer read here.
  *
@@ -152,7 +152,20 @@ export default function Highlights() {
                   className="pointer-events-none absolute inset-[6%] z-0"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={banner.glow} alt="" aria-hidden="true" className="hl-glow" />
+                  <img
+                    src={banner.glow}
+                    alt=""
+                    aria-hidden="true"
+                    // LAZY AND ASYNC. React hoists a plain <img> in the
+                    // initial HTML into a <link rel="preload">, so these two
+                    // decorative glows — both below the fold — were being
+                    // fetched at high priority alongside the hero poster they
+                    // compete with. They are ~1.3KB each and nobody sees them
+                    // until the Highlights section is scrolled to.
+                    loading="lazy"
+                    decoding="async"
+                    className="hl-glow"
+                  />
                 </Reveal>
 
                 <div className="hl-frame z-10">

@@ -1,115 +1,194 @@
 import PageShell from '@/components/PageShell';
-import PageHeading from '@/components/PageHeading';
-import FaqAccordion from '@/components/FaqAccordion';
-import ContactForm from '@/components/ContactForm';
-import { SETUP_STEPS, FAQS, TROUBLESHOOTING } from '@/lib/iriz';
-import { faqJsonLd, pageMetadata } from '@/lib/seo';
+import PageHero from '@/components/PageHero';
+import SupportTiles from '@/components/SupportTiles';
+import AnswerSearch from '@/components/support/AnswerSearch';
+import { ALL_FAQS, BRAND, MEDIA, TROUBLESHOOTING } from '@/lib/iriz';
+import { ROUTES, routeRobots } from '@/lib/routes';
+import { pageMetadata } from '@/lib/seo';
+import {
+  SUPPORT,
+  isPlaceholderPhone,
+  visibleSupportPhones,
+} from '@/lib/site-config';
 
-export const metadata = pageMetadata({
-  title: 'IRIZ Support — Setup, FAQs & Troubleshooting | BluNeuron',
-  description:
-    'Set up your IRIZ mini projector, read answers on brightness and throw distance, troubleshoot common issues, or contact BluNeuron support in India.',
-  path: '/support',
-});
+export const metadata = {
+  ...pageMetadata({
+    title: 'IRIZ Support — Warranty, FAQs & Downloads | BluNeuron',
+    description:
+      'Register a warranty, make a claim, read the FAQ and troubleshooting, or contact BluNeuron support in India — email, phone and service hours.',
+    path: ROUTES.support,
+  }),
+  robots: routeRobots(ROUTES.support),
+};
 
-// FAQPage, derived from the same FAQS array the accordion renders below — see
-// faqJsonLd in lib/seo.js for why it is derived and not retyped.
-const FAQ_JSON_LD = faqJsonLd(FAQS);
+/**
+ * The support HUB.
+ *
+ * This page used to be the whole support section on one scroll: a setup guide,
+ * the FAQ, troubleshooting, and a contact form stacked five screens deep. That
+ * works while support is four things. It stops working the moment warranty
+ * registration and claims exist — the two things a real owner comes
+ * here to DO would have been buried below several screens of reading, and
+ * neither had a URL anyone could be sent to.
+ *
+ * So the content moved to pages that can be linked, and this page became the
+ * index of them:
+ *
+ *   setup guide        → was /support/manuals, which is retired until the
+ *                        PDFs exist — see MANUALS in lib/site-config.js
+ *   FAQ                → /support/faq
+ *   troubleshooting    → /support/faq, alongside the FAQ (both are "my
+ *                        question has an answer already")
+ *   contact form       → /support/contact
+ *
+ * The old in-page anchors (/support#faq, /support#contact) are gone with them.
+ * Every link that used them has been repointed at the new routes — see
+ * lib/routes.js, which is now the only place any of these paths is spelled.
+ *
+ * THE CHANNEL STRIP below the tiles is not a duplicate of /support/contact,
+ * and the difference is what it leaves out. That page is the full set with a
+ * note under each explaining when to use it, plus the form and the grievance
+ * escalation. This is the two addresses and the hours, on the page everyone
+ * lands on first, because "what is the email and when are you open" is the
+ * commonest question here and it should not cost a click. Both read SUPPORT
+ * and visibleSupportPhones() from lib/site-config.js, so neither can state a
+ * channel the other does not — and the phone rows obey the same one rule:
+ * a placeholder renders on a preview build and is absent on production.
+ */
+
+/**
+ * The hub's channels, flattened to label + value + href.
+ *
+ * No `note` field and no icons: a strip of four short rows under a heading
+ * does not need either, and copying the notes across from /support/contact is
+ * how two pages start saying slightly different things about one inbox.
+ */
+const CHANNELS = [
+  { label: 'Support', value: SUPPORT.email, href: `mailto:${SUPPORT.email}` },
+  ...visibleSupportPhones().map((entry) => ({
+    label: entry.label,
+    value: entry.number,
+    // No `tel:` on a placeholder — it strips to "+91" and dials it. See the
+    // fuller note in app/support/contact/page.jsx.
+    href: isPlaceholderPhone(entry.number)
+      ? null
+      : `tel:${String(entry.number).replace(/[^+\d]/g, '')}`,
+  })),
+  { label: 'Sales', value: SUPPORT.salesEmail, href: `mailto:${SUPPORT.salesEmail}` },
+  { label: 'Hours', value: SUPPORT.hours, href: null },
+];
 
 export default function SupportPage() {
   return (
     <PageShell>
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
-      />
-      <PageHeading
+      {/* No scroll reveal anywhere under /support: see components/Reveal.jsx.
+          Support pages are read, not browsed, and a good share of this traffic
+          is an in-app browser opened by a QR scan, where the bundle may never
+          land. They are plain, static, visible markup. */}
+      {/* A STILL FROM THE LOOP WE ALREADY SHIP, not new photography.
+
+          The hub used to open on flat black — a heading, one line, then six
+          tiles — which is what made a page about owning the product feel
+          like a directory. The poster frame is a hand holding the unit,
+          which suits "we've got you covered" better than a beauty render
+          would. */}
+      <PageHero
         eyebrow="Support"
         title="We've got you covered."
-        subtitle="Setup help, answers to common questions, troubleshooting, and a direct line to our team."
-      />
+        subtitle={`Everything for your ${BRAND.model} in one place — warranty, answers, and a direct line to our team.`}
+        image={MEDIA.heroLoop.poster}
+        imagePosition="60% 45%"
+      >
+        {/* The search box is the first interactive thing on the page because
+            "find the answer" is the commonest reason to be here, and it
+            otherwise took two clicks and a page of scrolling to begin. */}
+        <AnswerSearch
+          faqs={ALL_FAQS}
+          fixes={TROUBLESHOOTING}
+          faqHref={ROUTES.faq}
+          contactHref={ROUTES.contact}
+        />
+      </PageHero>
 
-      <section id="setup-guide" className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20">
+      <section className="border-b border-border-subtle bg-black py-16 sm:py-20">
         <div className="section-container">
-          {/* No scroll reveal anywhere on this page: see
-              components/Reveal.jsx. Support copy is read, not browsed, and a
-              good share of the traffic arrives from a QR scan in an in-app
-              browser where the bundle may never land. */}
-          <div className="mb-10 max-w-lg">
-            <p className="eyebrow mb-3">Getting Started</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">Setup guide</h2>
-          </div>
+          <SupportTiles />
 
-          {/* Five steps on the 12-column board: two 6-wide pairs, then the
-              last one full width so the row doesn't end on a hole. */}
-          <ol className="bento-grid">
-            {SETUP_STEPS.map((step, i) => (
-              <li
-                key={step.title}
-                className={`bento-tile flex-row gap-4 p-6 ${
-                  i === SETUP_STEPS.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
-                }`}
-              >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white">
-                  {i + 1}
-                </span>
-                <div>
-                  <h3 className="mb-1.5 text-sm font-semibold text-white">{step.title}</h3>
-                  <p className="text-sm leading-relaxed text-white/55">{step.body}</p>
+          {/* THE CHANNELS. Addresses and hours, on the page people land on.
+
+              In the SAME section as the tiles, not one of its own: it is the
+              rest of "here is how to get help", and a section border between
+              them would read as a change of subject. `mt-12` is the gap.
+
+              A definition list, because that is what it is: four terms and
+              their values. `sm:grid-cols-2 lg:grid-cols-4` rather than a flex
+              row, so the long one — the hours string, at 48 characters —
+              wraps inside its own column instead of pushing the others off a
+              phone. */}
+          <div className="glass-panel mt-12 p-8 sm:p-10">
+            <p className="eyebrow mb-3">Reach us</p>
+            <h2 className="text-2xl font-bold tracking-tighter text-white">
+              Email us, or call during service hours
+            </h2>
+
+            <dl className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {CHANNELS.map((channel) => (
+                <div key={channel.label}>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
+                    {channel.label}
+                  </dt>
+                  {/* `break-words`: an email address is a single unbroken
+                      token and will widen a 390px column without it. */}
+                  <dd className="mt-2 break-words text-sm font-semibold text-white">
+                    {channel.href ? (
+                      <a
+                        href={channel.href}
+                        className="underline underline-offset-4 decoration-white/25 transition-colors hover:decoration-white"
+                      >
+                        {channel.value}
+                      </a>
+                    ) : (
+                      channel.value
+                    )}
+                  </dd>
                 </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+              ))}
+            </dl>
 
-      <section id="faq" className="scroll-mt-24 border-b border-border-subtle bg-black-soft py-16 sm:py-20">
-        <div className="section-container">
-          <div className="mb-10 max-w-lg">
-            <p className="eyebrow mb-3">Common Questions</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">FAQ</h2>
-          </div>
-
-          <FaqAccordion items={FAQS} />
-        </div>
-      </section>
-
-      <section id="troubleshooting" className="scroll-mt-24 border-b border-border-subtle bg-black py-16 sm:py-20">
-        <div className="section-container">
-          <div className="mb-10 max-w-lg">
-            <p className="eyebrow mb-3">Something Not Working?</p>
-            <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">Troubleshooting</h2>
-          </div>
-
-          <div className="bento-grid">
-            {TROUBLESHOOTING.map((item, i) => (
-              <div
-                key={item.issue}
-                className={`bento-tile p-6 ${
-                  i === TROUBLESHOOTING.length - 1 ? 'sm:col-span-2 lg:col-span-12' : 'lg:col-span-6'
-                }`}
+            <p className="mt-7 text-sm leading-relaxed text-white/55">
+              A message sent outside service hours is answered the next working day. For a hardware
+              fault, the{' '}
+              <a
+                href={ROUTES.warrantyClaim}
+                className="underline underline-offset-2 transition-colors hover:text-white"
               >
-                <h3 className="mb-2 text-sm font-semibold text-white">{item.issue}</h3>
-                <p className="text-sm leading-relaxed text-white/55">{item.fix}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" className="scroll-mt-24 bg-black-soft py-16 sm:py-20">
-        <div className="section-container grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
-          <div className="max-w-md">
-            <p className="eyebrow mb-3">Still Stuck?</p>
-            <h2 className="mb-4 text-3xl font-bold tracking-tighter text-white sm:text-4xl">Contact support</h2>
-            <p className="text-sm leading-relaxed text-white/55">
-              Send us a message and our team will get back to you — no bots, no ticket queue purgatory.
+                warranty claim form
+              </a>{' '}
+              collects what we need up front and is faster than an email.
             </p>
           </div>
+        </div>
+      </section>
 
-          <div>
-            <ContactForm />
+      {/* One destination repeated below the tiles, on purpose. Someone whose
+          problem is not on any tile should not have to work out which tile is
+          closest — "none of these" needs its own exit, and it is the last
+          thing on the page where they will be looking for it. */}
+      <section className="bg-black-soft py-16 sm:py-20">
+        <div className="section-container">
+          <div className="glass-panel flex flex-col gap-6 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-lg">
+              <h2 className="text-2xl font-bold tracking-tighter text-white">
+                Not sure where to start?
+              </h2>
+              <p className="mt-2.5 text-sm leading-relaxed text-white/55">
+                Tell us what is happening and we will point you at the right thing — no bots, no
+                ticket queue purgatory.
+              </p>
+            </div>
+            <a href={ROUTES.contact} className="btn-primary shrink-0 justify-center">
+              Contact support
+            </a>
           </div>
         </div>
       </section>

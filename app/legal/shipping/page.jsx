@@ -1,36 +1,99 @@
 import LegalPage from '@/components/LegalPage';
+import { BRAND } from '@/lib/iriz';
+import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
+import {
+  COMPANY,
+  POLICY_LAST_UPDATED,
+  SUPPORT,
+  WARRANTY,
+  sellersAnd,
+  sellersOr,
+  sellersVerb,
+} from '@/lib/site-config';
 
-export const metadata = pageMetadata({
-  title: 'Shipping Policy — BluNeuron',
-  description:
-    'How BluNeuron dispatches and delivers the IRIZ mini projector across India, including timelines and tracking. Draft text, pending legal review.',
-  path: '/legal/shipping',
-});
-
-const sections = [
+/**
+ * Shipping.
+ *
+ * The source Terms document has a shipping section — "standard delivery
+ * across India typically takes 3 to 7 business days following order
+ * dispatch", courier partners, tracking, delivery regions — written for
+ * orders placed on bluneuron.com. We do not dispatch those orders and never
+ * have: Amazon and Flipkart pick, pack and deliver every IRIZ, on their own
+ * estimates. Quoting a 3-7 day window we neither control nor measure would
+ * be a delivery promise made on someone else's behalf, so it is gone rather
+ * than restated.
+ *
+ * What is left is the shipping this company actually does, which is the
+ * service leg out of the warranty document: a unit coming in for repair, and
+ * the repaired unit going back. Those terms are real, they are ours, and
+ * they are the ones a reader of this page needs — so they are stated here in
+ * full rather than left as a cross-reference, and they read from WARRANTY in
+ * lib/site-config.js so they cannot drift from /legal/warranty.
+ */
+const SECTIONS = [
   {
-    heading: 'Overview',
-    body: 'This is placeholder shipping-policy text for the BluNeuron IRIZ launch site. Actual carriers, rates, and timelines must be finalized with logistics/fulfillment before this page goes live.',
+    heading: 'We do not ship your order',
+    body: `The ${BRAND.fullName} is fulfilled by ${sellersOr()}. They pick, pack, dispatch and deliver, and their delivery estimate, shipping charge and tracking are the ones that apply to your order.`,
+    note: 'There is no checkout on this site, so there is no order of ours to dispatch and no shipping charge of ours to quote.',
   },
   {
-    heading: 'Processing time',
-    body: 'Orders are intended to be dispatched within 24 hours of purchase (see the "Express Delivery" trust badge on the homepage) — a production version of this page must confirm this against actual fulfillment capacity.',
+    heading: 'Delivery estimates and charges',
+    body: `Shown on the product listing and at checkout on ${sellersOr()}, before you pay. They vary by pincode, by the delivery speed you choose, and by whether you hold a marketplace membership. We do not set them and cannot change them.`,
   },
   {
-    heading: 'Shipping regions',
-    body: 'The footer region selector currently lists United States, Canada, United Kingdom, European Union, and Australia as placeholder regions. Actual supported shipping destinations, rates, and customs/duties handling need to be confirmed before launch.',
+    heading: 'Tracking your order',
+    body: `Track the order in your ${sellersOr()} orders list. We have no visibility of it — marketplace sellers are not given tracking numbers, delivery dates or courier details for individual orders.`,
   },
   {
-    heading: 'Tracking',
-    body: 'Customers should receive a tracking number by email once an order ships. The specific carrier(s) and tracking integration are not yet finalized.',
+    heading: 'Where the IRIZ ships',
+    body: 'India only. The IRIZ is sold with an Indian power adapter and Indian warranty cover, and is not listed for export.',
   },
   {
-    heading: 'Delays and lost shipments',
-    body: 'A production policy needs to define how delays, damage in transit, and lost shipments are handled, including timeframes for filing a claim.',
+    heading: 'Delays, damage in transit and lost shipments',
+    body: [
+      "Raise all three with the marketplace that delivered the order. They are the courier's customer, not you, and only they can file a claim against the carrier.",
+      'If the parcel arrives visibly damaged, photograph the outer packaging before opening it, and the unit immediately after.',
+      `Damage found on delivery must reach us within 24 hours as well if you want it treated as a transit-damage claim on our side — see ${ROUTES.returns}.`,
+    ],
+  },
+  {
+    heading: 'Sending a unit in for service',
+    body: [
+      WARRANTY.inboundShipping,
+      `The destination is an authorised service centre, or our central warehouse at ${COMPANY.registeredAddress}. Raise the claim at ${ROUTES.warrantyClaim} first — we will confirm where to send it before you ship anything.`,
+      'A unit damaged in transit on its way to us is treated as out-of-warranty physical damage and quoted for paid repair, so pack it in its original box where you still have it.',
+    ],
+  },
+  {
+    heading: 'Getting your unit back',
+    body: WARRANTY.returnShipping,
+    note: 'The same applies to a replacement unit and to any spare part or accessory we send you directly as part of a service request.',
+  },
+  {
+    heading: 'Questions',
+    body: `Email ${SUPPORT.email} within support hours (${SUPPORT.hours}), or use the form at ${ROUTES.contact}.`,
   },
 ];
 
+export const metadata = {
+  ...pageMetadata({
+    title: 'Shipping — BluNeuron',
+    description:
+      `How shipping works for the BluNeuron IRIZ: ${sellersAnd()} ${sellersVerb('delivers', 'deliver')} every order, and BluNeuron pays the return leg on a service repair.`,
+    path: ROUTES.shipping,
+  }),
+  robots: routeRobots(ROUTES.shipping),
+};
+
 export default function ShippingPage() {
-  return <LegalPage title="Shipping Policy" sections={sections} draftDate="2026-09-27" />;
+  return (
+    <LegalPage
+      title="Shipping"
+      path={ROUTES.shipping}
+      intro={`${sellersAnd()} ${sellersVerb('delivers', 'deliver')} every IRIZ order. The shipping we do handle is the service leg — a unit coming in for repair, and the repaired unit going back.`}
+      sections={SECTIONS}
+      lastUpdated={POLICY_LAST_UPDATED}
+    />
+  );
 }

@@ -1,138 +1,128 @@
+import { Suspense } from 'react';
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
-import ClaimForm from '@/components/warranty/ClaimForm';
+import DraftBanner from '@/components/DraftBanner';
+import SupportForm from '@/components/SupportForm';
+import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { SUPPORT, WARRANTY } from '@/lib/warranty';
+import { WARRANTY, sellersPossessive } from '@/lib/site-config';
+
+export const metadata = {
+  ...pageMetadata({
+    title: 'Warranty Claim — BluNeuron IRIZ',
+    description:
+      'Make a warranty claim on your BluNeuron IRIZ: order ID, serial number, purchase date and what is going wrong.',
+    path: ROUTES.warrantyClaim,
+  }),
+  robots: routeRobots(ROUTES.warrantyClaim),
+};
 
 /**
- * The claim form, and the page says the two things people get wrong about
- * claiming before it shows them a field.
+ * A claim form that points people AWAY from itself first.
  *
- * "Not registered yet? You can still claim" is first among them. Registration
- * is optional (/support/warranty-registration says so too), but a form headed
- * "warranty claim" reads to most people as something you are only entitled to
- * if you did the paperwork — and someone with a dead projector who believes
- * they forfeited their cover does not write in at all. Saying it plainly here
- * costs a line and prevents that.
+ * Inside the marketplace's own return window, a replacement from Amazon or
+ * Flipkart is faster than anything we can do and costs the owner nothing — so
+ * the page says that before the form, even though it means fewer claims reach
+ * us. Sending someone down a slower path because it is our path is the kind of
+ * thing that turns a working product into a bad review.
  *
- * On a phone the form comes FIRST and all of that sits under it, for the
- * reason set out at length on /support/warranty-registration: someone filing
- * a claim from a phone has a broken projector in front of them and has
- * already decided to write in. The one point that must survive being moved
- * below the form — that you can claim without having registered — is also
- * the mobile subtitle, so it is read before the first field either way.
- *
- * From `lg` up nothing changes; `order-*` only bites while the grid is one
- * column.
+ * Troubleshooting comes first for the same reason: most of what arrives as "it
+ * is broken" is a focus that needs trimming on the remote, or an audio output set to
+ * the wrong device, and both are a minute on /support/faq rather than a week
+ * without a projector.
  */
-
-export const metadata = pageMetadata({
-  title: 'Warranty Claim — BluNeuron IRIZ',
-  description:
-    'Make a warranty claim on your BluNeuron IRIZ: your order ID, serial number, and what is going wrong. You do not need to have registered first.',
-  path: '/support/warranty-claim',
-});
-
 export default function WarrantyClaimPage() {
   return (
     <PageShell>
-      {/* Two subtitles, one per breakpoint — see the registration page. The
-          mobile line is not "takes about a minute": a claim is not a quick
-          errand someone chose to run, and promising speed to a person whose
-          projector has died would read as glib. It carries the fact that
-          actually unblocks them instead. */}
+      {/* No scroll reveal anywhere under /support: see components/Reveal.jsx.
+          Support pages are read, not browsed, and a good share of this traffic
+          is an in-app browser opened by a QR scan, where the bundle may never
+          land. They are plain, static, visible markup. */}
       <PageHeading
         eyebrow="Support"
         title="Make a warranty claim"
-        subtitle={
-          <>
-            <span className="lg:hidden">
-              {WARRANTY.months} months cover from your invoice date. You do not need to have
-              registered first.
-            </span>
-            <span className="hidden lg:inline">
-              Tell us what is happening, with your order and serial details, and we will take it
-              from there.
-            </span>
-          </>
-        }
+        subtitle="Tell us what is happening, with the order and serial details, and we will take it from there."
       />
 
       <section className="bg-black py-16 sm:py-20">
         <div className="section-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          {/* No scroll reveal on this page: see components/Reveal.jsx. A
-              customer with a broken projector is not here to watch anything
-              fade in, and half of this traffic is an in-app browser. */}
-          <div className="order-2 max-w-md lg:order-1 lg:sticky lg:top-28">
-            <h2 className="text-2xl font-bold tracking-tighter text-white">
-              Something not right?
-            </h2>
+          <div className="max-w-md lg:sticky lg:top-28">
+            <DraftBanner path={ROUTES.warrantyClaim} className="mb-8" />
+
+            <h2 className="text-2xl font-bold tracking-tighter text-white">Try these first</h2>
             <p className="mt-4 text-sm leading-relaxed text-white/60">
-              Fill in the form and we will come back to you on the email address you give. You get
-              a claim reference as soon as it is in.
+              Two things are quicker than a claim, and one of them is usually the answer:
             </p>
 
-            <ul className="mt-6 space-y-3 text-sm leading-relaxed text-white/60">
-              <Point>
-                <strong className="font-semibold text-white/85">Keep your invoice ready.</strong>{' '}
-                It is the proof of purchase date the claim is assessed against.
-              </Point>
-              <Point>
-                The <strong className="font-semibold text-white/85">serial number</strong> is on
-                the label underneath the projector.
-              </Point>
-              <Point>
-                Cover runs for{' '}
-                <strong className="font-semibold text-white/85">{WARRANTY.months} months</strong>{' '}
-                from the invoice date.
-              </Point>
-            </ul>
-
-            <div className="mt-8 rounded-2xl border border-border-subtle bg-white/[0.03] p-5">
-              <p className="text-sm font-semibold text-white">Not registered yet?</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-white/55">
-                You can still claim. Registering was always optional — your cover runs from the
-                invoice date either way, and this form asks for everything a claim needs.
-              </p>
-            </div>
+            <ol className="mt-5 space-y-4 text-sm leading-relaxed text-white/60">
+              <li className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">
+                  1
+                </span>
+                <span>
+                  Check{' '}
+                  <a
+                    href={`${ROUTES.faq}#troubleshooting`}
+                    className="underline underline-offset-2 transition-colors hover:text-white"
+                  >
+                    troubleshooting
+                  </a>
+                  . Blurry images, a trapezoid picture, no sound and an unresponsive remote all
+                  have a fix that takes a minute.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">
+                  2
+                </span>
+                <span>
+                  If you are still inside {sellersPossessive()} own return window, open a
+                  return or replacement <strong className="font-semibold text-white/85">there</strong>{' '}
+                  — it is faster than a warranty claim and they collect the unit.{' '}
+                  <a
+                    href={ROUTES.returns}
+                    className="underline underline-offset-2 transition-colors hover:text-white"
+                  >
+                    Returns &amp; refunds
+                  </a>
+                  .
+                </span>
+              </li>
+            </ol>
 
             <div className="mt-8 border-t border-border-subtle pt-6">
               <p className="text-sm leading-relaxed text-white/50">
+                {/* `WARRANTY.label` ("1 year"), not `${WARRANTY.months} months`.
+                    Same cover period, one vocabulary — the site said "12
+                    months" here and on /about while /legal/warranty,
+                    /shop/iriz and /shop all said "1 year". */}
+                Cover runs for{' '}
+                <span className="font-semibold text-white/80">{WARRANTY.label}</span> from
+                the purchase date. Claims are handled{' '}
+                <span className="font-semibold text-white/80">{WARRANTY.claimRoute}</span>.{' '}
                 <a
-                  href="/legal/warranty"
+                  href={ROUTES.warranty}
                   className="underline underline-offset-2 transition-colors hover:text-white"
                 >
                   Full warranty policy
                 </a>
-                {' · '}
-                <a
-                  href={`mailto:${SUPPORT.email}`}
-                  className="underline underline-offset-2 transition-colors hover:text-white"
-                >
-                  {SUPPORT.email}
-                </a>
+                .
               </p>
             </div>
           </div>
 
-          <div className="order-1 lg:order-2">
-            <ClaimForm />
+          <div>
+            {/* `useSearchParams` inside SupportForm (the claim link from the
+                account pre-fills the unit) is a request-time API, and a
+                prerendered page containing one without a boundary pulls the
+                WHOLE page out of static rendering. Wrapped, the page stays
+                static and only the form waits for the params. */}
+            <Suspense fallback={<div className="glass-panel h-96" aria-hidden="true" />}>
+              <SupportForm kind="claim" />
+            </Suspense>
           </div>
         </div>
       </section>
     </PageShell>
-  );
-}
-
-/** A bullet in the left column's list. */
-function Point({ children }) {
-  return (
-    <li className="flex gap-2.5">
-      <span
-        className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
-        aria-hidden="true"
-      />
-      <span>{children}</span>
-    </li>
   );
 }

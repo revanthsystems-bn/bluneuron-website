@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { usePathname } from 'next/navigation';
 import NewsletterPopup from '../NewsletterPopup';
 import { NOTIFY_SOURCES } from '@/lib/web3forms';
+import { NOTIFY_AUTO_OPEN } from '@/lib/site-config';
 
 /**
  * Pre-launch, every CTA on the site means the same thing: "put me on the
@@ -27,31 +28,6 @@ const NotifyContext = createContext(null);
 const DISMISSED_KEY = 'bluneuron-iriz-popup-dismissed';
 const AUTO_OPEN_DELAY_MS = 8000;
 
-/**
- * The ONLY route the invitation opens itself on.
- *
- * It used to open on every page after 8 seconds, which is fine on a landing
- * page someone is browsing and wrong everywhere else. The warranty pages
- * made that obvious: /support/warranty-registration is reached by scanning
- * a QR code on the carton, usually by someone standing over a projector
- * they have just unboxed or one that has stopped working. Covering that
- * form with "Be the first to see IRIZ" interrupts a task — and invites
- * someone to a launch list for a product they have already bought.
- *
- * The same reasoning covers /legal/*: a policy page is read by someone
- * looking up a term, which is the worst possible moment for a marketing
- * modal, and a consent-adjacent document is the worst possible place for
- * one.
- *
- * So the auto-open is allow-listed to the home page rather than blocked
- * page by page. A deny-list would mean every page added from now on opts
- * out by being remembered, and the warranty pages are proof that does not
- * happen. MANUAL opens are unaffected: the masthead "Notify Me", the mobile
- * menu and the sticky bar all call openNotify() directly and still work on
- * every route, including these.
- */
-const AUTO_OPEN_PATHS = new Set(['/']);
-
 export function useNotify() {
   const ctx = useContext(NotifyContext);
   if (!ctx) throw new Error('useNotify must be used inside <NotifyProvider>');
@@ -59,6 +35,7 @@ export function useNotify() {
 }
 
 export default function NotifyProvider({ children }) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [source, setSource] = useState(NOTIFY_SOURCES.timedInvitation);
 
@@ -86,14 +63,41 @@ export default function NotifyProvider({ children }) {
     }
   }, []);
 
-  // `usePathname` returns the path with no query or hash, and no trailing
-  // slash (trailingSlash is false), so '/' is an exact match. It changes on
-  // client navigation, so the timer below is re-armed on arriving at the
-  // home page and torn down on leaving it.
-  const pathname = usePathname();
-
+  /**
+   * THE UNPROMPTED INVITATION IS HOMEPAGE-ONLY.
+   *
+   * It used to fire on every route after a delay, which put a launch-list
+   * modal over the product page, the basket, the sign-in form and the
+   * account area — i.e. over every screen where the visitor is already doing
+   * something more valuable than joining a mailing list. Interrupting a
+   * checkout to ask for an email address is the clearest way to lose both.
+   *
+   * The homepage is where someone is browsing rather than transacting, so it
+   * is the one place an invitation is a fair trade. `pathname === '/'`
+   * rather than a list of excluded routes: a deny-list silently fails open
+   * for every page added later, and the next page added is far more likely
+   * to be part of the shop than part of the story.
+   *
+   * This gates ONLY the automatic open. Every explicit "Notify Me" button
+   * still calls `openNotify` directly and still works everywhere — a visitor
+   * who asks for the modal must always get it.
+   */
   useEffect(() => {
-    if (!AUTO_OPEN_PATHS.has(pathname)) return undefined;
+    /*
+     * THE UNPROMPTED INVITATION IS OFF (NOTIFY_AUTO_OPEN, lib/site-config),
+     * because the product is on sale: a modal offering to tell you when IRIZ
+     * launches is both out of date and sitting on top of the Buy button.
+     *
+     * Checked FIRST, before the storage read and before the timer is
+     * scheduled — a switched-off feature that still sets a timeout is a
+     * switched-off feature that can still surprise you.
+     *
+     * This gates ONLY the automatic open. Every explicit "Notify Me" control
+     * still calls `openNotify` directly and still works.
+     */
+    if (!NOTIFY_AUTO_OPEN) return undefined;
+    if (pathname !== '/') return undefined;
+
     try {
       if (window.localStorage.getItem(DISMISSED_KEY)) return undefined;
     } catch {

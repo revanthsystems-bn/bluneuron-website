@@ -6,7 +6,7 @@ import Reveal from './Reveal';
 import { THROW_RANGE } from '@/lib/iriz';
 
 /**
- * The projected image growing from 40" to 200" as you scroll — the hard-number
+ * The projected image growing from 35" to 200" as you scroll — the hard-number
  * beat between the lens tunnel and the spec table, and the thing the table's
  * "Throw Ratio 1:1 · 0.9m–5m" row only states in the abstract.
  *
@@ -106,12 +106,12 @@ export default function ThrowRange() {
             <div className="inline-flex shrink-0 items-center gap-4 rounded-full border border-white/10 bg-white/[0.06] px-6 py-4 backdrop-blur-glass">
               <p className="flex items-baseline gap-1 text-3xl font-bold tracking-tighter text-white">
                 <motion.span>{inchLabel}</motion.span>
-                <span className="text-base font-medium text-white/45">in</span>
+                <span className="text-base font-medium text-white/55">in</span>
               </p>
               <span aria-hidden="true" className="h-8 w-px bg-white/15" />
               <p className="flex items-baseline gap-1 text-3xl font-bold tracking-tighter text-white">
                 <motion.span>{metreLabel}</motion.span>
-                <span className="text-base font-medium text-white/45">m</span>
+                <span className="text-base font-medium text-white/55">m</span>
               </p>
               <span className="sr-only">
                 Screen size against projection distance, from{' '}

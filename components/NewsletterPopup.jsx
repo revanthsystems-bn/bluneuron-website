@@ -216,7 +216,7 @@ export default function NewsletterPopup({ open, source, onClose, onSubscribed })
                       <button
                         type="button"
                         onClick={onClose}
-                        className="text-xs text-white/40 underline-offset-4 transition-colors hover:text-white/70 hover:underline"
+                        className="text-xs text-white/55 underline-offset-4 transition-colors hover:text-white/70 hover:underline"
                       >
                         Maybe later
                       </button>
