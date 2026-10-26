@@ -38,13 +38,6 @@ export const metadata = {
   description: 'The IRIZ Club is for IRIZ owners.',
 };
 
-/** Where the serial is, in words. No invented photograph of a sticker. */
-const WHERE_TO_LOOK = [
-  'On the sticker on the bottom of the projector, beside the model number.',
-  'On the white label on the side of the retail carton.',
-  'On the warranty card inside the box.',
-];
-
 export default async function ClubPage() {
   /*
    * READING THE COOKIE MAKES THIS ROUTE DYNAMIC, which is correct and is why
@@ -130,47 +123,45 @@ export default async function ClubPage() {
               )}
             </div>
 
-            {/* WHERE THE SERIAL IS. Described, not illustrated.
-                A drawing of a sticker we have not photographed would be a
-                guess at what the carton looks like, and a wrong one sends
-                people hunting in the wrong place. The example serial is the
-                real format and its check letter is genuine — but it is not in
-                club_serials, so nobody can join by typing the one on the
-                website. */}
+            {/* WHAT THE FORM DOES NOT ALREADY SAY.
+                Step one of the door now carries the sketch of the label and
+                the three places to look (components/club/ClubDoor), because
+                on a phone this column is a screen and a half below the
+                field and is no help to somebody holding a box. So this is
+                the OTHER half: the format, and what to do when it cannot be
+                found at all. Repeating the three places here would be the
+                same list twice on every phone.
+
+                The example serial is the real format and its check letter is
+                genuine — but it is not in club_serials, so nobody can join
+                by typing the one printed on the website. */}
             <aside className="min-w-0">
               <div className="rounded-2xl border border-border-subtle bg-white/[0.02] p-6 sm:p-8">
                 <h2 className="text-base font-semibold text-white">
-                  Where to find your serial number
+                  What a serial number looks like
                 </h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/55">
-                  Eleven characters, letters and digits, printed in one block. It looks like this:
+                  Eleven characters, letters and digits, printed in one block:
                 </p>
                 <p className="mt-4 rounded-xl border border-border bg-black-elevated px-4 py-3 font-mono text-base tracking-[0.18em] text-white">
                   {SERIAL_EXAMPLE}
                 </p>
 
-                <ul className="mt-6 space-y-3 text-sm leading-relaxed text-white/60">
-                  {WHERE_TO_LOOK.map((line) => (
-                    <li key={line} className="flex gap-3">
-                      <span
-                        className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
-                        aria-hidden="true"
-                      />
-                      {line}
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="mt-6 text-xs leading-relaxed text-white/55">
+                <p className="mt-6 text-sm leading-relaxed text-white/60">
                   Capitals, lower case, spaces and dashes are all fine — we tidy it up for you.
-                  Cannot find it? Email{' '}
+                  Type it exactly as it is printed and the form will tell you straight away if a
+                  character has been misread.
+                </p>
+
+                <p className="mt-5 text-xs leading-relaxed text-white/55">
+                  Cannot find it anywhere on the box? Email{' '}
                   <a
                     href={`mailto:${CLUB.links.supportEmail}`}
                     className="underline underline-offset-4 decoration-white/25 transition-colors hover:decoration-white"
                   >
                     {CLUB.links.supportEmail}
                   </a>{' '}
-                  with a photo of the box.
+                  with a photo of the carton and we will look it up for you.
                 </p>
               </div>
             </aside>

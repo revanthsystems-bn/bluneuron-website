@@ -39,6 +39,12 @@ import { createSessionToken, sessionCookieHeaders } from '@/lib/club-session';
  * A mistyped one dies at step 5 and costs the database nothing, which is the
  * entire reason the check letter exists.
  *
+ * STEP ONE IS NOT TRUSTED. /api/club/check-serial has usually already told
+ * the browser this serial is free, and this route behaves exactly as if it
+ * had not: the check letter, the existence of the serial and whether it is
+ * already claimed are all established again here and again in SQL. A
+ * "status" a browser is holding is not a fact.
+ *
  * WHAT IS NEVER LOGGED: the serial, the name, the email, the phone, the city,
  * the IP. There is no `console.log` of a request body anywhere in this file,
  * and the one error path in lib/club-server logs a status code and a function
@@ -97,14 +103,26 @@ export async function POST(request) {
   const city = optionalText(body.city, CLUB_LIMITS.city);
   if (city === undefined) return fail('INVALID');
 
-  // The phone is optional, and when given it must be a real Indian mobile —
-  // normalised to +91XXXXXXXXXX so support is not left with four spellings of
-  // one number. A malformed one is refused rather than stored as typed: an
-  // uncallable number in a members table is worse than no number.
-  const rawPhone = optionalText(body.phone, CLUB_LIMITS.phone);
-  if (rawPhone === undefined) return fail('INVALID');
+  /*
+   * THE MOBILE NUMBER IS REQUIRED, as of the two-step join.
+   *
+   * It used to be optional. A member we cannot reach when their email
+   * bounces is a row that does nothing for them or for us, and the Club's
+   * one promise - that we will tell members things first - needs a channel
+   * that works. The form asks for it, this refuses without it, and
+   * `club_claim` refuses again in SQL (see
+   * supabase/migrations/20261027_club_two_step.sql). Members who joined
+   * before the change keep their rows: the SQL constraint is `not valid`,
+   * so it binds new rows only.
+   *
+   * It must be a real Indian mobile, normalised to +91XXXXXXXXXX so support
+   * is not left with four spellings of one number. A malformed one is
+   * refused rather than stored as typed: an uncallable number in a members
+   * table is worse than no number.
+   */
+  const rawPhone = text(body.phone, CLUB_LIMITS.phone);
   const phone = rawPhone ? normalizePhone(rawPhone) : null;
-  if (rawPhone && !phone) return fail('INVALID');
+  if (!phone) return fail('INVALID');
 
   // THE CHECK LETTER, server side. The browser checks it too, which is a
   // courtesy to the person typing; this is the one that counts, because the

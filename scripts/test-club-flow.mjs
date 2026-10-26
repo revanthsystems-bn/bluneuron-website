@@ -5,11 +5,25 @@
  *
  * WHAT IT ACTUALLY EXERCISES. Everything between the browser and the database:
  * the route handlers, the body cap, the same-origin check, the server-side
- * check letter, the cookie signing and verification, the server guard on
- * /club/home, and the masthead's /api/club/me. Real HTTP against a real
- * `next start` of a real build.
+ * check letter, the TWO-STEP join (check-serial then join), the cookie
+ * signing and verification, the server guard on /club/home, and the
+ * masthead's /api/club/me. Real HTTP against a real `next start` of a real
+ * build.
  *
- * WHAT IT MOCKS, and why that is honest: the three PostgREST RPC endpoints.
+ * THE THREE PROPERTIES OF THE TWO-STEP FLOW THAT ARE WORTH TESTING, and that
+ * are each one refactor away from quietly breaking:
+ *
+ *   1. INVALID AND NOT_FOUND ARE BYTE-IDENTICAL. A malformed serial and a
+ *      well-formed one nobody has ever manufactured must produce the same
+ *      status and the same body, or /api/club/check-serial becomes an oracle
+ *      that tells an attacker which guessed serials are real units.
+ *   2. THE RATE LIMIT IS SHARED. Five failures an hour across check-serial
+ *      AND join together, not five each — otherwise step one is simply a
+ *      second allowance to spend.
+ *   3. STEP ONE GRANTS NOTHING. Posting straight to /api/club/join without
+ *      ever calling check-serial is validated exactly as fully.
+ *
+ * WHAT IT MOCKS, and why that is honest: the four PostgREST RPC endpoints.
  * The Supabase project has no club tables until somebody runs the migration
  * by hand (docs/club-setup.md), and a test that cannot run until then is a
  * test that never runs. The mock below implements the SAME contract the SQL
@@ -40,6 +54,8 @@ import { createServer } from 'node:http';
 
 const base = (process.argv[2] || 'http://127.0.0.1:3300').replace(/\/+$/, '');
 const mockPort = Number(process.argv[3] || 54321);
+
+const NL = String.fromCharCode(10);
 
 let failures = 0;
 let checks = 0;
@@ -99,9 +115,32 @@ const mock = createServer((req, res) => {
       return;
     }
 
+    /*
+     * club_check_serial. Mirrors 20261027_club_two_step.sql, including the
+     * part that matters most: a serial that is not in the set comes back as
+     * INVALID, not NOT_FOUND. The conflation happens in SQL so that no route
+     * handler can reintroduce the distinction by accident, and the mock has
+     * to be conflated too or the test would be checking a looser contract
+     * than the one that ships.
+     */
+    if (req.url.endsWith('/club_check_serial')) {
+      if (rateLimited(args.p_key_hash)) return reply({ code: 'RATE_LIMITED' });
+      if (!serials.has(args.p_serial)) {
+        recordFailure(args.p_key_hash);
+        return reply({ code: 'INVALID' });
+      }
+      // CLAIMED does not count as a failure: the person hitting it is
+      // overwhelmingly the owner who has forgotten they joined.
+      if (members.has(args.p_serial)) return reply({ code: 'CLAIMED' });
+      return reply({ code: 'OK' });
+    }
+
     if (req.url.endsWith('/club_claim')) {
       if (rateLimited(args.p_key_hash)) return reply({ code: 'RATE_LIMITED' });
       if (args.p_consent !== true) return reply({ code: 'INVALID' });
+      // Required since the two-step join. Not counted as a rate-limit
+      // failure, exactly as the name and email checks are not.
+      if (!args.p_phone || !String(args.p_phone).trim()) return reply({ code: 'INVALID' });
       if (!serials.has(args.p_serial)) {
         recordFailure(args.p_key_hash);
         return reply({ code: 'NOT_FOUND' });
@@ -299,23 +338,108 @@ try {
 
     const badLetter = await post(
       '/api/club/join',
-      { serial: 'IRZT6XA001Y', name: 'A', email: 'a@b.co', consent: true },
+      { serial: 'IRZT6XA001Y', name: 'A', email: 'a@b.co', phone: '9876543210', consent: true },
       null
     );
     ok(badLetter.status === 400, 'a wrong check letter is refused server-side');
 
     const noConsent = await post(
       '/api/club/join',
-      { serial: 'IRZT6XA001D', name: 'A', email: 'a@b.co', consent: false },
+      { serial: 'IRZT6XA001D', name: 'A', email: 'a@b.co', phone: '9876543210', consent: false },
       null
     );
     ok(noConsent.status === 400, 'a join without consent is refused');
+
+    // The mobile number became required with the two-step join.
+    const noPhone = await post(
+      '/api/club/join',
+      { serial: 'IRZT6XA001D', name: 'A', email: 'a@b.co', consent: true },
+      null
+    );
+    ok(noPhone.status === 400, 'a join with no mobile number is refused');
+
+    const badPhone = await post(
+      '/api/club/join',
+      { serial: 'IRZT6XA001D', name: 'A', email: 'a@b.co', phone: '12345', consent: true },
+      null
+    );
+    ok(badPhone.status === 400, 'a join with a number that is not an Indian mobile is refused');
+
+    // ...and every guard above applies to step one as well.
+    const checkNoOrigin = await fetch(base + '/api/club/check-serial', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serial: 'IRZT6XA001D' }),
+    });
+    ok(checkNoOrigin.status === 403, 'check-serial with no Origin is refused');
+
+    const checkCrossOrigin = await post(
+      '/api/club/check-serial',
+      { serial: 'IRZT6XA001D' },
+      null,
+      { Origin: 'https://evil.example' }
+    );
+    ok(checkCrossOrigin.status === 403, 'a cross-origin check-serial is refused');
+
+    const checkHuge = await post('/api/club/check-serial', 'x'.repeat(8 * 1024), null);
+    ok(checkHuge.status === 400, 'a check-serial body over the 4 KB cap is refused');
+
     ok(members.size === 0, 'none of the above reached the database');
   }
 
-  /* --- 5. Joining. */
-  console.log('\nJoining:');
+  /* --- 4b. STEP ONE, and the property that makes it safe to exist. */
+  console.log(NL + 'Step one - check-serial:');
   {
+    const good = await post('/api/club/check-serial', { serial: 'irz-t6x-a001-d' }, null);
+    ok(
+      good.status === 200 && good.data.status === 'OK',
+      'a real, unclaimed serial answers OK - lower case and dashed, as typed',
+      JSON.stringify(good.data)
+    );
+    ok(members.size === 0, 'and OK reserved nothing: no member row was created');
+
+    /*
+     * THE ENUMERATION TEST. This is the reason the endpoint returns so
+     * little. IRZT6XA001Y has a WRONG check letter and dies in the route
+     * handler; IRZT6XA004L has a CORRECT one and reaches the database, which
+     * has never heard of it. Those are two completely different code paths,
+     * and from outside they must be one response.
+     */
+    const malformed = await post('/api/club/check-serial', { serial: 'IRZT6XA001Y' }, null);
+    const unknown = await post('/api/club/check-serial', { serial: 'IRZT6XA004L' }, null);
+    ok(
+      malformed.status === unknown.status,
+      'INVALID and NOT_FOUND share a status code',
+      malformed.status + ' vs ' + unknown.status
+    );
+    ok(
+      JSON.stringify(malformed.data) === JSON.stringify(unknown.data),
+      'INVALID and NOT_FOUND share a byte-identical body - no enumeration hint',
+      JSON.stringify(malformed.data) + ' vs ' + JSON.stringify(unknown.data)
+    );
+    ok(
+      !/not found|unknown|does not exist/i.test(unknown.data.error ?? ''),
+      'and the message does not hint that the serial was well-formed but unknown'
+    );
+
+    const empty = await post('/api/club/check-serial', { serial: '' }, null);
+    ok(empty.status === 400, 'an empty serial is refused');
+
+    const honeypot = await post(
+      '/api/club/check-serial',
+      { serial: 'IRZT6XA001D', botcheck: 'spam' },
+      null
+    );
+    ok(honeypot.status === 400, 'the honeypot is wired up on check-serial too');
+  }
+
+  /* --- 5. Joining, both steps, the way a browser does it. */
+  console.log(NL + 'Joining (step one, then step two):');
+  {
+    const stepOne = await post('/api/club/check-serial', { serial: 'irz-t6x-a001-d' }, deviceOne);
+    ok(stepOne.status === 200 && stepOne.data.status === 'OK', 'step one clears the serial');
+    ok(!deviceOne.has('club_session'), 'step one sets no cookie - it is not a sign-in');
+
     const joined = await post(
       '/api/club/join',
       {
@@ -366,6 +490,7 @@ try {
         serial: 'IRZT6XA001D',
         name: 'Someone Else',
         email: 'someone@example.test',
+        phone: '9000000001',
         consent: true,
       },
       jar()
@@ -376,11 +501,80 @@ try {
       'and says so, so the real owner knows to sign in instead'
     );
     ok(members.size === 1, 'no second member row was created');
+
+    // And step one says so FIRST, which is the whole point of step one: the
+    // owner is sent to sign-in before typing five more fields.
+    const check = await post('/api/club/check-serial', { serial: 'IRZT6XA001D' }, jar());
+    ok(
+      check.status === 200 && check.data.status === 'CLAIMED',
+      'step one reports CLAIMED for a serial that already has a member',
+      JSON.stringify(check.data)
+    );
+  }
+
+  /* --- 7b. STEP ONE GRANTS NOTHING. */
+  console.log(NL + 'Step one is not a gate:');
+  {
+    /*
+     * A join posted with NO preceding check-serial, naming a serial that
+     * does not exist. If step one were ever treated as an entitlement - a
+     * token, a cookie, a cached "verified" flag - this is where it would
+     * show up, as either an acceptance or a different error.
+     */
+    const straightToJoin = await post(
+      '/api/club/join',
+      {
+        serial: 'IRZT6XA005X',   // correct check letter, not a real unit
+        name: 'Nobody',
+        email: 'nobody@example.test',
+        phone: '9876543210',
+        consent: true,
+      },
+      jar()
+    );
+    ok(straightToJoin.status === 400, 'joining without step one is still validated server-side');
+    ok(!members.has('IRZT6XA005X'), 'and no member row was created');
+
+    // The opposite direction: step one says OK, then the join is posted with
+    // a DIFFERENT serial. The join must judge what it was sent, not what was
+    // checked a moment ago.
+    const device = jar();
+    await post('/api/club/check-serial', { serial: 'IRZT6XA002P' }, device);
+    const swapped = await post(
+      '/api/club/join',
+      {
+        serial: 'IRZT6XA501X',   // correct check letter, not a real unit
+        name: 'Swapper',
+        email: 'swapper@example.test',
+        phone: '9876543210',
+        consent: true,
+      },
+      device
+    );
+    ok(swapped.status === 400, 'a serial swapped in after step one is refused');
+    ok(!members.has('IRZT6XA501X'), 'and claims nothing');
+    ok(!members.has('IRZT6XA002P'), 'and does not claim the serial that WAS checked either');
   }
 
   /* --- 8. A second device signs in. */
   console.log('\nA second device:');
   {
+    /*
+     * THE BUCKET IS CLEARED FIRST, for the same reason section 11 clears
+     * it, and it became necessary when the two-step sections above were
+     * added. Every request in this file comes from 127.0.0.1, so they all
+     * share one rate-limit key — and sections 4b and 7b deliberately spend
+     * three failures probing the enumeration behaviour. Add the two this
+     * section spends itself (the wrong email, and the unknown-serial probe
+     * beside it) and the real sign-in below was the sixth: refused with 429
+     * by a limiter doing its job, which made three assertions about SIGNING
+     * IN fail for reasons that have nothing to do with signing in.
+     *
+     * Clearing it here keeps each section measuring the thing it is named
+     * after. The limiter itself is tested in section 11, from zero.
+     */
+    attempts.clear();
+
     const homeBefore = await get('/club/home', deviceTwo);
     ok(homeBefore.status !== 200, 'the second device starts out locked out');
 
@@ -470,7 +664,7 @@ try {
     for (const serial of guesses) {
       const r = await post(
         '/api/club/join',
-        { serial, name: 'Guess', email: 'guess@example.test', consent: true },
+        { serial, name: 'Guess', email: 'guess@example.test', phone: '9000000002', consent: true },
         jar()
       );
       seen.push(r.status);
@@ -483,7 +677,7 @@ try {
 
     const sixth = await post(
       '/api/club/join',
-      { serial: 'IRZT6XA003A', name: 'Guess', email: 'guess@example.test', consent: true },
+      { serial: 'IRZT6XA003A', name: 'Guess', email: 'guess@example.test', phone: '9000000002', consent: true },
       jar()
     );
     ok(sixth.status === 429, 'the sixth attempt is rate limited', `status ${sixth.status}`);
@@ -497,6 +691,54 @@ try {
     );
 
     /*
+     * ONE ALLOWANCE, SHARED BY BOTH STEPS.
+     *
+     * The failures below are spent entirely on /api/club/check-serial, and
+     * the request that is then refused is a /api/club/join. If step one
+     * ever grew a counter of its own, this is where it would show: the join
+     * would sail through on a fresh budget, and an enumerator would simply
+     * use check-serial, which is cheaper to call and answers faster.
+     */
+    attempts.clear();
+    {
+      const sharedGuesses = [
+        'IRZT6XA004L', 'IRZT6XA005X', 'IRZT6XA501X', 'IRZT6XA502H', 'IRZT6XA006H',
+      ];
+      for (const serial of sharedGuesses) {
+        await post('/api/club/check-serial', { serial }, jar());
+      }
+
+      const joinAfterChecks = await post(
+        '/api/club/join',
+        {
+          serial: 'IRZT6XA003A',
+          name: 'Shared',
+          email: 'shared@example.test',
+          phone: '9000000005',
+          consent: true,
+        },
+        jar()
+      );
+      ok(
+        joinAfterChecks.status === 429,
+        'five failed check-serials rate-limit the JOIN - one shared counter',
+        'status ' + joinAfterChecks.status
+      );
+      ok(!members.has('IRZT6XA003A'), 'and the serial it named was not claimed');
+
+      const checkAfterChecks = await post(
+        '/api/club/check-serial',
+        { serial: 'IRZT6XA002P' },
+        jar()
+      );
+      ok(
+        checkAfterChecks.status === 429,
+        'and check-serial is itself refused once the allowance is gone',
+        'status ' + checkAfterChecks.status
+      );
+    }
+
+    /*
      * A TYPO IS NOT AN ATTACK. A serial with a bad check letter is rejected
      * by the route handler before the RPC, so it costs the caller nothing
      * from their hourly allowance. Someone fat-fingering their own serial
@@ -506,19 +748,37 @@ try {
     for (let i = 0; i < 8; i += 1) {
       await post(
         '/api/club/join',
-        { serial: 'IRZT6XA001Y', name: 'Typo', email: 'typo@example.test', consent: true },
+        { serial: 'IRZT6XA001Y', name: 'Typo', email: 'typo@example.test', phone: '9000000003', consent: true },
         jar()
       );
     }
     const afterTypos = await post(
       '/api/club/join',
-      { serial: 'IRZT6XA003A', name: 'Real', email: 'real@example.test', consent: true },
+      { serial: 'IRZT6XA003A', name: 'Real', email: 'real@example.test', phone: '9000000004', consent: true },
       jar()
     );
     ok(
       afterTypos.status === 200,
       'eight mistyped serials do NOT use up the allowance — a typo is not an attack',
       `status ${afterTypos.status}`
+    );
+
+    // The same on step one. Someone squinting at a sticker will mistype it
+    // more than five times, and must not be locked out of the first screen
+    // before ever reaching the second.
+    attempts.clear();
+    for (let i = 0; i < 8; i += 1) {
+      await post('/api/club/check-serial', { serial: 'IRZT6XA001Y' }, jar());
+    }
+    const checkAfterTypos = await post(
+      '/api/club/check-serial',
+      { serial: 'IRZT6XA002P' },
+      jar()
+    );
+    ok(
+      checkAfterTypos.status === 200 && checkAfterTypos.data.status === 'OK',
+      'eight typos on step one do not use up the allowance either',
+      'status ' + checkAfterTypos.status
     );
   }
 
