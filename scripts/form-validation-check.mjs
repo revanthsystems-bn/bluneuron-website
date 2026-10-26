@@ -22,9 +22,9 @@ const REG = {
   email: 'not-an-email',          // invalid by default, so a typo cannot pass
   phone: '12345',
   purchaseSource: 'Nowhere',
-  orderId: 'X',
+  invoiceNo: 'X',                 // under the 4-character floor
   purchaseDate: '2026-13-45',
-  serialNumber: 'X',
+  serialNumber: 'X',              // optional, but 'X' is not a valid serial
 };
 
 const CASES = [
@@ -44,6 +44,18 @@ const CASES = [
     body: { ...REG, email: 'x@example.com', purchaseSource: 'Amazon', purchaseDate: '2099-01-01' } },
   { route: '/api/warranty-registration', name: 'field over 200 chars', expect: 400,
     body: { ...REG, email: 'x@example.com', purchaseSource: 'Amazon', purchaseDate: '2026-01-01', name: 'A'.repeat(500) } },
+  { route: '/api/warranty-registration', name: 'invoice number with a space in it', expect: 400,
+    body: { ...REG, email: 'x@example.com', purchaseSource: 'Amazon', purchaseDate: '2026-01-01',
+      invoiceNo: 'FA ABCD 2601', serialNumber: '' } },
+  { route: '/api/warranty-registration', name: 'invoice number over 40 chars', expect: 400,
+    body: { ...REG, email: 'x@example.com', purchaseSource: 'Amazon', purchaseDate: '2026-01-01',
+      invoiceNo: 'F'.repeat(41), serialNumber: '' } },
+  { route: '/api/warranty-registration', name: 'serial with a wrong check letter', expect: 400,
+    body: { ...REG, email: 'x@example.com', purchaseSource: 'Amazon', purchaseDate: '2026-01-01',
+      invoiceNo: 'FAABCD2601234567', serialNumber: 'IRZT6XA001Y' } },
+  { route: '/api/warranty-registration', name: 'legacy orderId, still invalid on its own', expect: 400,
+    body: { ...REG, email: 'x@example.com', purchaseSource: 'Amazon', purchaseDate: '2026-01-01',
+      invoiceNo: undefined, orderId: 'X' } },
   { route: '/api/warranty-registration', name: 'body over the 10KB cap', expect: 413,
     body: { ...REG, serialNumber: 'A'.repeat(11 * 1024) } },
   { route: '/api/warranty-registration', name: 'GET instead of POST', expect: 405, method: 'GET' },

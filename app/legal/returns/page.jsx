@@ -51,7 +51,7 @@ const SECTIONS = [
   {
     heading: 'Where a return starts',
     body: `The ${BRAND.fullName} is sold on ${sellersAnd()}. Your order, your payment and your invoice are with the marketplace you bought from, so a return, a replacement or a refund is started in your orders list there — not here. Their window, their process and their refund timelines apply to the purchase, and they are usually wider than ours.`,
-    note: 'We cannot start, authorise or refund a marketplace return on your behalf, and we cannot see your order unless you give us the order ID.',
+    note: 'We cannot start, authorise or refund a marketplace return on your behalf, and we cannot see your order unless you give us the invoice number.',
   },
   {
     heading: 'How to start a marketplace return',

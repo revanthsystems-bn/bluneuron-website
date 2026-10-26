@@ -7,6 +7,8 @@ import {
   WARRANTY_ISSUE_TYPES,
   isValidClaimReference,
   newClaimReference,
+  parseInvoiceNo,
+  parseOptionalSerial,
 } from '@/lib/warranty';
 
 /**
@@ -105,7 +107,12 @@ async function saveToSheet(claim) {
         fullName: claim.name,
         email: claim.email,
         phoneNumber: claim.phone,
-        orderId: claim.orderId,
+        // Both spellings, the same value - see the note on the matching
+        // lines in app/api/warranty-registration/route.js. The updated
+        // Code.gs reads `invoiceNo`; a deployment of the old one reads
+        // `orderId`, and neither has to be redeployed in lockstep.
+        invoiceNo: claim.invoiceNo,
+        orderId: claim.invoiceNo,
         serialNumber: claim.serialNumber,
         issueType: claim.issueType,
         description: claim.description,
@@ -156,8 +163,10 @@ async function sendByEmail(claim) {
         email: claim.email,
         phone: claim.phone,
         claim_reference: claim.claimRef,
-        order_id: claim.orderId,
-        serial_number: claim.serialNumber,
+        invoice_number: claim.invoiceNo,
+        // Omitted when blank - Web3Forms renders every key it is given, and
+        // an empty "serial_number" row is noise in the inbox.
+        ...(claim.serialNumber ? { serial_number: claim.serialNumber } : {}),
         issue_type: claim.issueType,
         message:
           `Warranty claim ${claim.claimRef}\n\n`
@@ -166,8 +175,8 @@ async function sendByEmail(claim) {
           + `Name: ${claim.name}\n`
           + `Email: ${claim.email}\n`
           + `Phone: ${claim.phone}\n`
-          + `Order ID: ${claim.orderId}\n`
-          + `Serial number: ${claim.serialNumber}\n`
+          + `Invoice number: ${claim.invoiceNo}\n`
+          + `Serial number: ${claim.serialNumber || 'not given'}\n`
           + `Issue: ${claim.issueType}\n\n`
           + `Description:\n${claim.description}`,
         source: 'warranty-claim-fallback',
@@ -212,8 +221,14 @@ export async function POST(request) {
   const name = typeof body.name === 'string' ? body.name.trim() : '';
   const email = typeof body.email === 'string' ? body.email.trim() : '';
   const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
-  const orderId = typeof body.orderId === 'string' ? body.orderId.trim() : '';
-  const serialNumber = typeof body.serialNumber === 'string' ? body.serialNumber.trim() : '';
+  // Either spelling, same as the registration route - the live site still
+  // posts `orderId`.
+  const invoiceNo = parseInvoiceNo(
+    typeof body.invoiceNo === 'string' ? body.invoiceNo : body.orderId
+  );
+  // Optional, and check-lettered when given. See parseOptionalSerial.
+  const serial = parseOptionalSerial(body.serialNumber);
+  const serialNumber = serial.value ?? '';
   const issueType = body.issueType;
   const description = typeof body.description === 'string' ? body.description.trim() : '';
 
@@ -226,8 +241,8 @@ export async function POST(request) {
     !isValidText(name)
     || !isValidEmail(email)
     || !normalizePhone(phone)
-    || !isValidText(orderId)
-    || !isValidText(serialNumber)
+    || !invoiceNo
+    || !serial.ok
     || !WARRANTY_ISSUE_TYPES.includes(issueType)
     || description.length < CLAIM_DESCRIPTION_MIN
     || description.length > MAX_DESCRIPTION_CHARS
@@ -240,7 +255,7 @@ export async function POST(request) {
     name,
     email,
     phone: normalizePhone(phone),
-    orderId,
+    invoiceNo,
     serialNumber,
     issueType,
     description,
@@ -263,7 +278,7 @@ export async function POST(request) {
     // conversation can start from it. NEVER a success screen over this.
     console.error(`[BluNeuron] Warranty claim ${claimRef} could not be delivered by any route.`);
     return errorResponse(
-      `We could not submit your claim just now. Please email ${SUPPORT.email} with your order ID and serial number, and quote ${claimRef}.`,
+      `We could not submit your claim just now. Please email ${SUPPORT.email} with your invoice number and serial number, and quote ${claimRef}.`,
       502
     );
   }

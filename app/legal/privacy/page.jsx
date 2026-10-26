@@ -29,7 +29,8 @@ import { CLUB } from '@/lib/club';
  * whose only form was a launch-list signup asking for an email and an
  * optional phone number. There are now three more forms — warranty
  * registration, warranty claim and contact — collecting a name, a mobile
- * number, a marketplace, an order ID, a purchase date and a serial number.
+ * number, a marketplace, an invoice number, a purchase date and an optional
+ * serial number.
  * A privacy policy that does not mention the data the site's main forms
  * collect is not a disclosure, so the "What we collect" section is written
  * per form, naming the fields.
@@ -185,7 +186,7 @@ const KEY_POINTS = [
   },
   {
     title: 'We collect only what a form asks for',
-    body: 'A warranty claim needs the serial number and the order ID. It does not need your address, and the form does not ask for one.',
+    body: 'A warranty claim needs the invoice number, and the serial number when the unit has one printed on it. It does not need your address, and the form does not ask for one.',
   },
   {
     title: 'You can have it deleted',
@@ -305,7 +306,8 @@ export default function PrivacyPage() {
                     Warranty registration and warranty claims:
                   </strong>{' '}
                   your name, email address and mobile number, which marketplace you bought from,
-                  your order ID, the purchase date, the unit&rsquo;s serial number, and — on a claim
+                  your invoice number, the purchase date, the unit&rsquo;s serial number where it has
+                  one, and — on a claim
                   — your description of what is going wrong.
                 </li>
                 <li>
@@ -323,7 +325,7 @@ export default function PrivacyPage() {
                     <strong className="font-semibold text-white">If you create an account:</strong>{' '}
                     your email address (which is also how you sign in), and your name and mobile
                     number if you add them. If you save an address for a service pickup, we hold
-                    that too. Units you register are kept with their marketplace, order ID, purchase
+                    that too. Units you register are kept with their marketplace, invoice number, purchase
                     date and serial number, along with any warranty claim you raise and its status.
                   </li>
                 )}
@@ -344,7 +346,7 @@ export default function PrivacyPage() {
               </ul>
               <p className="mt-4">
                 Give us only what a form asks for. A warranty claim needs the serial number and the
-                order ID to be assessed; it does not need your address, and the form does not ask
+                invoice number to be assessed; it does not need your address, and the form does not ask
                 for one.
               </p>
               <p className="mt-4">
@@ -428,7 +430,7 @@ export default function PrivacyPage() {
                   visits and measures which pages people use. It uses cookies. Google&rsquo;s
                   advertising and cross-device features are switched off for this site, so the data
                   is not used to personalise ads or linked to a Google account, and we never send
-                  your name, email address, phone number, order ID or serial number to it. Google
+                  your name, email address, phone number, invoice number or serial number to it. Google
                   processes this data under its own privacy policy. You can opt out across all sites
                   with Google&rsquo;s browser add-on at{' '}
                   <Ext href="https://tools.google.com/dlpage/gaoptout">
@@ -450,7 +452,7 @@ export default function PrivacyPage() {
                   <strong className="font-semibold text-white">Google Workspace and Sheets:</strong>{' '}
                   hosts our support inbox and the Google Sheet our support team works from. Warranty
                   registrations and claims are written to that sheet — your name, email address,
-                  mobile number, where you bought the unit, your order ID, the purchase date and the
+                  mobile number, where you bought the unit, your invoice number, the purchase date and the
                   serial number. Access to it is limited to named members of the BluNeuron team; it
                   is not shared by link and is not public. Google processes this under its own
                   privacy policy and does not use it for anything of its own.

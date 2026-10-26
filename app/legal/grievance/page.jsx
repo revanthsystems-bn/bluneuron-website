@@ -88,7 +88,7 @@ const SECTIONS = [
     heading: 'What to include',
     body: [
       'Your name, email and phone number.',
-      `Your ${sellersOr()} order ID, and the serial number if the complaint is about a unit.`,
+      `Your ${sellersOr()} invoice number, and the serial number if the complaint is about a unit.`,
       'What happened, what you have already tried, and what you are asking for.',
       'Any reference number from an earlier support message, so the history is not lost.',
     ],

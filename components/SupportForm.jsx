@@ -6,6 +6,16 @@ import Magnetic from './Magnetic';
 import { isValidEmail, normalizePhone, submitSupportRequest } from '@/lib/web3forms';
 import { registerWarranty } from '@/lib/warranty-registration';
 import { SUPPORT_PURCHASE_SOURCES } from '@/lib/site-config';
+import {
+  INVOICE_NO_EXAMPLE,
+  INVOICE_NO_HINT,
+  INVOICE_NO_MAX,
+  SERIAL_ERROR,
+  invoiceNoError,
+  parseInvoiceNo,
+  parseOptionalSerial,
+} from '@/lib/warranty';
+import { SERIAL_EXAMPLE, SERIAL_LENGTH, normalizeSerial } from '@/lib/club-serial';
 import { ROUTES } from '@/lib/routes';
 
 /**
@@ -66,14 +76,28 @@ const INVALID_CLASS = 'border-red-400/60';
  * which is what separates the two now that the tones match. Do not dim
  * either of them again.
  */
-function Field({ label, htmlFor, hint, error, errorId, children }) {
+function Field({ label, htmlFor, hint, error, errorId, optional = false, children }) {
   return (
     <div>
       <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-medium text-white/50">
         {label}{' '}
-        <span className="text-accent-soft" aria-hidden="true">
-          *
-        </span>
+        {optional ? (
+          /* "(optional)" is WORDS, where the asterisk is a glyph with a
+             legend somewhere else. One optional field among seven required
+             ones is exactly the case where a missing asterisk is read as an
+             oversight rather than as permission to skip it.
+
+             `/50`, NOT `/40`. The note above on the hint applies verbatim:
+             anything dimmer than `/50` is under 4.5:1 against this form's
+             #0b0b0b, and axe-core flagged `/40` here on both warranty
+             pages. `font-normal` against the label's `font-medium` is what
+             separates the two now that the tones match. */
+          <span className="font-normal text-white/50">(optional)</span>
+        ) : (
+          <span className="text-accent-soft" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
       {children}
       {error ? (
@@ -97,11 +121,20 @@ const LABELS = {
   email: 'Email',
   phone: 'Mobile number',
   marketplace: 'Where you bought it',
-  orderId: 'Order ID',
+  invoiceNo: 'Invoice number',
   purchaseDate: 'Purchase date',
   serialNumber: 'Serial number',
   issue: 'What is going wrong',
 };
+
+/**
+ * The fields that may be left blank. Everything else is required.
+ *
+ * A SET rather than a flag on each call site, so the asterisk the <Field>
+ * draws, the `aria-required` the input carries and the validation rule
+ * cannot drift apart — all three read this.
+ */
+const OPTIONAL_FIELDS = new Set(['serialNumber']);
 
 const MODES = {
   registration: {
@@ -131,10 +164,15 @@ export default function SupportForm({ kind = 'registration' }) {
    *
    * "Raise a claim" on a registered unit (components/account/ProductList)
    * links here with the unit's details as query parameters, so a customer
-   * does not retype the serial number and order ID the account page was just
-   * showing them — which is the whole reason registering a unit is worth
+   * does not retype the invoice number and serial number the account page was
+   * just showing them — which is the whole reason registering a unit is worth
    * doing. Query parameters rather than client state so the link survives
    * being opened in a new tab, copied, or followed after a sign-in.
+   *
+   * `?invoice=` IS READ, AND SO IS THE OLD `?order=`. The parameter was
+   * renamed with the field, and a link that is already in somebody's browser
+   * history, or in an email support sent last week, still has to fill the
+   * form in. The new name wins when both are present.
    *
    * The values are still EDITABLE and still validated. Nothing here trusts
    * them: they arrive from a URL anyone can type, they are only ever used to
@@ -154,9 +192,9 @@ export default function SupportForm({ kind = 'registration' }) {
     email: '',
     phone: '',
     marketplace: searchParams.get('marketplace') ?? '',
-    orderId: searchParams.get('order') ?? '',
+    invoiceNo: searchParams.get('invoice') ?? searchParams.get('order') ?? '',
     purchaseDate: searchParams.get('purchased') ?? '',
-    serialNumber: searchParams.get('serial') ?? '',
+    serialNumber: normalizeSerial(searchParams.get('serial') ?? ''),
     issue: '',
   }));
   const [errors, setErrors] = useState({});
@@ -174,6 +212,15 @@ export default function SupportForm({ kind = 'registration' }) {
   const busy = status === 'submitting';
   const update = (key) => (e) => setFields((f) => ({ ...f, [key]: e.target.value }));
 
+  /**
+   * The serial is normalised AS IT IS TYPED, exactly as it is on the Club
+   * door (components/club/ClubDoor). Someone copying "irz-t6x-a001-d" off a
+   * sticker watches it become "IRZT6XA001D", so the field agrees with the box
+   * in front of them rather than quietly accepting something different.
+   */
+  const updateSerial = (e) =>
+    setFields((f) => ({ ...f, serialNumber: normalizeSerial(e.target.value) }));
+
   const validate = () => {
     const next = {};
     if (!fields.name.trim()) next.name = 'Enter your name.';
@@ -184,14 +231,21 @@ export default function SupportForm({ kind = 'registration' }) {
       next.phone = 'Enter a 10-digit Indian mobile number.';
     }
     if (!fields.marketplace) next.marketplace = 'Choose where you bought it.';
-    if (!fields.orderId.trim()) next.orderId = 'Enter the order ID from your invoice.';
+    // One rule, shared with both API routes and with Code.gs — see
+    // parseInvoiceNo in lib/warranty.js for the charset and the length.
+    if (!parseInvoiceNo(fields.invoiceNo)) {
+      next.invoiceNo = invoiceNoError(fields.invoiceNo);
+    }
     if (!fields.purchaseDate) {
       next.purchaseDate = 'Enter the purchase date.';
     } else if (fields.purchaseDate > todayIso()) {
       next.purchaseDate = 'The purchase date cannot be in the future.';
     }
-    if (!fields.serialNumber.trim()) {
-      next.serialNumber = 'Enter the serial number.';
+    // OPTIONAL, and held to the Club's check letter when it is given. Blank
+    // is a supported answer: units sold before the carton labels existed do
+    // not have one. See parseOptionalSerial in lib/warranty.js.
+    if (!parseOptionalSerial(fields.serialNumber).ok) {
+      next.serialNumber = SERIAL_ERROR;
     }
     if (isClaim && !fields.issue.trim()) {
       next.issue = 'Describe what is happening so we can help.';
@@ -222,9 +276,11 @@ export default function SupportForm({ kind = 'registration' }) {
         email: fields.email.trim(),
         phone: fields.phone.trim(),
         marketplace: fields.marketplace,
-        orderId: fields.orderId.trim(),
+        invoiceNo: parseInvoiceNo(fields.invoiceNo),
         purchaseDate: fields.purchaseDate,
-        serialNumber: fields.serialNumber.trim(),
+        // Normalised, or omitted entirely. Never the empty string: a blank
+        // serial must not travel as a value that looks like one.
+        serialNumber: parseOptionalSerial(fields.serialNumber).value ?? '',
         botcheck: Boolean(botcheckRef.current?.checked),
       };
       if (isClaim) {
@@ -313,7 +369,7 @@ export default function SupportForm({ kind = 'registration' }) {
     value: fields[name],
     onChange: update(name),
     disabled: busy,
-    'aria-required': true,
+    'aria-required': !OPTIONAL_FIELDS.has(name),
     'aria-invalid': Boolean(errors[name]),
     'aria-describedby': errors[name] ? errorId(name) : undefined,
     className: `${FIELD_CLASS} ${extraClass} ${errors[name] ? INVALID_CLASS : ''}`,
@@ -325,6 +381,7 @@ export default function SupportForm({ kind = 'registration' }) {
     htmlFor: id(name),
     error: errors[name],
     errorId: errorId(name),
+    optional: OPTIONAL_FIELDS.has(name),
     hint,
   });
 
@@ -404,8 +461,16 @@ export default function SupportForm({ kind = 'registration' }) {
           </select>
         </Field>
 
-        <Field {...fieldProps('orderId', 'From your invoice or purchase confirmation.')}>
-          <input type="text" autoComplete="off" {...inputProps('orderId')} />
+        <Field {...fieldProps('invoiceNo', INVOICE_NO_HINT)}>
+          <input
+            type="text"
+            autoComplete="off"
+            spellCheck={false}
+            inputMode="text"
+            maxLength={INVOICE_NO_MAX}
+            placeholder={`e.g. ${INVOICE_NO_EXAMPLE}`}
+            {...inputProps('invoiceNo')}
+          />
         </Field>
 
         <Field {...fieldProps('purchaseDate')}>
@@ -413,12 +478,24 @@ export default function SupportForm({ kind = 'registration' }) {
         </Field>
 
         <div className="sm:col-span-2">
-          <Field {...fieldProps('serialNumber', 'On the label underneath the projector.')}>
+          <Field
+            {...fieldProps(
+              'serialNumber',
+              `${SERIAL_LENGTH} characters, on the sticker on the box or under the projector — e.g. ${SERIAL_EXAMPLE}. Leave it blank if your unit has no sticker.`
+            )}
+          >
             <input
               type="text"
               autoComplete="off"
+              autoCapitalize="characters"
+              autoCorrect="off"
               spellCheck={false}
-              {...inputProps('serialNumber')}
+              /* Room for the grouping people type ("IRZ-T6X-A001-D"); the
+                 dashes and spaces are stripped as they go in. */
+              maxLength={SERIAL_LENGTH + 4}
+              placeholder={SERIAL_EXAMPLE}
+              {...inputProps('serialNumber', 'font-mono uppercase tracking-[0.18em]')}
+              onChange={updateSerial}
             />
           </Field>
         </div>

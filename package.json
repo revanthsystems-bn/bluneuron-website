@@ -17,6 +17,7 @@
     "assert:footer-links": "node scripts/assert-footer-links.mjs",
     "test:cart": "node scripts/test-cart-flow.mjs",
     "test:club-serial": "node scripts/test-club-serial.mjs",
+    "test:codegs": "node scripts/test-codegs.mjs",
     "test:club": "node scripts/test-club-flow.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "preview:upload": "opennextjs-cloudflare build && wrangler versions upload",

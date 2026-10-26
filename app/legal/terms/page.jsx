@@ -90,7 +90,7 @@ const SECTIONS = [
     body: [
       'An account is optional. You can browse the site, read every policy and contact support without one; it exists so a warranty registration, the units you own and any claim you raise are kept in one place.',
       'Signing in uses a six-digit code sent to your email address. There is no password. Anyone with access to that inbox can sign in, so keep it secure and tell us if you lose control of it.',
-      'You are responsible for the accuracy of what you put in — in particular the serial number, order ID and purchase date of a registered unit. A claim is assessed against the invoice, so a registration that does not match one cannot be honoured.',
+      'You are responsible for the accuracy of what you put in — in particular the invoice number, purchase date and serial number of a registered unit. A claim is assessed against the invoice, so a registration that does not match one cannot be honoured.',
       "One account per person. Do not register a unit you do not own, and do not file a claim on someone else's behalf without telling us that is what you are doing.",
     ],
     note: 'You can delete your account, and everything in it, from your account settings at any time. Doing so does not cancel a warranty: cover runs from the invoice date and belongs to the unit, not to the account.',

@@ -46,30 +46,49 @@ export default function WarrantyRegistrationPage() {
             <h2 className="text-2xl font-bold tracking-tighter text-white">
               What you&apos;ll need
             </h2>
+            {/* EACH BULLET'S TEXT IS ONE <span>, AND THAT IS STRUCTURAL.
+                The <li> is a flex row, so every inline child — each text
+                node AND each <strong> — becomes a flex ITEM and gets laid
+                out in its own column. With one short bolded word that is
+                invisible; with "invoice number" it put the two words in a
+                narrow column of their own and wrapped the sentence around
+                them. Wrapping the prose in a single span makes it one item
+                that flows normally, and keeps the bullet dot as the only
+                other one. */}
             <ul className="mt-5 space-y-3 text-sm leading-relaxed text-white/60">
               <li className="flex gap-2.5">
                 <span
                   className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
                   aria-hidden="true"
                 />
-                Your <strong className="font-semibold text-white/85">order ID</strong> from your
-                invoice or purchase confirmation.
+                <span>
+                  Your <strong className="font-semibold text-white/85">invoice number</strong> —
+                  printed on your invoice from Flipkart, Amazon or the dealer you bought from.
+                </span>
               </li>
               <li className="flex gap-2.5">
                 <span
                   className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
                   aria-hidden="true"
                 />
-                The <strong className="font-semibold text-white/85">serial number</strong> on the
-                label underneath the projector.
+                <span>
+                  The <strong className="font-semibold text-white/85">serial number</strong> from
+                  the sticker on the box, if your unit has one.{' '}
+                  {/* `/50` is the contrast floor on this background — `/45`
+                      measured under 4.5:1 and axe-core flagged it. Same rule
+                      as the hints in components/SupportForm. */}
+                  <span className="text-white/50">Optional.</span>
+                </span>
               </li>
               <li className="flex gap-2.5">
                 <span
                   className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
                   aria-hidden="true"
                 />
-                The <strong className="font-semibold text-white/85">purchase date</strong> — the
-                invoice date, not the delivery date.
+                <span>
+                  The <strong className="font-semibold text-white/85">purchase date</strong> — the
+                  invoice date, not the delivery date.
+                </span>
               </li>
             </ul>
 

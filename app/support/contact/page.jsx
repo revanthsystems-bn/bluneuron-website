@@ -42,7 +42,7 @@ export const metadata = {
  * THE CHANNELS, in the order someone with a problem should try them.
  *
  * Email first, because it is the one that definitely answers and the one that
- * can carry a photograph, an order ID and a serial number. The phones follow.
+ * can carry a photograph, an invoice number and a serial number. The phones follow.
  * Sales is a different inbox for a different reader — a distributor enquiry
  * must not queue behind a broken unit, and a broken unit must not queue behind
  * a distributor enquiry. Hours last, because it qualifies all four above it.
@@ -60,7 +60,7 @@ const CHANNELS = [
     label: 'Email',
     value: SUPPORT.email,
     href: isTBD(SUPPORT.email) ? null : `mailto:${SUPPORT.email}`,
-    note: 'Best for anything with an order ID, a photo or a serial number.',
+    note: 'Best for anything with an invoice number, a photo or a serial number.',
   },
   ...visibleSupportPhones().map((entry) => ({
     icon: Phone,

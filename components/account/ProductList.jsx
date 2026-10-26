@@ -22,7 +22,7 @@ import { WARRANTY } from '@/lib/site-config';
  * after; nothing runs nightly to age these rows, and nothing should have to.
  *
  * THE CLAIM LINK PRE-FILLS. Linking to the bare claim form would make someone
- * retype the order ID and serial number this page is already showing them,
+ * retype the invoice number and serial number this page is already showing them,
  * which is the entire reason to register a unit.
  */
 function formatDate(iso) {
@@ -48,7 +48,10 @@ function isActive(product) {
 export function claimHref(product) {
   const params = new URLSearchParams({
     serial: product.serialNumber ?? '',
-    order: product.orderId ?? '',
+    // `invoice`, not `order` - renamed with the field. SupportForm still
+    // reads the old name as a fallback, so a link already sitting in
+    // somebody's history or inbox keeps working.
+    invoice: product.orderId ?? '',
     marketplace: product.marketplace ?? '',
     purchased: product.purchaseDate ?? '',
   });
@@ -81,7 +84,7 @@ export default function ProductList() {
         <div className="rounded-3xl border border-border-subtle bg-black-soft px-6 py-14 text-center">
           <h3 className="text-base font-semibold text-white">No units registered yet</h3>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/50">
-            Register your IRIZ with its order ID and serial number and its warranty status will
+            Register your IRIZ with its invoice number and its warranty status will
             show here.
           </p>
           <a href={ROUTES.warrantyRegistration} className="btn-primary mt-7 justify-center">
@@ -118,7 +121,7 @@ export default function ProductList() {
 
                     <dl className="mt-4 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
                       <Row label="Bought from" value={product.marketplace} />
-                      <Row label="Order ID" value={product.orderId} mono />
+                      <Row label="Invoice number" value={product.orderId} mono />
                       <Row label="Serial number" value={product.serialNumber} mono />
                       <Row label="Purchased" value={formatDate(product.purchaseDate)} />
                       <Row
@@ -179,7 +182,7 @@ function Row({ label, value, mono = false }) {
       <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/55">
         {label}
       </dt>
-      {/* `break-all` on the identifiers: an Amazon order ID is a single
+      {/* `break-all` on the identifiers: an Amazon invoice number is a single
           unbroken 23-character token and will push a 390px card into
           horizontal scroll without it. */}
       <dd className={`mt-1 text-white/75 ${mono ? 'break-all font-mono text-xs' : 'text-sm'}`}>

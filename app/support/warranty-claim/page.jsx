@@ -11,7 +11,7 @@ export const metadata = {
   ...pageMetadata({
     title: 'Warranty Claim — BluNeuron IRIZ',
     description:
-      'Make a warranty claim on your BluNeuron IRIZ: order ID, serial number, purchase date and what is going wrong.',
+      'Make a warranty claim on your BluNeuron IRIZ: invoice number, purchase date, serial number and what is going wrong.',
     path: ROUTES.warrantyClaim,
   }),
   robots: routeRobots(ROUTES.warrantyClaim),
@@ -41,7 +41,7 @@ export default function WarrantyClaimPage() {
       <PageHeading
         eyebrow="Support"
         title="Make a warranty claim"
-        subtitle="Tell us what is happening, with the order and serial details, and we will take it from there."
+        subtitle="Tell us what is happening, with your invoice details, and we will take it from there."
       />
 
       <section className="bg-black py-16 sm:py-20">

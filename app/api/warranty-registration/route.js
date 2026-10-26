@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/request-body';
 import { isValidEmail, normalizePhone } from '@/lib/web3forms';
+import { parseInvoiceNo, parseOptionalSerial } from '@/lib/warranty';
 import {
   SUPPORT_PURCHASE_SOURCES,
   purchaseSourceNeedsVerification,
@@ -120,10 +121,30 @@ export async function POST(request) {
   const email = typeof body.email === 'string' ? body.email.trim() : '';
   const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
   const purchaseSource = body.marketplace;
-  const orderId = typeof body.orderId === 'string' ? body.orderId.trim() : '';
   const purchaseDate = body.purchaseDate;
-  const serialNumber =
-    typeof body.serialNumber === 'string' ? body.serialNumber.trim() : '';
+
+  /*
+   * THE INVOICE NUMBER, UNDER EITHER NAME.
+   *
+   * `invoiceNo` is what this site sends now. `orderId` is what the LIVE site
+   * sends — www.bluneuron.com is a Worker deployed by hand from the
+   * `cloudflare` branch and is a separate build from this one, so for as long
+   * as the two coexist both spellings arrive at whichever of them is
+   * deployed. Accepting both costs one `??` and means neither deployment has
+   * to be updated in lockstep with the other. Same rule in Code.gs.
+   */
+  const invoiceNo = parseInvoiceNo(
+    typeof body.invoiceNo === 'string' ? body.invoiceNo : body.orderId
+  );
+
+  /*
+   * THE SERIAL IS OPTIONAL, and validated against the Club's check letter
+   * when it is given. `ok: false` means something was typed that does not
+   * check out — refused, rather than stored as a serial that matches no unit.
+   * See parseOptionalSerial in lib/warranty.js.
+   */
+  const serial = parseOptionalSerial(body.serialNumber);
+  const serialNumber = serial.value ?? '';
 
   // The browser sends one so the Supabase row and the Sheet row match. A
   // request without one (or with a malformed one) still works — it just gets
@@ -138,9 +159,9 @@ export async function POST(request) {
     !isValidEmail(email) ||
     !normalizePhone(phone) ||
     !SUPPORT_PURCHASE_SOURCES.includes(purchaseSource) ||
-    !isValidText(orderId) ||
+    !invoiceNo ||
     !isValidPurchaseDate(purchaseDate) ||
-    !isValidText(serialNumber)
+    !serial.ok
   ) {
     return errorResponse('Please check the required registration details and try again.', 400);
   }
@@ -169,7 +190,14 @@ export async function POST(request) {
         email,
         phoneNumber: normalizePhone(phone),
         purchaseSource,
-        orderId,
+        // BOTH KEYS, THE SAME VALUE. `invoiceNo` is what the updated Code.gs
+        // reads; `orderId` is what a deployment of the OLD Code.gs reads. A
+        // build of this site posted at an Apps Script that has not been
+        // redeployed yet therefore still writes the right column, which is
+        // what makes the two sides independently deployable. Drop `orderId`
+        // once the Apps Script version is confirmed live.
+        invoiceNo,
+        orderId: invoiceNo,
         purchaseDate,
         serialNumber,
         // "Other seller" is accepted and FLAGGED rather than refused. The
