@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Reveal from './Reveal';
 import StoreButtons from './buy/StoreButtons';
-import { BRAND, HERO, MEDIA } from '@/lib/iriz';
+import { BRAND, HERO, PRODUCT_SHOT, productPlate } from '@/lib/iriz';
 import { BUY_ANCHOR, ROUTES } from '@/lib/routes';
 import { MARKETPLACE, formatInr, sellersAnd, sellersVerb } from '@/lib/site-config';
 
@@ -41,24 +41,29 @@ export default function BuySection() {
 
       <div className="section-container relative">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          {/* The render is a transparent CUTOUT, so it needs no mask: the
-              frame carries `.product-stage` for the ambient lighting and
-              nothing touches the image itself. The `product-glow` +
-              `product-fade` pair this comment used to describe is gone —
-              see the note above `.product-stage` in app/globals.css.
+          {/* THE FRAME CARRIES THE PHOTO'S OWN GROUND.
 
-              The square frame is now just the card's shape, NOT a mask
-              alignment constraint, and the source is 1475×1038 rather than
-              the 1600×1600 this comment claimed. `fill` with
-              `object-contain` is what matters: the product is letterboxed
-              inside the square at its own 1.42:1 ratio, so the frame's
-              shape and the asset's shape no longer have to agree. The
-              frame declares its own aspect-square, so nothing reflows when
-              the image decodes. */}
-          <Reveal className="product-stage relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl border border-border-subtle">
+              The source is an opaque photograph on a flat #FEFEFE seamless,
+              not the transparent cutout this comment used to describe. So
+              the card is filled with that exact colour — `productPlate()`,
+              which reads PRODUCT_SHOT.plate in lib/iriz.js — and the seam
+              between card and photo is invisible, letterbox bands included.
+
+              `fill` + `object-contain` is what keeps it honest: the source is
+              3:2 and the frame is square, so the product is letterboxed at
+              its own ratio rather than cropped. The frame declares its own
+              aspect-square, so nothing reflows when the image decodes.
+
+              When a transparent cutout arrives, `plate: null` in lib/iriz.js
+              turns this background off here and everywhere else at once —
+              `.product-stage` keeps the ambient lighting either way. */}
+          <Reveal
+            className="product-stage relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl border border-border-subtle"
+            style={productPlate()}
+          >
             <Image
-              src={MEDIA.product.cutout}
-              alt={`${BRAND.fullName} projector`}
+              src={PRODUCT_SHOT.src}
+              alt={PRODUCT_SHOT.alt}
               fill
               sizes="(min-width: 1024px) 520px, 92vw"
               className="object-contain p-10"

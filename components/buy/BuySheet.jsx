@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import useDialogBehaviour from '@/lib/useDialogBehaviour';
 import StoreButtons from './StoreButtons';
-import { BRAND, HERO, PRODUCT } from '@/lib/iriz';
+import { BRAND, HERO, PRODUCT, PRODUCT_SHOT, productPlate } from '@/lib/iriz';
 import { MARKETPLACE, formatInr, sellersOr, sellersVerb } from '@/lib/site-config';
 
 /**
@@ -111,25 +111,31 @@ export default function BuySheet({ open, onClose }) {
                 it "Mini projector for home" ran underneath the X at desktop
                 widths. */}
             <div className="flex items-start gap-4 sm:pr-12">
-              <div className="relative h-20 w-20 flex-none overflow-hidden rounded-xl border border-border bg-black-elevated">
-                {/* CONTAIN, NOT COVER, and sized for retina.
+              {/* CONTAIN, NOT COVER, and sized for retina.
 
-                    `object-cover` centre-cropped a 1.42:1 source (1475x1038)
-                    into a 1:1 box, which threw away the product and kept
-                    background.
-                    `sizes="80px"` then asked the optimiser for an 80px-wide
-                    file, so a 1x screen received 80x48 of real pixels — an
-                    unreadable smudge. `sizes="160px"` buys the 2x variant and
-                    still costs only a few KB as AVIF.
+                  `object-cover` centre-cropped a 3:2 source into this 1:1
+                  box, which threw away the product and kept background.
+                  `sizes="80px"` then asked the optimiser for an 80px-wide
+                  file, so a 1x screen received 80x53 of real pixels — an
+                  unreadable smudge. `sizes="160px"` buys the 2x variant and
+                  still costs only a few KB as AVIF.
 
-                    NO FADE MASK any more. The source is a transparent
-                    cutout (PRODUCT.image -> MEDIA.product.cutout), so there
-                    is no white ground to dissolve — and the radial mask that
-                    used to do that job would now only eat the product's own
-                    edges. */}
+                  NO FADE MASK. It is an elliptical radial mask and this is a
+                  rectangular photograph; it would eat the corners.
+
+                  THE TILE CARRIES THE PHOTO'S OWN GROUND instead of
+                  `bg-black-elevated`, because PRODUCT.image is an opaque
+                  shot on a white seamless (PRODUCT_SHOT in lib/iriz.js).
+                  `productPlate()` returns undefined once the asset is
+                  transparent, and the `bg-black-elevated` class underneath
+                  then shows through again with no edit here. */}
+              <div
+                className="relative h-20 w-20 flex-none overflow-hidden rounded-xl border border-border bg-black-elevated"
+                style={productPlate()}
+              >
                 <Image
                   src={PRODUCT.image}
-                  alt=""
+                  alt={PRODUCT_SHOT.alt}
                   fill
                   sizes="160px"
                   className="object-contain p-1.5"

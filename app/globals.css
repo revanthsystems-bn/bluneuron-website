@@ -1878,11 +1878,17 @@
    * lozenge with the corners of the frame left over as dark bars down
    * either side — which is how it was reported, and it was right.
    *
-   * The product is a real transparent cutout now
-   * (design-src/cutout.mjs -> MEDIA.product.cutout), so there are no
-   * bounds to hide. This is just the lighting: a soft off-centre key
-   * so the card reads as a lit space rather than a flat panel, over
-   * the page's own near-black.
+   * The product image carries its OWN ground now — an opaque shot
+   * mounted on a card filled with its backdrop colour, set in one
+   * place by PRODUCT_SHOT.plate in lib/iriz.js — so there are no
+   * bounds left for a mask to hide. This is just the lighting: a soft
+   * off-centre key so the card reads as a lit space rather than a flat
+   * panel, over the page's own near-black.
+   *
+   * It sits UNDER that plate, so on the product surfaces it is
+   * currently invisible; it returns to view the moment `plate` goes
+   * null for a transparent asset. That is deliberate — the lighting
+   * belongs to the frame, not to the file in it.
    * ================================================================ */
   .product-stage {
     background:

@@ -122,7 +122,7 @@ export const metadata = {
     siteName: 'BluNeuron',
     images: [
       {
-        url: '/media/iriz/product/hero-clean.png',
+        url: '/media/iriz/product/iriz-og.jpg',
         width: 1600,
         height: 1600,
         alt: 'The BluNeuron IRIZ mini projector for home, three-quarter view, lens forward',
@@ -135,7 +135,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
-    images: ['/media/iriz/product/hero-clean.png'],
+    images: ['/media/iriz/product/iriz-og.jpg'],
   },
 };
 

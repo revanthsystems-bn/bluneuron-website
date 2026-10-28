@@ -22,19 +22,23 @@ import { BOX_CONTENTS, BOX_PHOTO, BOX_SUMMARY } from '@/lib/iriz';
  * the card, clipped to the same 22px radius, so this reads as one clean photo
  * tile rather than a small picture mounted inside a dark frame.
  *
- * The card's aspect ratio is the PHOTO's own (603/588, a shade wider than
- * square) rather than a rounded-off `aspect-square`. At the photo's exact
- * ratio `object-cover` has nothing to crop, so the carton is never shaved at
- * the edges — the cover is there to keep the fit safe if the source is ever
- * re-shot at a different ratio, not to do work today.
+ * The card's aspect ratio is the PHOTO's own, read from BOX_PHOTO rather
+ * than hard-coded, so a re-shoot at a different ratio moves the card with
+ * it. At the photo's exact ratio `object-cover` has nothing to crop, so the
+ * carton is never shaved at the edges — the cover is there to keep the fit
+ * safe, not to do work today.
  *
- * On the source resolution: the file is 603x588, which is small. At the
- * widest this section goes (a 1024px container, two columns, 56px gap) the
- * image renders at ~484 CSS px, so it is still at roughly 1:1 on a standard
- * display and is upscaled only on a 2x one. That is the same ballpark the
- * earlier max-w-[440px] cap produced — dropping the cap changed the framing,
- * not the sharpness. Re-shoot the carton at 1600px or wider to fix it
- * properly; see BOX_PHOTO in lib/iriz.js.
+ * THE SOURCE RESOLUTION PROBLEM IS FIXED. This used to be a 603x588 file
+ * with a note asking for a re-shoot at 1600px or wider; the photograph here
+ * now is 1254x1254. At the widest this section goes (a 1024px container, two
+ * columns, 56px gap) the image renders at ~484 CSS px, so it is comfortably
+ * past 1:1 even on a 2x display.
+ *
+ * NO PLATE HERE, unlike every other product surface. This photograph is the
+ * tile — full-bleed, clipped to the card's radius — so its light ground is
+ * the design rather than something to be matched or hidden. `productPlate()`
+ * is for the shots that float inside a frame; see PRODUCT_SHOT in
+ * lib/iriz.js.
  *
  * ICONS ARE INLINE SVG, not lucide-react, even though lucide is already a
  * dependency and TrustBadges uses it. In v1.47 every lucide icon renders
@@ -140,7 +144,10 @@ export default function ProductShowcase() {
                 without it the image's own square corners sit proudly outside
                 the card's rounded ones. The aspect ratio is the photo's, so
                 the box below is exactly the shape of what goes in it. */}
-            <div className="relative aspect-[603/588] overflow-hidden rounded-[22px] border border-white/10 shadow-[0_24px_70px_-28px_rgba(0,0,0,0.9)]">
+            <div
+              className="relative overflow-hidden rounded-[22px] border border-white/10 shadow-[0_24px_70px_-28px_rgba(0,0,0,0.9)]"
+              style={{ aspectRatio: `${BOX_PHOTO.width} / ${BOX_PHOTO.height}` }}
+            >
               <Image
                 src={BOX_PHOTO.src}
                 alt={BOX_PHOTO.alt}

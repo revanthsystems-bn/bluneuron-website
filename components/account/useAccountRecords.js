@@ -5,6 +5,7 @@ import { useAccount } from './AccountContext';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { DEMO_MODE } from '@/lib/supabase/config';
 import { DEMO_ADDRESSES, DEMO_CLAIMS, DEMO_PRODUCTS } from '@/lib/account-demo';
+import { MEDIA } from '@/lib/iriz';
 
 /**
  * The account's rows: profile, addresses, registered products, claims.
@@ -144,5 +145,11 @@ function toClaim(row) {
  * should not be: storing a path per row would let two rows of the same
  * product disagree about what it looks like, and the asset is a front-end
  * concern that changes with a redesign, not with the data.
+ *
+ * READ FROM `MEDIA`, not spelled out here. This was a literal path, and when
+ * the product photography was replaced it became the one reference pointing
+ * at a file that no longer existed — a 404 in the account's product list,
+ * which is not a build error and would have shipped. `scripts/check-media.js`
+ * caught it; importing the constant is what stops it recurring.
  */
-const PRODUCT_IMAGE = '/media/iriz/product/retail-box.jpg';
+const PRODUCT_IMAGE = MEDIA.product.withBox;

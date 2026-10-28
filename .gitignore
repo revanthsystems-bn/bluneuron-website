@@ -77,3 +77,19 @@ desktop.ini
 # they are internal working documents, not site content, and they must never
 # be served from public/. The published text in app/legal/ is the deliverable.
 content/source-policies/
+
+# "Save page as" dumps must never reach public/.
+#
+# A Flipkart product listing was once saved straight into
+# public/media/iriz/ as `iriz_photo.html` + `iriz_photo_files/` — 6 MB of
+# third-party JavaScript, CSS, vendor SVGs and COMPETITOR product
+# photography, all of it uploaded to the edge and publicly fetchable at
+# /media/iriz/iriz_photo.html. Nothing referenced it, which is exactly why
+# it survived review: an unreferenced file in public/ is still a served
+# file. check-media only validates that referenced paths EXIST, so it could
+# not have caught this.
+#
+# These two rules are scoped to public/media so the design-src/ mocks and
+# board sources (`design-src/images/*.html`) are unaffected.
+public/media/**/*.html
+public/media/**/*_files/

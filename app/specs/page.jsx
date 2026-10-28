@@ -4,6 +4,7 @@ import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
 import {
   FULL_SPEC_SHEET, BOX_CONTENTS, SHOW_PENDING_SPECS, MEDIA, THROW_RANGE,
+  PRODUCT_SHOT, productPlate,
 } from '@/lib/iriz';
 import { ROUTES } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
@@ -86,7 +87,7 @@ export default function SpecsPage() {
         eyebrow="Full Spec Sheet"
         title="Every spec, in one place."
         subtitle="The complete technical breakdown for the BluNeuron IRIZ — no rounding, no marketing shorthand."
-        image={MEDIA.product.heroClean}
+        image={MEDIA.product.shot}
         imagePosition="62% 50%"
       />
 
@@ -97,9 +98,10 @@ export default function SpecsPage() {
           first number on a 1440 screen. A page called "Every spec, in one
           place" should not make you scroll past nothing to reach one.
 
-          The cut-out, not `heroClean`: this sits on a dark ground and
-          `heroClean` is a white product on a white seamless. See the note on
-          MEDIA.product.cutout in lib/iriz.js.
+          The product photograph sits on a dark ground here, and it is an
+          OPAQUE shot on a white seamless — so it is mounted on a card filled
+          with its own backdrop colour rather than floated bare. See
+          PRODUCT_SHOT in lib/iriz.js.
 
           `lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]` rather than fr/fr —
           the product is a fixed-ish object and the numbers want the rest, and
@@ -107,21 +109,31 @@ export default function SpecsPage() {
           the grid wider than its container. */}
       <section className="border-b border-border-subtle bg-black py-12 sm:py-14">
         <div className="section-container grid items-center gap-10 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-16">
-          <Reveal y={20} className="relative mx-auto w-full max-w-[360px] lg:mx-0 lg:max-w-none">
-            {/* THE ASSET'S OWN PIXELS, 1475x1038. These two numbers were
-                760x760, which is not the shape of the file: an <img> takes
-                its aspect ratio from its width/height attributes, so
+          <Reveal
+            y={20}
+            className="relative mx-auto w-full max-w-[360px] overflow-hidden rounded-3xl lg:mx-0 lg:max-w-none"
+            style={productPlate()}
+          >
+            {/* THE ASSET'S OWN PIXELS, from PRODUCT_SHOT rather than typed
+                here. These two numbers were once 760x760, which is not the
+                shape of any file we have ever shipped: an <img> takes its
+                aspect ratio from its width/height attributes, so
                 `h-auto w-full` resolved to a SQUARE box and the projector
-                was drawn 1.42x too tall on this route. `h-auto` now
-                resolves to the real ratio, and the reserved space it
-                reserves is the space the image actually needs. See the note
-                on MEDIA.product.cutout in lib/iriz.js. */}
+                was drawn 1.42x too tall on this route. Reading them from
+                the one object that owns the asset is what stops that
+                happening again when the file is re-shot.
+
+                The wrapper is now a rounded card carrying the photo's own
+                ground (`productPlate()`), because this source is opaque;
+                `overflow-hidden` clips the photo's square corners to the
+                card's radius. Both vanish when a transparent asset lands —
+                `plate: null` in lib/iriz.js. */}
             <Image
-              src={MEDIA.product.cutout}
+              src={PRODUCT_SHOT.src}
               alt=""
               aria-hidden="true"
-              width={1475}
-              height={1038}
+              width={PRODUCT_SHOT.width}
+              height={PRODUCT_SHOT.height}
               sizes="(min-width: 1024px) 420px, 360px"
               className="h-auto w-full"
               priority={false}

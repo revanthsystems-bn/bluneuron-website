@@ -83,7 +83,7 @@ export default function ManualsPage() {
         eyebrow="Support"
         title="Manuals & downloads"
         subtitle="Everything that ships in the box, as a document — and the setup walkthrough if you would rather just follow along."
-        image={MEDIA.product.boxFront}
+        image={MEDIA.product.withBox}
         imagePosition="58% 50%"
       />
 

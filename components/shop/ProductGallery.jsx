@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { productPlate } from '@/lib/iriz';
 
 /**
  * The product gallery: one large frame, a row of thumbnails under it.
@@ -19,10 +20,17 @@ import Image from 'next/image';
  * nothing reflows when a different image decodes.
  *
  * `shot.fade` marks the white-on-white renders that need the site's
- * `product-fade` mask to dissolve their backdrop into the page. The retail
- * photograph must NOT get it — its grey ground and its reflection are what
- * make it read as a photograph — which is exactly the distinction the MEDIA
- * block in lib/iriz.js documents.
+ * `product-fade` mask to dissolve their backdrop into the page. No shot
+ * currently sets it: the mask is an ellipse, and everything in the gallery
+ * today is a rectangular photograph or an infographic board, both of which it
+ * would eat the corners of.
+ *
+ * `shot.plate` is the replacement for that job on the product shot. It mounts
+ * the image on a card filled with the photograph's OWN backdrop colour
+ * instead of trying to dissolve the backdrop away — see PRODUCT_SHOT in
+ * lib/iriz.js, which is also the single place to turn it off if a transparent
+ * cutout ever replaces the asset. The carton photograph and the infographic
+ * boards must NOT get it: they carry their own grounds already.
  *
  * Only the first image is `priority`. It is what a visitor sees before any
  * interaction and is usually the page's largest paint; the others load when
@@ -57,6 +65,7 @@ export default function ProductGallery({ shots }) {
         className={`product-stage relative aspect-[3/2] max-h-[42svh] w-full overflow-hidden rounded-3xl border border-border-subtle sm:aspect-square sm:max-h-none ${
           current.fade ? 'product-glow bg-black' : ''
         }`}
+        style={current.plate ? productPlate() : undefined}
       >
         <Image
           key={current.src}
@@ -106,6 +115,7 @@ export default function ProductGallery({ shots }) {
                   ? 'border-accent/60 bg-white/[0.06]'
                   : 'border-border-subtle bg-black-soft hover:border-white/20'
               }`}
+              style={shot.plate ? productPlate() : undefined}
             >
               <Image
                 src={shot.src}

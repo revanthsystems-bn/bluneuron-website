@@ -33,7 +33,7 @@ export default function ComparePage() {
         eyebrow="IRIZ vs. Others"
         title='Not all "500 lumens" are the same.'
         subtitle="A side-by-side look at where the BluNeuron IRIZ pulls ahead of a typical budget projector."
-        image={MEDIA.product.heroClean}
+        image={MEDIA.product.shot}
         imagePosition="62% 50%"
       />
 

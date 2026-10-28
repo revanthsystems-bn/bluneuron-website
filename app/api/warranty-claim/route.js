@@ -143,6 +143,43 @@ async function saveToSheet(claim) {
  * That is fine and is what the variable is for: a Web3Forms access key
  * carries no privilege beyond "deliver a form to this inbox", which is why
  * every other form on this site posts to it straight from the client.
+ *
+ * ---------------------------------------------------------------------------
+ * TODO(email-provider): THIS FALLBACK CANNOT CURRENTLY SUCCEED IN PRODUCTION.
+ * ---------------------------------------------------------------------------
+ *
+ * Web3Forms refuses SERVER-SIDE submissions on the free plan, and it also
+ * refuses submissions originating from a `*.workers.dev` host. The live site
+ * is a Cloudflare Worker (see CLAUDE.md > "What is live, and where"), so both
+ * conditions apply at once: every call made from this function returns a
+ * rejection, `sendByEmail` returns false, and the claim falls through to the
+ * 502 branch below.
+ *
+ * The practical consequence is narrow but real: when the Apps Script sheet
+ * write succeeds — the normal path — nothing here runs and the claim is
+ * safe. This function only matters when the sheet ALREADY failed, and in
+ * exactly that case it cannot rescue the claim. The customer is still told
+ * the truth and given the support address, so no claim is silently dropped;
+ * what is lost is the automatic second delivery route.
+ *
+ * KEPT DELIBERATELY, NOT DEAD CODE. It is the complete, correct shape of the
+ * fallback — field mapping, subject line and the "add it to the sheet by
+ * hand" instruction are all already right. Replace the transport, not the
+ * logic, once a real sender exists:
+ *
+ *   - Resend, Postmark or SES with a server-side API key held as a Worker
+ *     SECRET (`wrangler secret put`), NOT a NEXT_PUBLIC_* variable — a real
+ *     sending key carries privilege and must never be inlined into the
+ *     browser bundle the way this access key is.
+ *   - Or Web3Forms' paid plan, which permits server-side submissions.
+ *
+ * Until then this is a no-op in production and must not be read as a working
+ * safety net. Do NOT delete it to "remove dead code": deleting it would also
+ * delete the only written record of what the second delivery route should
+ * do. Verifying it is equally constrained — see the note in MEMORY on why a
+ * preview deployment cannot exercise this path either.
+ *
+ * NO BEHAVIOUR CHANGE is intended by this comment.
  */
 async function sendByEmail(claim) {
   const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY;

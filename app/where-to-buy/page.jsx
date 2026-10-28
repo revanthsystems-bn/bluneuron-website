@@ -4,7 +4,7 @@ import PageHero from '@/components/PageHero';
 import DraftBanner from '@/components/DraftBanner';
 import StoreButtons from '@/components/buy/StoreButtons';
 import Reveal from '@/components/Reveal';
-import { BRAND, HERO, MEDIA } from '@/lib/iriz';
+import { BRAND, HERO, MEDIA, PRODUCT_SHOT, productPlate } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import {
@@ -63,7 +63,7 @@ export default function WhereToBuyPage() {
           'The listing is the official BluNeuron store, and it ships the unit with the manufacturer warranty.',
           'Both listings are the official BluNeuron store, and both ship the same unit with the same warranty.'
         )}`}
-        image={MEDIA.product.boxFront}
+        image={MEDIA.product.withBox}
         imagePosition="58% 50%"
       />
 
@@ -72,14 +72,20 @@ export default function WhereToBuyPage() {
           <DraftBanner path={ROUTES.whereToBuy} className="mb-10 max-w-[680px]" />
 
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            {/* Square frame around a 1475×1038 cutout — `object-contain`
+            {/* Square frame around a 3:2 photograph — `object-contain`
                 letterboxes it at its own ratio, so the frame's shape is a
-                card decision and not a constraint on the asset. See the
-                fuller note in components/BuySection. */}
-            <Reveal className="product-stage relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl border border-border-subtle">
+                card decision and not a constraint on the asset, and the
+                card is filled with the photo's own ground via
+                `productPlate()` so the letterbox bands do not show. See the
+                fuller note in components/BuySection and PRODUCT_SHOT in
+                lib/iriz.js. */}
+            <Reveal
+              className="product-stage relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-3xl border border-border-subtle"
+              style={productPlate()}
+            >
               <Image
-                src={MEDIA.product.cutout}
-                alt={`${BRAND.fullName} projector`}
+                src={PRODUCT_SHOT.src}
+                alt={PRODUCT_SHOT.alt}
                 fill
                 sizes="(min-width: 1024px) 520px, 92vw"
                 className="object-contain p-10"

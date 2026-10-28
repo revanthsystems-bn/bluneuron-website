@@ -72,7 +72,7 @@ export default function AboutPage() {
         eyebrow="About BluNeuron"
         title="A projector brand built around one honest number."
         subtitle="We started BluNeuron because the home-projector market is full of inflated brightness claims — and we wanted to build the projector we couldn't find."
-        image={MEDIA.product.retailBox}
+        image={MEDIA.product.withBox}
         imageAlt=""
         imagePosition="50% 50%"
       />

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Reveal from './Reveal';
-import { COMPARISON, MEDIA } from '@/lib/iriz';
+import { COMPARISON, PRODUCT_SHOT, productPlate } from '@/lib/iriz';
 
 const DEFAULT_COLUMNS = COMPARISON.columns;
 const DEFAULT_ROWS = COMPARISON.rows;
@@ -60,9 +60,9 @@ function Cell({ value }) {
 /**
  * The IRIZ column's header: the product, then its name.
  *
- * The cut-out, not `heroClean` — this sits on a dark ground and heroClean is
- * a white product on a white seamless. See MEDIA.product.cutout in
- * lib/iriz.js.
+ * The product photograph sits on a dark ground here and is an OPAQUE shot on
+ * a white seamless, so it is mounted on a small rounded card filled with its
+ * own backdrop colour. See PRODUCT_SHOT in lib/iriz.js.
  *
  * IT REPLACES A "MOST POPULAR" BADGE. That badge was a popularity claim
  * nothing on this site supports: there is one product, no sales ranking and
@@ -73,20 +73,33 @@ function Cell({ value }) {
 function IrizMark({ name }) {
   return (
     <span className="flex items-center gap-2.5">
-      {/* The asset's real pixels (1475x1038), scaled down. The box is a
-          fixed 36x36 square and `object-contain` is what keeps the product
-          undistorted inside it — but the attributes are the asset's own
-          ratio anyway, so the intrinsic size next/image reasons about is
-          the truth rather than a square guess. */}
-      <Image
-        src={MEDIA.product.cutout}
-        alt=""
-        aria-hidden="true"
-        width={1475}
-        height={1038}
-        sizes="36px"
-        className="h-9 w-9 shrink-0 object-contain"
-      />
+      {/* The asset's real pixels, read from PRODUCT_SHOT rather than typed
+          here. The box is a fixed 36x36 square and `object-contain` is what
+          keeps the product undistorted inside it — the attributes are the
+          asset's own 3:2 ratio, so the intrinsic size next/image reasons
+          about is the truth rather than a square guess.
+
+          `sizes="72px"` buys the 2x variant: at 36px a 1x file is 36x24 of
+          real pixels, which is a smudge rather than a product. It costs a
+          couple of KB as AVIF.
+
+          The span carries the photo's own ground, so the letterboxing a 3:2
+          source leaves in a square box does not show as dark bands. It
+          disappears with `plate: null`. */}
+      <span
+        className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md"
+        style={productPlate()}
+      >
+        <Image
+          src={PRODUCT_SHOT.src}
+          alt=""
+          aria-hidden="true"
+          width={PRODUCT_SHOT.width}
+          height={PRODUCT_SHOT.height}
+          sizes="72px"
+          className="h-full w-full object-contain"
+        />
+      </span>
       <span>{name}</span>
     </span>
   );

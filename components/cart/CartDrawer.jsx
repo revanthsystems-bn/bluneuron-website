@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { ShoppingBag, Trash2, X } from 'lucide-react';
 import QuantityStepper from '../shop/QuantityStepper';
 import { useCart } from './CartContext';
-import { BRAND, PRODUCT } from '@/lib/iriz';
+import { BRAND, PRODUCT, productPlate } from '@/lib/iriz';
 import { ROUTES } from '@/lib/routes';
 import { CART_ENABLED, MARKETPLACE, formatInr } from '@/lib/site-config';
 
@@ -158,15 +158,22 @@ function CartDrawerPanel() {
               <>
                 <div className="flex-1 overflow-y-auto px-6 py-6">
                   <div className="flex gap-4">
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-black-soft">
+                    <div
+                      className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-black-soft"
+                      style={productPlate()}
+                    >
                       {/* CONTAIN, NOT COVER — the same fix components/buy/
                           BuySheet already carries, applied to the other two
-                          callers it named. PRODUCT.image is a 1475x1038
-                          transparent cutout and this tile is 1:1, so
-                          `object-cover` centre-cropped roughly 30% of the
-                          product's width away and kept empty space. And
-                          `sizes="160px"` rather than "80px", so an 80px box
-                          gets the 2x file instead of 80x56 real pixels. */}
+                          callers it named. PRODUCT.image is a 3:2 photograph
+                          and this tile is 1:1, so `object-cover` centre-
+                          cropped roughly 30% of the product's width away and
+                          kept empty space. And `sizes="160px"` rather than
+                          "80px", so an 80px box gets the 2x file instead of
+                          80x53 real pixels.
+
+                          The tile carries the photo's own ground, since the
+                          source is opaque; `bg-black-soft` underneath comes
+                          back by itself when `plate` goes null. */}
                       <Image
                         src={PRODUCT.image}
                         alt=""
@@ -227,10 +234,12 @@ function CartDrawerPanel() {
 }
 
 /*
- * The thumbnail is PRODUCT.image (lib/iriz.js) — the retail-box PHOTOGRAPH,
- * not the white-on-white render. At 80px on a dark panel a white unit on a
- * white ground is nearly invisible and says nothing about what ships, which
- * is the same reasoning that picked that file for PRODUCT.image in the first
- * place. Imported rather than re-spelled here, so there is one answer to
+ * The thumbnail is PRODUCT.image (lib/iriz.js) — the current product
+ * photograph, imported rather than re-spelled here so there is one answer to
  * "which picture represents this product in a list".
+ *
+ * At 80px on a dark panel a white unit on a white ground would be nearly
+ * invisible floated bare, which is why the tile is mounted on the photo's own
+ * ground via `productPlate()`: the product reads against its card, and the
+ * card reads against the panel.
  */

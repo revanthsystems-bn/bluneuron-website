@@ -58,7 +58,7 @@ export default function ShopPage() {
         eyebrow="Shop"
         title="One projector. Built properly."
         subtitle="The IRIZ is the only thing we make, and everything we know about it is on this site."
-        image={MEDIA.product.heroClean}
+        image={MEDIA.product.shot}
         imagePosition="62% 50%"
       />
 

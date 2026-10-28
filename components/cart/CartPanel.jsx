@@ -6,7 +6,7 @@ import { ShoppingBag, Trash2 } from 'lucide-react';
 import QuantityStepper from '../shop/QuantityStepper';
 import MarketplaceButtons from '../MarketplaceButtons';
 import { useCart } from './CartContext';
-import { BRAND, PRODUCT } from '@/lib/iriz';
+import { BRAND, PRODUCT, productPlate } from '@/lib/iriz';
 import { ROUTES } from '@/lib/routes';
 import { trackViewCart } from '@/lib/shop-analytics';
 import { MARKETPLACE, WARRANTY, formatInr } from '@/lib/site-config';
@@ -96,11 +96,15 @@ export default function CartPanel() {
           <a
             href={ROUTES.product}
             className="relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl border border-border-subtle bg-black sm:h-32 sm:w-32"
+            style={productPlate()}
           >
             {/* CONTAIN, NOT COVER — see the note in components/cart/
-                CartDrawer. A 1475x1038 cutout in a square tile loses its
-                ends to `object-cover`; contained, the whole unit is in
-                frame at its own ratio. */}
+                CartDrawer. A 3:2 photograph in a square tile loses its ends
+                to `object-cover`; contained, the whole unit is in frame at
+                its own ratio, and the tile carries the photo's own ground
+                (`productPlate()`) so the letterbox bands do not read as dark
+                stripes. `bg-black` underneath returns on its own once the
+                asset is transparent. */}
             <Image
               src={PRODUCT.image}
               alt={BRAND.fullName}
