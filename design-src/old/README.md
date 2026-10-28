@@ -36,13 +36,38 @@ The replacement photograph shows the carton's front and a shorter feature
 list, so it is the better picture and the worse document. Check printed
 claims against this file, not against `iriz-with-box.jpg`.
 
-## Boards with the old render baked in
+## Boards with the old render baked in — now withdrawn
 
-Two shipped boards still contain the retired white unit, composited into the
-artwork and not separable from it:
+Two shipped boards contained the retired white unit, composited into the
+artwork and not separable from it. **Both have been removed from the site**
+and now live here:
 
-- `public/media/iriz/detail/09-screen-size.png` — bottom left
-- `public/media/iriz/detail/08-keystone.png` — bottom left
+| File | Was | Showed the old unit |
+|---|---|---|
+| `09-screen-size.png` | `MEDIA.detail.screenSize`. The "Screen size" gallery slide on /shop/iriz and the third tile of the "What You Get" board on the homepage. | bottom left |
+| `08-keystone.png` | `MEDIA.detail.keystone`. The "Auto keystone" gallery slide and the fourth "What You Get" tile. | bottom left |
 
-They were left alone deliberately: re-rendering them means re-doing the
-artwork, not swapping a layer. Fixing them needs new boards.
+Re-rendering them means re-doing the artwork, not swapping a layer, so they
+were withdrawn rather than patched. New artwork is expected later.
+
+### Putting them back
+
+Four places, and they must move together:
+
+1. `MEDIA.detail` in `lib/iriz.js` — restore the `screenSize` and `keystone`
+   keys pointing at the new files in `public/media/iriz/detail/`.
+2. `GALLERY` in `lib/iriz.js` — restore the "Screen size" and "Auto keystone"
+   entries. Set `plate` to match the artwork: `false` for a board that
+   carries its own dark ground, as these did.
+3. `HIGHLIGHT_BOARDS` in `lib/iriz.js` — restore both entries with their real
+   `width`/`height`.
+4. `components/Highlights.jsx` — restore the two `TILE` entries (the array is
+   index-aligned with `HIGHLIGHT_BOARDS`), put the grid back to
+   `lg:grid-cols-4`, drop the `lg:max-w-[720px] lg:mx-auto` cap, and set
+   `sizes` back to `(min-width: 1024px) 25vw, ...`.
+
+Then re-sample the two `.img-field-*` gradients in `app/globals.css` from the
+new artwork's own edge colours — the method is documented on
+`.img-field-apps`. Those rules must be referenced from a file under `./app` or
+`./components` or Tailwind tree-shakes them; that is why `TILE` holds the
+class names rather than `lib/iriz.js`.

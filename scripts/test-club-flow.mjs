@@ -44,10 +44,24 @@
  *   NEXT_PUBLIC_SUPABASE_ANON_KEY=test-anon-key \
  *   npx next build
  *
- *   CLUB_SERVER_KEY=<any 64 chars> CLUB_COOKIE_SECRET=<any 32+ chars> \
+ *   CLUB_SERVER_KEY=test-server-key-000000000000000000000000000000000000000000000000 \
+ *   CLUB_COOKIE_SECRET=test-cookie-secret-00000000000000000000000000000 \
  *   npx next start -p 3300 &
  *
  *   node scripts/test-club-flow.mjs http://127.0.0.1:3300 54321
+ *
+ * THOSE TWO VALUES ARE NOT PLACEHOLDERS. This block used to read
+ * `CLUB_SERVER_KEY=<any 64 chars>`, and that was wrong in a way that cost
+ * real time: the mock below enforces the server-key guard exactly as
+ * `club_key_ok` does, comparing `p_server_key` against ONE hard-coded
+ * string. Any other 64-character key makes the mock answer 403 to every
+ * RPC, lib/club-server.js maps that to UNAVAILABLE, and the suite reports
+ * 32 of 74 failures that all read `status 503` — which reads as a broken
+ * Club rather than a mistyped environment variable.
+ *
+ * The values live in SERVER_KEY / COOKIE_SECRET below, and the preflight
+ * further down fails with one clear sentence instead of 32 misleading ones
+ * if the running app disagrees with them.
  */
 
 import { createServer } from 'node:http';
@@ -81,6 +95,14 @@ function ok(condition, label, detail) {
 const SERVER_KEY = 'test-server-key-'.padEnd(64, '0');
 const COOKIE_SECRET = 'test-cookie-secret-'.padEnd(48, '0');
 
+/*
+ * How many RPCs the mock turned away because `p_server_key` did not match.
+ * Nothing in the suite asserts on it; it exists so the preflight can tell
+ * "the app is misconfigured" apart from "the Club is genuinely broken",
+ * which from outside the process are the same 503.
+ */
+let keyRejections = 0;
+
 const serials = new Set(['IRZT6XA001D', 'IRZT6XA002P', 'IRZT6XA003A', 'IRZT6XA500L']);
 const members = new Map(); // serial -> { member_no, email, name, joined_at }
 const attempts = new Map(); // key_hash -> timestamps[]
@@ -110,6 +132,7 @@ const mock = createServer((req, res) => {
 
     // The server key guard, exactly as club_key_ok does it.
     if (args.p_server_key !== SERVER_KEY) {
+      keyRejections += 1;
       res.writeHead(403, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ message: 'forbidden' }));
       return;
@@ -264,6 +287,77 @@ async function get(path, cookies) {
  * ------------------------------------------------------------------ */
 await new Promise((resolve) => mock.listen(mockPort, '127.0.0.1', resolve));
 console.log(`\nIRIZ Club — end to end (mock Supabase on :${mockPort})\n`);
+
+/* ------------------------------------------------------------------ *
+ * PREFLIGHT: is the app under test wired to THIS mock?
+ * ------------------------------------------------------------------ *
+ * One throwaway check-serial before the suite starts, purely to tell three
+ * indistinguishable-from-outside failures apart. All three answer 503, and
+ * without this the operator sees 32 red lines reading `status 503` and no
+ * indication which of these it is:
+ *
+ *   1. CLUB_SERVER_KEY does not match SERVER_KEY above. The mock 403s every
+ *      RPC and `keyRejections` climbs. This is the one that actually
+ *      happened, because the usage block used to say "any 64 chars".
+ *   2. The app is not pointed at the mock at all — NEXT_PUBLIC_SUPABASE_URL
+ *      was not set to the mock's origin AT BUILD TIME (it is inlined, so
+ *      setting it only when starting the server does nothing). The mock
+ *      then sees no traffic and `keyRejections` stays at 0.
+ *   3. CLUB_SERVER_KEY or CLUB_COOKIE_SECRET is unset, so `clubConfigured()`
+ *      is false and the route 503s without reaching the mock either.
+ *
+ * `keyRejections` is what separates (1) from (2) and (3): it can only be
+ * non-zero if the app reached the mock and was turned away.
+ *
+ * This aborts rather than counting a failure. Every later assertion would
+ * fail for the same reason, and 74 lines of consequence bury the cause.
+ */
+{
+  const probe = await post('/api/club/check-serial', { serial: 'IRZT6XA001D' }, jar());
+
+  if (probe.status === 503) {
+    const lines = [
+      '',
+      'PREFLIGHT FAILED — the app under test is not talking to this mock.',
+      '',
+    ];
+
+    if (keyRejections > 0) {
+      lines.push(
+        `  The mock rejected ${keyRejections} RPC(s): CLUB_SERVER_KEY does not match.`,
+        '',
+        '  Start the server with EXACTLY this key (it is compared literally,',
+        '  the same way club_key_ok does it — any other 64-character string',
+        '  is turned away):',
+        '',
+        `    CLUB_SERVER_KEY=${SERVER_KEY}`,
+        `    CLUB_COOKIE_SECRET=${COOKIE_SECRET}`
+      );
+    } else {
+      lines.push(
+        '  The mock saw no RPC at all, so the request never got that far.',
+        '',
+        '  Either the build is not pointed at the mock — NEXT_PUBLIC_SUPABASE_URL',
+        '  is inlined by `next build`, so it must be set for the BUILD, not just',
+        '  for `next start` — or CLUB_SERVER_KEY / CLUB_COOKIE_SECRET are unset',
+        '  and clubConfigured() is false. Rebuild with:',
+        '',
+        `    NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:${mockPort}`,
+        '    NEXT_PUBLIC_SUPABASE_ANON_KEY=test-anon-key'
+      );
+    }
+
+    lines.push('', '  The full sequence is in the comment at the top of this file.', '');
+    console.error(lines.join(NL));
+    mock.close();
+    process.exit(1);
+  }
+
+  // Not a 503, so the wiring is good. The probe spent one check-serial call
+  // against a VALID, unclaimed serial — `club_check_serial` records a
+  // failure only for an invalid one, so this costs nothing from the
+  // five-an-hour allowance the rate-limit sections below depend on.
+}
 
 const deviceOne = jar();
 const deviceTwo = jar();
