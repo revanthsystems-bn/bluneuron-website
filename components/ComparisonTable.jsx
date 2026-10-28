@@ -159,7 +159,7 @@ function Mark({ yes }) {
       fill="none"
       role="img"
       aria-label={yes ? 'Yes' : 'No'}
-      className={yes ? 'text-accent-soft' : 'text-white/35'}
+      className={yes ? 'text-accent-soft' : 'text-white/55'}
     >
       <path
         className="tick-path"
@@ -228,39 +228,52 @@ function Heading({ heading, highlight }) {
  * say honestly, and a superlative does not.
  */
 function ColumnCard({ name, highlight, compact = false }) {
+  const box = compact ? 'h-12 w-16' : 'h-20 w-28';
+
   const art = highlight ? (
-    <span
-      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-xl ${
-        compact ? 'h-11 w-11' : 'h-14 w-14'
-      }`}
-      style={productPlate()}
-    >
-      <Image
-        src={PRODUCT_SHOT.src}
-        alt=""
+    // THE GLOW IS A SIBLING, NOT A BACKGROUND ON THE PLATE. The poster lights
+    // the unit from behind with a blue bloom; the plate itself has to stay
+    // the asset's own flat #FEFEFE (see productPlate) or the opaque
+    // photograph's white rectangle fights the gradient. So the bloom is an
+    // absolutely-positioned blur UNDER the plate, and `plate: null` on a
+    // future transparent asset leaves it looking even better rather than
+    // breaking it.
+    <span className="relative flex items-center justify-center">
+      <span
         aria-hidden="true"
-        width={PRODUCT_SHOT.width}
-        height={PRODUCT_SHOT.height}
-        sizes="112px"
-        className="h-full w-full object-contain"
+        className={`absolute rounded-full bg-accent/30 blur-2xl ${
+          compact ? 'h-12 w-20' : 'h-20 w-36'
+        }`}
       />
+      <span
+        className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-xl ${box}`}
+        style={productPlate()}
+      >
+        <Image
+          src={PRODUCT_SHOT.src}
+          alt=""
+          aria-hidden="true"
+          width={PRODUCT_SHOT.width}
+          height={PRODUCT_SHOT.height}
+          sizes="224px"
+          className="h-full w-full object-contain"
+        />
+      </span>
     </span>
   ) : (
     <span
-      className={`flex shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white/40 ${
-        compact ? 'h-11 w-11' : 'h-14 w-14'
-      }`}
+      className={`flex shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-white/35 ${box}`}
     >
-      <GenericProjector className={compact ? 'h-6 w-6' : 'h-7 w-7'} />
+      <GenericProjector className={compact ? 'h-7 w-7' : 'h-10 w-10'} />
     </span>
   );
 
   return (
-    <span className="flex flex-col items-center gap-2.5 text-center">
+    <span className="flex flex-col items-center gap-3 text-center">
       {art}
       <span
-        className={`font-semibold leading-tight ${compact ? 'text-[13px]' : 'text-sm'} ${
-          highlight ? 'text-white' : 'text-white/65'
+        className={`font-semibold leading-tight ${compact ? 'text-[13px]' : 'text-base'} ${
+          highlight ? 'text-white' : 'text-white/70'
         }`}
       >
         {name}
@@ -273,17 +286,23 @@ function ColumnCard({ name, highlight, compact = false }) {
  * THE COLUMN TINTS, declared once and shared by the table and the phone
  * cards, so the two layouts cannot drift apart visually.
  *
+ * TUNED TO THE POSTER (design-src/marketing/iriz-vs-budget.png): ours is a
+ * lit blue panel with a bright edge, theirs is flat charcoal. The poster's
+ * contrast between the two columns is most of what makes it read as a
+ * comparison at a glance, and the first pass here was far too timid —
+ * accent/7 against white/3.5 on black is two barely-different greys.
+ *
  * The literal strings matter: Tailwind scans source text, so a class
  * assembled at runtime would never be generated.
  */
 const TINT = {
-  // Ours: brand blue, and a visible edge. `border-accent/25` is on the left
+  // Ours: brand blue, and a visible edge. `border-accent/45` is on the left
   // and right of EVERY cell in the column, with the top only on the header
   // and the bottom only on the last row — which is what draws one continuous
   // card edge down the column. It needs `border-separate`; with collapsed
   // borders the per-cell radii are ignored outright.
-  iriz: 'bg-accent/[0.07] border-x border-accent/25',
-  other: 'bg-white/[0.035] border-x border-white/10',
+  iriz: 'bg-accent/[0.13] border-x border-accent/45',
+  other: 'bg-white/[0.055] border-x border-white/10',
 };
 
 export default function ComparisonTable({
@@ -303,15 +322,40 @@ export default function ComparisonTable({
   const last = rows.length - 1;
 
   return (
-    <section id="compare" className="border-b border-border-subtle bg-black py-20 scroll-mt-20">
-      <div className="section-container">
-        <Reveal className="mb-10 max-w-2xl">
+    /*
+     * A LIT ROOM, NOT A FLAT BLACK BAND.
+     *
+     * The poster sits the whole comparison in a dark cinema-blue space with
+     * the light coming from behind the product. Reproduced here as two
+     * pointer-events-none washes over a near-black base rather than as a
+     * photograph: a background image would be another megabyte to ship and
+     * would fight the text at every breakpoint.
+     *
+     * The base stays `bg-black-obsidian` — near enough to the neighbouring
+     * sections that the page rhythm is unbroken — and the blue is a wide,
+     * very low-opacity radial. Deliberately restrained: this is behind body
+     * copy and a data table, and the poster is not.
+     */
+    <section
+      id="compare"
+      className="relative overflow-hidden border-b border-border-subtle bg-black-obsidian py-20 scroll-mt-20"
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(59,130,246,0.16)_0%,rgba(59,130,246,0.04)_38%,rgba(0,0,0,0)_72%)]"
+      />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-noise" />
+
+      <div className="section-container relative">
+        <Reveal className="mb-10 max-w-3xl">
           <p className="eyebrow mb-3">{eyebrow}</p>
-          <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl md:text-5xl">
             <Heading heading={heading} highlight={highlight} />
           </h2>
           {subheading && (
-            <p className="mt-4 text-[15px] leading-relaxed text-white/55">{subheading}</p>
+            <p className="mt-4 text-[15px] leading-relaxed text-white/60 sm:text-base">
+              {subheading}
+            </p>
           )}
         </Reveal>
 
@@ -337,13 +381,13 @@ export default function ComparisonTable({
          * ------------------------------------------------------------- */}
         <div className="md:hidden">
           <Reveal className="grid grid-cols-2 gap-3" aria-hidden="true">
-            <div className="rounded-2xl border border-accent/25 bg-accent/[0.07] p-4">
+            <div className="rounded-2xl border border-accent/45 bg-accent/[0.13] p-4">
               <ColumnCard name={highlighted.name} highlight compact />
             </div>
             {others.map((col) => (
               <div
                 key={col.key}
-                className="rounded-2xl border border-white/10 bg-white/[0.035] p-4"
+                className="rounded-2xl border border-white/10 bg-white/[0.055] p-4"
               >
                 <ColumnCard name={col.name} highlight={false} compact />
               </div>
@@ -353,8 +397,10 @@ export default function ComparisonTable({
           <Reveal delay={0.1} as="ul" className="mt-3 flex flex-col gap-3">
             {rows.map((row) => (
               <li key={row.label} className="glass-panel p-5">
-                <p className="flex items-center gap-2.5 text-sm font-semibold text-white">
-                  <Glyph name={row.icon} className="h-[18px] w-[18px] shrink-0 text-accent-soft" />
+                <p className="flex items-center gap-3 text-sm font-semibold text-white">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-white/[0.04] text-accent-soft">
+                    <Glyph name={row.icon} className="h-[18px] w-[18px]" />
+                  </span>
                   {row.label}
                 </p>
 
@@ -368,12 +414,15 @@ export default function ComparisonTable({
                     OURS FIRST, every time. The row is read as "what we give
                     you, versus what you would otherwise get". */}
                 <dl className="mt-4 flex flex-col gap-2">
-                  <div className="flex flex-col gap-1 rounded-xl bg-accent/[0.07] p-3">
+                  <div className="flex flex-col gap-1 rounded-xl border border-accent/30 bg-accent/[0.13] p-3">
                     <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-accent-soft">
                       {highlighted.name}
                     </dt>
-                    <dd className="text-sm text-white">
-                      <Cell value={row[highlighted.key]} tone="text-white" />
+                    <dd>
+                      <Cell
+                        value={row[highlighted.key]}
+                        tone="text-[15px] font-semibold text-white"
+                      />
                     </dd>
                   </div>
 
@@ -382,8 +431,8 @@ export default function ComparisonTable({
                       <dt className="text-xs font-medium uppercase tracking-[0.12em] text-white/40">
                         {col.name}
                       </dt>
-                      <dd className="text-sm text-white/70">
-                        <Cell value={row[col.key]} />
+                      <dd className="text-sm">
+                        <Cell value={row[col.key]} tone="text-white/60" />
                       </dd>
                     </div>
                   ))}
@@ -426,8 +475,8 @@ export default function ComparisonTable({
                   <th
                     key={col.key}
                     scope="col"
-                    className={`rounded-t-3xl border-t p-6 align-bottom font-semibold ${
-                      col.highlight ? `${TINT.iriz} border-t-accent/25` : `${TINT.other} border-t-white/10`
+                    className={`rounded-t-3xl border-t p-6 pb-7 align-bottom font-semibold ${
+                      col.highlight ? `${TINT.iriz} border-t-accent/45` : `${TINT.other} border-t-white/10`
                     }`}
                   >
                     <ColumnCard name={col.name} highlight={col.highlight} />
@@ -445,30 +494,46 @@ export default function ComparisonTable({
                       axe's td-has-header rule reports. */}
                   <th
                     scope="row"
-                    className="border-t border-border-subtle p-5 text-left font-medium text-white/60"
+                    className="border-t border-border-subtle py-4 pl-0 pr-5 text-left font-medium text-white/70"
                   >
-                    <span className="flex items-center gap-2.5">
-                      <Glyph
-                        name={row.icon}
-                        className="h-[18px] w-[18px] shrink-0 text-white/35 transition-colors duration-200 group-hover:text-accent-soft"
-                      />
+                    {/* THE ICON SITS IN ITS OWN TILE, which is the poster's
+                        arrangement: a rail of square glyph chips down the
+                        left edge rather than an icon leaning against each
+                        label. A fixed 38px box is what makes them line up
+                        when the labels are different lengths. */}
+                    <span className="flex items-center gap-3.5">
+                      <span className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-white/[0.04] text-accent-soft transition-colors duration-200 group-hover:border-accent/40 group-hover:bg-accent/10">
+                        <Glyph name={row.icon} className="h-[19px] w-[19px]" />
+                      </span>
                       {row.label}
                     </span>
                   </th>
                   {columns.map((col) => (
                     <td
                       key={col.key}
-                      className={`border-t p-5 transition-colors duration-200 ${
+                      className={`border-t px-5 py-4 transition-colors duration-200 ${
                         col.highlight
-                          ? `${TINT.iriz} border-t-accent/20 group-hover:bg-accent/[0.11]`
-                          : `${TINT.other} border-t-white/10 group-hover:bg-white/[0.055]`
+                          ? `${TINT.iriz} border-t-accent/30 group-hover:bg-accent/[0.17]`
+                          : `${TINT.other} border-t-white/10 group-hover:bg-white/[0.075]`
                       } ${i === last ? 'rounded-b-3xl border-b' : ''} ${
-                        i === last && col.highlight ? 'border-b-accent/25' : ''
+                        i === last && col.highlight ? 'border-b-accent/45' : ''
                       } ${i === last && !col.highlight ? 'border-b-white/10' : ''}`}
                     >
+                      {/* OURS IS SET LIKE A HEADLINE, THEIRS LIKE BODY COPY.
+                          The poster's single loudest move: the IRIZ answer is
+                          large and bold, the other column's is plain. Kept
+                          WHITE rather than blue-on-blue — the poster tints
+                          some of its values, and on this panel that lands
+                          between 3:1 and 4:1 against the tinted ground. The
+                          blue is carried by the panel, the border, the icon
+                          rail and the tick instead. */}
                       <Cell
                         value={row[col.key]}
-                        tone={col.highlight ? 'font-medium text-white' : 'text-white/65'}
+                        tone={
+                          col.highlight
+                            ? 'text-[15px] font-semibold text-white'
+                            : 'text-white/60'
+                        }
                       />
                     </td>
                   ))}
@@ -488,15 +553,20 @@ export default function ComparisonTable({
          * ------------------------------------------------------------- */}
         {showUseCases && USE_CASES.length > 0 && (
           <Reveal delay={0.15} className="mt-12 border-t border-border-subtle pt-10">
-            <h3 className="eyebrow mb-6 text-center">Made for</h3>
-            <ul className="flex flex-wrap items-stretch justify-center gap-3">
+            <h3 className="eyebrow mb-7 text-center">Made for</h3>
+            {/* BARE GLYPHS ON THE GROUND, no card around each one — the
+                poster runs them as a single rail along its foot and the
+                borders were what made the first pass read as five more
+                buttons under a table that already had buttons. The circle
+                is the only chrome, and it is what keeps the rail legible
+                when the labels wrap to two lines at 360. */}
+            <ul className="grid grid-cols-3 gap-x-2 gap-y-7 sm:grid-cols-5">
               {USE_CASES.map((useCase) => (
-                <li
-                  key={useCase.label}
-                  className="flex min-w-[140px] flex-1 basis-[140px] flex-col items-center gap-2.5 rounded-2xl border border-border-subtle bg-white/[0.02] px-4 py-5 text-center sm:max-w-[200px]"
-                >
-                  <Glyph name={useCase.icon} className="h-6 w-6 text-accent-soft" />
-                  <span className="text-[13px] font-medium leading-snug text-white/75">
+                <li key={useCase.label} className="flex flex-col items-center gap-3 text-center">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full border border-accent/25 bg-accent/10 text-accent-soft">
+                    <Glyph name={useCase.icon} className="h-[22px] w-[22px]" />
+                  </span>
+                  <span className="max-w-[11ch] text-[13px] font-medium leading-snug text-white/70">
                     {useCase.label}
                   </span>
                 </li>
@@ -523,7 +593,15 @@ export default function ComparisonTable({
          * ------------------------------------------------------------- */}
         {showStores && SHOW_BUY && (
           <Reveal delay={0.2} className="mt-12 flex flex-col items-center border-t border-border-subtle pt-10">
-            <h3 className="eyebrow mb-5">Available on</h3>
+            {/* A RULE EITHER SIDE, as the poster sets its "LIVE ON" lockup.
+                `aria-hidden` spans rather than an <hr>: they are two short
+                decorative strokes flanking a heading, not a thematic break
+                in the document. */}
+            <h3 className="eyebrow mb-5 flex items-center gap-4">
+              <span aria-hidden="true" className="h-px w-10 bg-border-strong" />
+              Available on
+              <span aria-hidden="true" className="h-px w-10 bg-border-strong" />
+            </h3>
             <StoreButtons
               className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center"
               buttonClassName="w-full sm:w-auto"
