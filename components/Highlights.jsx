@@ -47,19 +47,21 @@ import { HIGHLIGHT_BANNERS, HIGHLIGHT_BOARDS } from '@/lib/iriz';
 const TILE = [
   { ratio: 'aspect-[1014/1551]', field: 'img-field-apps' },     // 11-apps-10000
   { ratio: 'aspect-[750/1240]', field: 'img-field-chipset' },   // 06-chipset
+  { ratio: 'aspect-[750/1065]', field: 'img-field-screen' },    // 09-screen-size
+  { ratio: 'aspect-[750/967]', field: 'img-field-keystone' },   // 08-keystone
 ];
 
 /*
- * TWO BOARDS, NOT FOUR. `09-screen-size` and `08-keystone` were pulled
- * because both have the RETIRED all-white projector composited into their
- * artwork — the unit with no black front panel and no wordmark, which is not
- * the product we sell. It is baked into the pixels, so there was no layer to
- * swap: the boards had to come out whole. Their `.img-field-screen` and
- * `.img-field-keystone` rules came out of app/globals.css with them.
+ * FOUR BOARDS AGAIN. `09-screen-size` and `08-keystone` were withdrawn for a
+ * while — both carry the RETIRED all-white projector composited into their
+ * artwork, the unit with no black front panel and no wordmark. It is baked
+ * into the pixels, so there was no layer to swap and the boards came out
+ * whole, taking their `.img-field-*` rules with them.
  *
- * The files are parked in design-src/old/ with the rest of the retired
- * imagery. Put the entries back here, in HIGHLIGHT_BOARDS, and in GALLERY
- * when the re-shot artwork lands — and restore the four-column grid below.
+ * They are back by request, unchanged, pending re-shot artwork. THIS ARRAY
+ * IS INDEX-ALIGNED WITH HIGHLIGHT_BOARDS in lib/iriz.js — a board added
+ * there without an entry here reads `TILE[i].field` of undefined and the
+ * section throws, so the two move together, in the same order.
  */
 
 export default function Highlights() {
@@ -83,17 +85,15 @@ export default function Highlights() {
             bleed past the container, so the two are siblings rather than one
             grid that reflows. */}
         <div className="section-container">
-          {/* `lg:grid-cols-2`, and `lg:max-w-[720px]` with it, because this
-              board is down to two tiles. On the four-column grid this used to
-              be, two boards sat in the left half and left the right half
-              empty; dropping to two columns without the width cap swung the
-              other way and stretched each tile to ~700px, so the artwork
-              floated in the middle of a very wide gradient field. 720px total
-              puts each tile at 352px — within a couple of pixels of the 25vw
-              they occupied at 1440 before, so the boards are the size they
-              were designed at. Restore `lg:grid-cols-4` and drop the cap when
-              the board count goes back up. */}
-          <div className="mt-10 hidden gap-4 md:grid md:grid-cols-2 lg:mt-12 lg:grid-cols-2 lg:max-w-[720px] lg:mx-auto">
+          {/* FOUR COLUMNS, NO WIDTH CAP. While this board was down to two
+              tiles it ran `lg:grid-cols-2` inside a `lg:max-w-[720px]` cap,
+              which held each tile at 352px — about the 25vw it occupies here
+              at 1440 — so the artwork did not float in a half-empty gradient
+              field. Both are gone now that the count is back to four: at
+              `lg:grid-cols-4` the quarter-width track is the size these
+              boards were designed at. Put the cap back if the count ever
+              drops again; `sizes` below has to follow it either way. */}
+          <div className="mt-10 hidden gap-4 md:grid md:grid-cols-2 lg:mt-12 lg:grid-cols-4">
             {HIGHLIGHT_BOARDS.map((board, i) => (
               <Reveal
                 key={board.image}
@@ -124,7 +124,7 @@ export default function Highlights() {
                     alt={board.alt}
                     width={board.width}
                     height={board.height}
-                    sizes="(min-width: 1024px) 352px, (min-width: 768px) 50vw, 78vw"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 78vw"
                     className={`img-tile-media ${TILE[i].field} h-auto max-h-full w-auto max-w-full object-contain`}
                     preload={false}
                     loading="lazy"

@@ -556,17 +556,22 @@
     );
   }
 
-  /* `.img-field-screen` (09-screen-size.png) and `.img-field-keystone`
-     (08-keystone.png) WERE HERE and were removed with their boards: both
-     artworks carry the retired all-white projector composited into the
-     pixels. A field gradient is sampled from its own image's edge colours,
-     so neither rule means anything without the file it was measured from —
-     keeping them would leave two dead rules that Tailwind tree-shakes
-     anyway, and a reader with no way to tell they were unused.
+  /* 09-screen-size.png — #000000 at every sampled height. */
+  .img-field-screen {
+    background-image: linear-gradient(180deg, #000000 0%, #000000 100%);
+  }
 
-     Re-sample from the new artwork when it arrives; the method is in the
-     comment on `.img-field-apps` above. The retired files are in
-     design-src/old/. */
+  /* 08-keystone.png — NOT pure black. The room photograph runs to the
+     frame edges, so only the top and bottom bands are black:
+     0% #000000  10% #171b25  25% #1e2941  40% #253656  55% #4b4861
+     70% #5b4c4c  85% #3e4457  95% #1d1e22  100% #000000 */
+  .img-field-keystone {
+    background-image: linear-gradient(
+      180deg,
+      #000000 0%, #171b25 10%, #1e2941 25%, #253656 40%,
+      #4b4861 55%, #5b4c4c 70%, #3e4457 85%, #1d1e22 95%, #000000 100%
+    );
+  }
 
   /*
    * ONE-SCREEN FIT.
