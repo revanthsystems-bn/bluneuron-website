@@ -38,9 +38,15 @@ import {
  * disagreed — 48 hours here against 7 days there, for the same dead unit.
  *
  * WHAT IS DELIBERATELY NOT HERE:
- *   - No helpline. Both numbers in SUPPORT_PHONES are still placeholders and
- *     render on preview builds only; a warranty page is the last place to
- *     print a number that does not ring.
+ *   - No helpline, and the reason has changed. It used to be that there was
+ *     no number to print: both SUPPORT_PHONES rows were placeholders, and a
+ *     warranty page is the last place to print a number that does not ring.
+ *     There is a real customer care line now, published on /support,
+ *     /support/contact and the grievance disclosure. It is still not here,
+ *     because a warranty claim has to be RAISED — it needs a serial number,
+ *     an invoice and a written record — so this page routes to the claim
+ *     form, and sending a claimant to a phone call that will only ask them
+ *     to fill the form in is a slower path, not a warmer one.
  *   - No service-centre address. It is given when a ticket is raised, because
  *     a published one invites units to arrive with no ticket and nothing to
  *     match them to. See WARRANTY.inboundShipping.

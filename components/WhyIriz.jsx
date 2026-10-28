@@ -46,7 +46,7 @@ import { BRAND, THROW_RANGE } from '@/lib/iriz';
  * everywhere — copy, specs, compare table, FAQ, meta, JSON-LD and alt text
  * — because the carton prints "4pt Auto Keystone" and names no focus
  * behaviour. FULL_SPEC_SHEET has no focus row, HIGHLIGHTS says "4-point
- * Auto Keystone", COMPARISON's row is "Keystone Correction". Two mentions
+ * Auto Keystone", COMPARISON's row is "Keystone correction". Two mentions
  * survive that cleanup by accident (components/TechSpecs alt text, and
  * SETUP_STEPS in lib/iriz.js) and they are leftovers, not licence. Do not
  * put focus back without the box in your hand.

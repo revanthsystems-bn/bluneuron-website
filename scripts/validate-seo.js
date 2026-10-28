@@ -62,24 +62,24 @@ const FORBIDDEN_WHEN_INDEXABLE = [
  * Forbidden on EVERY page, draft or not. A draft may be unfinished; it may not
  * be wrong.
  *
- * THE THIRD ENTRY IS A PRODUCTION-ONLY ASSERTION, and it is meant to be.
- * `+91 XXXXX` is PHONE_PLACEHOLDER from lib/site-config.js — the two
- * unconfirmed support numbers. A production build omits those rows entirely
- * (visibleSupportPhones(), gated on BUILD_CHANNEL), so a correct production
- * build cannot contain the string and this check passes silently.
+ * THE LAST ENTRY NOW HOLDS ON EVERY BUILD, which is a tightening.
+ * `+91 XXXXX` was the shape of PHONE_PLACEHOLDER in lib/site-config.js, back
+ * when there were two unconfirmed support numbers and a PREVIEW build
+ * rendered them on purpose so a reviewer could see the rows — so this entry
+ * was a production-only assertion and a preview tripped it by design.
  *
- * A PREVIEW BUILD WILL TRIP IT, by design: the preview renders the rows on
- * purpose so a reviewer can see them. So run this validator — and
- * check-production, which calls it — against a PRODUCTION-channel build, which
- * is the only build whose output anyone needs a guarantee about. If it fires
- * on a build you intend to publish, a masked number reached a page and that is
- * exactly the failure this list exists to catch.
+ * There is one real, confirmed number now (+91 91509 94000) and no masked
+ * row on any channel: `visibleSupportPhones()` drops a masked number from
+ * every build, preview included. So a preview no longer trips this, and the
+ * needle has gone from "expected on one channel" to a plain leak detector —
+ * if it fires at all, a masked number reached a page, which is exactly the
+ * failure this list exists to catch.
  */
 const FORBIDDEN_ALWAYS = [
   { needle: 'example.com', label: 'example.com' },
   { needle: 'XXXXXXXXXX', label: 'masked phone number (XXXXXXXXXX)' },
   { needle: '+91-XXXX', label: 'masked phone number (+91-XXXX)' },
-  { needle: '+91 XXXXX', label: 'unconfirmed placeholder phone (+91 XXXXX XXXXX)' },
+  { needle: '+91 XXXXX', label: 'masked phone number (+91 XXXXX XXXXX)' },
 ];
 
 /* ------------------------------------------------------------------ *

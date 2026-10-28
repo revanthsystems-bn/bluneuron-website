@@ -7,7 +7,7 @@ import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import {
   SUPPORT,
-  isPlaceholderPhone,
+  telHref,
   visibleSupportPhones,
 } from '@/lib/site-config';
 
@@ -49,12 +49,13 @@ export const metadata = {
  * THE CHANNEL STRIP below the tiles is not a duplicate of /support/contact,
  * and the difference is what it leaves out. That page is the full set with a
  * note under each explaining when to use it, plus the form and the grievance
- * escalation. This is the two addresses and the hours, on the page everyone
- * lands on first, because "what is the email and when are you open" is the
- * commonest question here and it should not cost a click. Both read SUPPORT
- * and visibleSupportPhones() from lib/site-config.js, so neither can state a
- * channel the other does not — and the phone rows obey the same one rule:
- * a placeholder renders on a preview build and is absent on production.
+ * escalation. This is the two addresses, the phone number and the hours, on
+ * the page everyone lands on first, because "how do I reach you and when are
+ * you open" is the commonest question here and it should not cost a click.
+ * Both read SUPPORT and visibleSupportPhones() from lib/site-config.js, so
+ * neither can state a channel the other does not — and the phone rows obey
+ * the same one rule: a confirmed number renders on every build, a masked one
+ * is dropped from every build.
  */
 
 /**
@@ -69,11 +70,10 @@ const CHANNELS = [
   ...visibleSupportPhones().map((entry) => ({
     label: entry.label,
     value: entry.number,
-    // No `tel:` on a placeholder — it strips to "+91" and dials it. See the
-    // fuller note in app/support/contact/page.jsx.
-    href: isPlaceholderPhone(entry.number)
-      ? null
-      : `tel:${String(entry.number).replace(/[^+\d]/g, '')}`,
+    // telHref() from lib/site-config.js, not a strip written here — one
+    // place on the site builds every `tel:`, so the readable number and the
+    // dialled one cannot drift. It returns null for anything masked.
+    href: telHref(entry.number),
   })),
   { label: 'Sales', value: SUPPORT.salesEmail, href: `mailto:${SUPPORT.salesEmail}` },
   { label: 'Hours', value: SUPPORT.hours, href: null },

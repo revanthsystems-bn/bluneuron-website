@@ -14,20 +14,23 @@
  * WHAT IT CHECKS:
  *   1. No PLACEHOLDER values in lib/site-config.js.
  *   2. At least one REAL marketplace listing URL — a product page, not a
- *      marketplace home page. One is enough: Flipkart is live and Amazon is
- *      declared absent, which is a supported state.
+ *      marketplace home page, and one that `AMAZON.live` has not withheld.
+ *      One is enough: Flipkart is live and Amazon is withheld, which is a
+ *      supported state.
  *   3. Demo account data is UNREACHABLE. Not "Supabase is configured" —
  *      see the long note on that check, which is the one that changed.
  *   4. Every referenced image exists. Delegated to scripts/check-media.js.
  *   5. No [TBD], no masked phone, canonicals and sitemap sane. Delegated to
  *      scripts/validate-seo.js, which checks the BUILT site.
  *
- * WHAT IT REPORTS BUT DOES NOT FAIL ON: an unconfirmed support phone number.
- * Those are placeholders by design and a production build HIDES them
- * (BUILD_CHANNEL / visibleSupportPhones in lib/site-config.js), so there is
- * nothing to leak and nothing to block. It is printed as a note because
- * shipping a support page with no phone number is a decision worth seeing
- * every time, not a defect.
+ * WHAT IT REPORTS BUT DOES NOT FAIL ON: an unconfirmed support phone number,
+ * and an Amazon listing withheld by `AMAZON.live`. Neither can leak — a
+ * masked row is dropped from every build (visibleSupportPhones in
+ * lib/site-config.js) and a withheld marketplace is absent from MARKETPLACES
+ * — so there is nothing to block. They are printed as notes because
+ * publishing no phone number, or no Amazon button, is a decision worth
+ * seeing every time rather than a defect. There IS one real number today, so
+ * the phone note is expected to read "all 1 confirmed".
  *
  * WHAT IT DOES NOT DO: it does not deploy, and it does not fix anything. It
  * exits non-zero and says what is wrong.
@@ -104,11 +107,12 @@ function readConfig(label, pattern) {
     .filter(({ line }) => line.includes('PLACEHOLDER'))
     .filter(({ line }) => !/^(\*|\/\/|\/\*)/.test(line))
     .filter(({ line }) => !line.startsWith('export const PLACEHOLDER'))
-    // PHONE_PLACEHOLDER is a different thing with an unfortunately similar
-    // name: it is the masked phone slot, it is HIDDEN on a production build
-    // rather than being a wired-up stand-in, and check 6 below is what
-    // reports it. Its declaration and its uses are not marketplace
-    // placeholders and must not fail this check.
+    // PHONE_PLACEHOLDER was a different thing with an unfortunately similar
+    // name: the masked phone slot, hidden on a production build rather than
+    // being a wired-up stand-in. It is GONE — there is one real support
+    // number now (SUPPORT_PHONES in lib/site-config.js) and nothing left to
+    // mask. The filter stays so the name cannot fail this check if a future
+    // unconfirmed line brings it back; check 4 below is what reports those.
     .filter(({ line }) => !/PHONE_PLACEHOLDER/.test(line))
     .filter(({ line }) => /`[^`]*PLACEHOLDER[^`]*`|'[^']*PLACEHOLDER[^']*'|"[^"]*PLACEHOLDER[^"]*"/.test(line));
 
@@ -142,25 +146,40 @@ function readConfig(label, pattern) {
  * existed to prevent, and `https://www.flipkart.com/` would otherwise pass a
  * "looks like a URL" test. Flipkart product URLs carry `/p/`; Amazon's carry
  * `/dp/`.
+ *
+ * AND IT READS `AMAZON.live`, because a filled-in URL is no longer the same
+ * question as a reachable listing. The Amazon ASIN and URL are real and the
+ * listing is not public yet, so `live: false` withholds every Amazon surface
+ * (AMAZON_LISTED in lib/site-config.js). Without reading that flag this
+ * check would count Amazon as a second buy path and drop the note saying it
+ * is hidden — reporting a destination the site deliberately does not offer.
+ * `withheld` is the state for that: a VALID product URL that is switched
+ * off, which is neither broken nor live.
  */
 {
   const flipkart = readConfig('MARKETPLACE.flipkartUrl', /flipkartUrl:\s*\r?\n?\s*'([^']*)'/);
   const amazonUrl = readConfig('AMAZON.url', /export const AMAZON = \{[\s\S]*?url:\s*'([^']*)'/);
+  // `live` sits after `url` in the AMAZON block. Matched as a word so the
+  // prose above it ("while `live` is false") cannot satisfy the pattern.
+  const amazonLive =
+    readConfig('AMAZON.live', /export const AMAZON = \{[\s\S]*?\blive:\s*(true|false)\b/) === 'true';
 
   if (flipkart !== null && amazonUrl !== null) {
     const listings = [
-      { name: 'Flipkart', url: flipkart, productPath: '/p/' },
-      { name: 'Amazon', url: amazonUrl, productPath: '/dp/' },
+      { name: 'Flipkart', url: flipkart, productPath: '/p/', enabled: true },
+      { name: 'Amazon', url: amazonUrl, productPath: '/dp/', enabled: amazonLive },
     ];
 
-    const live = listings.filter(
+    const valid = listings.filter(
       (l) =>
         l.url
         && /^https:\/\//.test(l.url)
         && !l.url.includes('PLACEHOLDER')
         && l.url.includes(l.productPath)
     );
-    const broken = listings.filter((l) => l.url && !live.includes(l));
+    const live = valid.filter((l) => l.enabled);
+    const withheld = valid.filter((l) => !l.enabled);
+    const broken = listings.filter((l) => l.url && !valid.includes(l));
 
     if (broken.length > 0) {
       fail(
@@ -190,6 +209,18 @@ function readConfig(label, pattern) {
           `${absent.join(' and ')} ${absent.length > 1 ? 'are' : 'is'} declared ABSENT`
             + ' — every button, link and mention is hidden sitewide.\n'
             + '       Fill in the asin and url in AMAZON (lib/site-config.js) to bring it back.'
+        );
+      }
+      // A VALID listing URL that is switched off. Reported as loudly as an
+      // absent one, because the site says nothing about it either way and
+      // that has to stay a visible decision rather than a forgotten flag.
+      if (withheld.length > 0) {
+        note(
+          `${withheld.map((l) => l.name).join(' and ')} ${withheld.length > 1 ? 'have' : 'has'}`
+            + ' a real listing URL but is WITHHELD (live: false)\n'
+            + '       — every button, link, badge and mention is hidden sitewide.\n'
+            + '       Confirm the listing opens in a logged-out browser, then set\n'
+            + '       live: true in AMAZON (lib/site-config.js) to publish it.'
         );
       }
     }
@@ -282,8 +313,14 @@ function readConfig(label, pattern) {
       'The pattern no longer matches. Fix it rather than removing the check.'
     );
   } else {
-    const unconfirmed = (phones[0].match(/PHONE_PLACEHOLDER/g) || []).length;
+    // A row is unconfirmed if its number is [TBD], a run of X's, or the old
+    // PHONE_PLACEHOLDER constant — the same three shapes isPlaceholderPhone()
+    // tests for, read off the source text rather than by importing it, which
+    // is how every other check in this file reads the config.
     const total = (phones[0].match(/label:/g) || []).length;
+    const unconfirmed = (
+      phones[0].match(/number:\s*(?:PHONE_PLACEHOLDER|'[^']*(?:\[TBD\]|[Xx]{3,})[^']*')/g) || []
+    ).length;
 
     if (unconfirmed === 0) {
       pass(`all ${total} support phone number${total === 1 ? '' : 's'} confirmed`);

@@ -6,6 +6,7 @@ import {
   GRIEVANCE_OFFICER,
   SUPPORT,
   allKnown,
+  primarySupportPhone,
   sellersOr,
 } from '@/lib/site-config';
 
@@ -50,6 +51,16 @@ import {
 const HAS_ADDRESS = allKnown(COMPANY.legalName, COMPANY.registeredAddress);
 
 /**
+ * The support number, or null. Read once here rather than at the row, so the
+ * row below is a plain conditional and the reason lives in one place.
+ *
+ * Deliberately NOT a separate "grievance line". There is one number and it
+ * is the customer care line; calling it something else on this page would be
+ * a claim that a complaint reaches a different desk, which it does not.
+ */
+const PHONE = primarySupportPhone();
+
+/**
  * The officer block, built row by row, because two of its rows are
  * conditional and a missing row must leave no trace.
  *
@@ -63,10 +74,15 @@ const OFFICER_ROWS = [
   ...(HAS_ADDRESS
     ? [`Entity: ${COMPANY.legalName}`, `Address: ${COMPANY.registeredAddress}`]
     : []),
-  // NO phone line. Both numbers in SUPPORT_PHONES are still placeholders and
-  // render on preview builds only — a published number that does not ring is
-  // the one thing a grievance disclosure must not contain, because the person
-  // reading it has already been let down once.
+  // A PHONE LINE, NOW THAT THERE IS A NUMBER. There was none here while both
+  // SUPPORT_PHONES rows were placeholders: a published number that does not
+  // ring is the one thing a grievance disclosure must not contain, because
+  // the person reading it has already been let down once. The customer care
+  // line is confirmed, so it is published — and it is read from
+  // primarySupportPhone() rather than typed, so this disclosure cannot come
+  // to state a different number from /support/contact. Absent again, with no
+  // edit here, if the number is ever withdrawn.
+  ...(PHONE ? [`Phone: ${PHONE.number} (${SUPPORT.hours})`] : []),
   `Hours: ${GRIEVANCE_OFFICER.hours}`,
 ];
 

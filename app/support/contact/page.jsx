@@ -11,9 +11,9 @@ import {
   SUPPORT,
   allKnown,
   hasGrievanceContact,
-  isPlaceholderPhone,
   isTBD,
   sellersOr,
+  telHref,
   visibleSupportPhones,
 } from '@/lib/site-config';
 import { MEDIA } from '@/lib/iriz';
@@ -22,7 +22,7 @@ export const metadata = {
   ...pageMetadata({
     title: 'Contact Support — BluNeuron',
     description:
-      'Support and sales email, support hours, and the form that reaches the BluNeuron team directly.',
+      'Customer care phone number, support and sales email, support hours, and the form that reaches the BluNeuron team directly.',
     path: ROUTES.contact,
   }),
   robots: routeRobots(ROUTES.contact),
@@ -48,11 +48,12 @@ export const metadata = {
  * a distributor enquiry. Hours last, because it qualifies all four above it.
  *
  * THE PHONE ROWS ARE DECIDED IN lib/site-config.js, NOT HERE.
- * `visibleSupportPhones()` returns a confirmed number always, and a
- * placeholder only on a preview build — so a reviewer sees both rows and what
- * they do to the tile grid, and a customer is never shown a number that does
- * not ring. There is no second rule on this page that could disagree with it,
- * and no surface to forget when the numbers land.
+ * `visibleSupportPhones()` returns every confirmed number and drops anything
+ * masked, on every build — so a customer is never shown a number that does
+ * not ring, and a reviewer sees exactly what a customer will. There is one
+ * confirmed number today, so there is one phone row. No second rule on this
+ * page could disagree with that, and no surface to forget if another line is
+ * ever added.
  */
 const CHANNELS = [
   {
@@ -67,15 +68,14 @@ const CHANNELS = [
     label: entry.label,
     value: entry.number,
     /*
-     * NO `tel:` ON A PLACEHOLDER. A `tel:` href built from "+91 XXXXX XXXXX"
-     * strips to "+91" and dials it — on a phone that is a real call attempt
-     * to a real two-digit prefix, which is worse than plain text. A confirmed
-     * number gets the link; a placeholder is text, and on a preview build
-     * that is all it should be.
+     * telHref() FROM lib/site-config.js, not a strip written here. One place
+     * on the site turns a readable number into a dialling string, so the two
+     * cannot drift — and it is the place that knows not to build a `tel:`
+     * from a masked number, which would strip to "+91" and place a real call
+     * to a two-digit prefix. A confirmed number gets the link; anything
+     * masked gets null, and the tile renders as plain text.
      */
-    href: isPlaceholderPhone(entry.number)
-      ? null
-      : `tel:${String(entry.number).replace(/[^+\d]/g, '')}`,
+    href: telHref(entry.number),
     note: 'Best for setup help you would rather have talked through.',
   })),
   {

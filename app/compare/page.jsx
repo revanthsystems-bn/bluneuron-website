@@ -17,11 +17,17 @@ export const metadata = pageMetadata({
 // and names no assistant. Removed rather than reworded: there is no confirmed
 // assistant to put in the cell, and an empty one would be a comparison the
 // table cannot support.
+//
+// "Video Decoding" IS NO LONGER HERE. It moved into COMPARISON (lib/iriz.js)
+// as "Video playback", because the homepage comparison block shows that row
+// and a row two pages share cannot live in a constant declared in one of
+// them. It still renders on this page — COMPARISON.rows comes first below —
+// and its IRIZ value is now FULL_SPEC_SHEET's exact wording rather than the
+// shortened "Up to 8K (decode)" this list carried. Do not re-add it here.
 const EXTRA_ROWS = [
-  { label: 'Apps', iriz: 'Installed over Wi-Fi, on the device', other: 'Sideloading required, if supported' },
-  { label: 'Video Decoding', iriz: 'Up to 8K (decode)', other: 'Typically 1080p or lower' },
-  { label: 'Chipset', iriz: 'Allwinner H723, Quad-core Cortex-A53', other: 'Often unnamed/unspecified' },
-  { label: 'Projection Distance', iriz: '0.9m – 5m', other: 'Varies, often more restrictive' },
+  { label: 'Apps', icon: 'apps', iriz: 'Installed over Wi-Fi, on the device', other: 'Sideloading required, if supported' },
+  { label: 'Chipset', icon: 'chip', iriz: 'Allwinner H723, Quad-core Cortex-A53', other: 'Often unnamed/unspecified' },
+  { label: 'Projection Distance', icon: 'distance', iriz: '0.9m – 5m', other: 'Varies, often more restrictive' },
 ];
 
 export default function ComparePage() {
@@ -37,9 +43,18 @@ export default function ComparePage() {
         imagePosition="62% 50%"
       />
 
+      {/* THE SAME COMPONENT THE HOMEPAGE USES, over MORE ROWS. The homepage
+          block shows COMPARISON_FEATURED_ROWS and ends in "See the full
+          comparison →"; this is that full comparison, so the link comes off
+          and every row goes on.
+
+          `subheading={null}` because PageHero above already carries a
+          subtitle, and two sentences of preamble stacked on one screen is
+          one too many. The homepage block, which has no hero, keeps it. */}
       <ComparisonTable
         eyebrow="Full Comparison"
         heading="Every category, head to head."
+        subheading={null}
         columns={COMPARISON.columns}
         rows={rows}
         showViewMore={false}
