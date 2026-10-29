@@ -187,10 +187,10 @@ export default function WarrantyPolicyPage() {
        * `effectiveFrom`, NOT `lastUpdated` — see the note on LegalPage. These
        * are new terms rather than a revision of the old ones, and what a
        * holder needs to know is which terms their unit was sold under.
-       * POLICY_LAST_UPDATED (14 October 2026) belongs to the other four
-       * policies, which were written together on that day; this page is no
-       * longer one of them, and printing their date here would date these
-       * terms to before they existed.
+       * POLICY_LAST_UPDATED (14 October 2026) now belongs to /legal/shipping
+       * alone — the five policies written together on that day have since
+       * been revised one by one, each taking its own date. Printing that
+       * date here would date these terms to before they existed.
        */
       effectiveFrom={WARRANTY.effectiveFrom}
     />

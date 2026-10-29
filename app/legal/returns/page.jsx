@@ -3,7 +3,7 @@ import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import {
-  POLICY_LAST_UPDATED,
+  RETURNS,
   SUPPORT,
   WARRANTY,
   primarySupportPhone,
@@ -140,7 +140,20 @@ export default function ReturnsPage() {
       path={ROUTES.returns}
       intro={`Where you bought your IRIZ decides how a return works. Online, the marketplace’s own return policy applies. From a store or dealer, goods are not taken back — but the ${WARRANTY.label} warranty still covers a manufacturing defect.`}
       sections={SECTIONS}
-      lastUpdated={POLICY_LAST_UPDATED}
+      /*
+       * `effectiveFrom`, NOT `lastUpdated` — the same choice /legal/warranty
+       * makes, and for the same reason. This is not a revision of the old
+       * returns policy: the two delivery clocks are gone, the page is
+       * restructured around the sales channel, and what applied before no
+       * longer applies. A reader with a unit in their hands is asking which
+       * terms their purchase was made under, and only an effective date
+       * answers that.
+       *
+       * It leaves POLICY_LAST_UPDATED (14 October 2026) holding /legal/
+       * shipping alone — which is what the note on that constant says to do
+       * the moment one of the four is revised on its own.
+       */
+      effectiveFrom={RETURNS.effectiveFrom}
     />
   );
 }

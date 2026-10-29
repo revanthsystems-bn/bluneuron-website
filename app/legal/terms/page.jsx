@@ -4,7 +4,6 @@ import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import {
   COMPANY,
-  POLICY_LAST_UPDATED,
   SUPPORT,
   WARRANTY,
   sellersAnd,
@@ -46,6 +45,25 @@ import {
  * jurisdiction (COMPANY.jurisdiction) rather than the source's unqualified
  * "competent courts in India".
  */
+/**
+ * This page's own date, split out of POLICY_LAST_UPDATED.
+ *
+ * The shared constant dates the four documents written together on
+ * 14 October 2026. These Terms have been revised since — the Sale Invoice
+ * terms added an errors-and-omissions clause and the dealer-liability
+ * clause — so the shared date is now a lie about this page, and leaving it
+ * would misstate the one line a reader uses to decide whether to re-read.
+ *
+ * `lastUpdated` rather than `effectiveFrom`, and the difference is real:
+ * /legal/returns and /legal/warranty were REPLACED and need an effective
+ * date, while this document was amended and still governs continuously.
+ *
+ * Same precedent as PRIVACY_LAST_UPDATED in app/legal/privacy, and exactly
+ * what the note on POLICY_LAST_UPDATED says to do. That constant now holds
+ * /legal/shipping alone.
+ */
+const TERMS_LAST_UPDATED = '29 October 2026';
+
 const SECTIONS = [
   {
     heading: 'Who these terms are between',
@@ -193,7 +211,7 @@ export default function TermsPage() {
       path={ROUTES.terms}
       intro={`These terms cover your use of this website and our support services. The sale itself happens on ${sellersOr()}, under their terms.`}
       sections={SECTIONS}
-      lastUpdated={POLICY_LAST_UPDATED}
+      lastUpdated={TERMS_LAST_UPDATED}
     />
   );
 }
