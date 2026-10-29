@@ -6,6 +6,7 @@ import {
   COMPANY,
   POLICY_LAST_UPDATED,
   SUPPORT,
+  WARRANTY,
   sellersAnd,
   sellersOr,
   sellersPossessive,
@@ -68,6 +69,33 @@ const SECTIONS = [
     heading: 'Accuracy of product information',
     body: `We make every effort to display product specifications, images and colours accurately. Actual visual output and features may vary with display settings, screen or wall surface, throw distance, and ambient lighting. Specifications on this site come from the manufacturer's own documentation and are published in good faith; brightness is stated in ANSI lumens, and display resolution as native 1080p — where supplied material used "4K" to describe video decoding rather than display resolution, this site says so explicitly. Full specifications are at ${ROUTES.specs}.`,
     note: 'Product photography is representative. Bundled accessories can change between production runs.',
+  },
+  {
+    /*
+     * ERRORS AND OMISSIONS EXCEPTED — the clause the sale invoice carries as
+     * "E.&O.E." and the site did not have at all.
+     *
+     * It is not the same clause as "Accuracy of product information" above,
+     * which is about how a projector's output varies with the room. This one
+     * is about US being wrong: a mistyped price, a wrong figure in a table, a
+     * stale image. Spelled out in plain words first and the abbreviation
+     * given second, because "E.&O.E." on an invoice means nothing to most
+     * readers and this is the page where it can be explained.
+     */
+    heading: 'Errors and omissions',
+    body: `Prices, specifications, descriptions and images published on this site may contain inadvertent errors, omissions or inaccuracies, and may be out of date. We may correct them at any time without prior notice, including after an order has been placed on a marketplace listing. Errors and omissions excepted (E.&O.E.).`,
+    note: 'Where a published error is material — a wrong price or a wrong specification — correcting it does not create an obligation to supply on the mistaken terms. If something here looks wrong, tell us and we will check it.',
+  },
+  {
+    /*
+     * DEALER LIABILITY, from the sale invoice. It belongs on this page as
+     * well as on /legal/warranty: the warranty page is read by someone with
+     * a fault, and this one is read by someone working out who they are
+     * contracting with.
+     */
+    heading: 'Dealers and distributors',
+    body: WARRANTY.soleProvider,
+    note: `A dealer or distributor selling an IRIZ does so as an independent seller. They are not our agent, and nothing they say or promise binds us. Warranty terms are at ${ROUTES.warranty}.`,
   },
   {
     heading: 'Prices shown on this site',

@@ -75,10 +75,24 @@ const HEADERS = [
 // check, but refusing the registration here would only teach people to pick
 // "Amazon" and record a confident falsehood.
 //
+// "Authorised dealer / store" is the offline channel, added when the Sale
+// Invoice terms named authorised dealers as a covered seller. It is a
+// COVERED purchase, but not one we can confirm from our own records — the
+// sale exists only on the dealer's invoice — so like "Other seller" it is
+// accepted and flagged for a human to read the paperwork. THIS LIST MUST
+// CONTAIN IT: a value the website offers and this script rejects fails the
+// registration after the customer has filled the form in.
+//
 // "BluNeuron Website" stays listed so a direct sale validates the day the
 // site takes payments (DIRECT_SALES_ENABLED in lib/site-config.js); until
 // then the form never offers it.
-const PURCHASE_SOURCES = ["Amazon", "Flipkart", "Other seller", "BluNeuron Website"];
+const PURCHASE_SOURCES = [
+  "Amazon",
+  "Flipkart",
+  "Authorised dealer / store",
+  "Other seller",
+  "BluNeuron Website"
+];
 
 /* ------------------------------------------------------------------ *
  * THE INVOICE NUMBER

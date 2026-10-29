@@ -8,6 +8,8 @@ import { BRAND, HERO, MEDIA, PRODUCT_SHOT, productPlate } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import {
+  DEALERS,
+  HAS_NAMED_DEALERS,
   MARKETPLACE,
   SHOW_BUY,
   formatInr,
@@ -108,6 +110,23 @@ export default function WhereToBuyPage() {
               <div className="mt-8">
                 <StoreButtons />
               </div>
+
+              {/* THE OFFLINE CHANNEL, stated without a store locator behind
+                  it. The sale invoice names authorised dealers as a covered
+                  channel, so this page has to say they exist — but DEALERS
+                  is empty (lib/site-config.js), and a "find a store near
+                  you" that leads nowhere is worse than a sentence. The
+                  invoice line is the part that actually protects the buyer:
+                  a dealer sale without a BluNeuron invoice has nothing to
+                  establish the purchase date, and the warranty needs one.
+
+                  Names appear here the moment DEALERS is non-empty, with no
+                  other edit. */}
+              <p className="mt-6 text-xs leading-relaxed text-white/55">
+                Also available from authorised BluNeuron dealers. Ask for a BluNeuron invoice to
+                keep your warranty.
+                {HAS_NAMED_DEALERS && <> Authorised dealers: {DEALERS.join(', ')}.</>}
+              </p>
 
               {/* The homepage says this beside its own buttons too. Said again
                   here because this is the page someone lands on from a search

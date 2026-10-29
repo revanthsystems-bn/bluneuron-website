@@ -4,11 +4,11 @@ import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 import {
   COMPANY,
-  DELIVERY_WINDOWS,
   SUPPORT,
   WARRANTY,
   WARRANTY_CLAIM_STEPS,
   authorisedSellersPhrase,
+  primarySupportPhone,
   sellersOr,
 } from '@/lib/site-config';
 
@@ -32,28 +32,38 @@ import {
  * send it back" is that one. One page would bury each half in the other, and
  * this is the half someone reads two years after buying.
  *
- * THE TWO DELIVERY CLOCKS BELONG TO BOTH PAGES, so neither page writes them:
- * both interpolate DELIVERY_WINDOWS from lib/site-config.js and therefore
- * state them in identical words. They used to be separate prose and they
- * disagreed — 48 hours here against 7 days there, for the same dead unit.
+ * THERE ARE NO DELIVERY CLOCKS LEFT. This page and /legal/returns used to
+ * share two — 48 hours to report damage on arrival, 7 days for an early
+ * failure — written once in DELIVERY_WINDOWS so the two pages could not
+ * disagree. The sale invoice grants neither: an online order's returns are
+ * governed strictly by the marketplace's own policy, and a store sale is not
+ * taken back at all. Both windows are deleted rather than reworded, and
+ * WARRANTY.onArrival routes by CHANNEL instead.
  *
  * WHAT IS DELIBERATELY NOT HERE:
- *   - No helpline, and the reason has changed. It used to be that there was
- *     no number to print: both SUPPORT_PHONES rows were placeholders, and a
- *     warranty page is the last place to print a number that does not ring.
- *     There is a real customer care line now, published on /support,
- *     /support/contact and the grievance disclosure. It is still not here,
- *     because a warranty claim has to be RAISED — it needs a serial number,
- *     an invoice and a written record — so this page routes to the claim
- *     form, and sending a claimant to a phone call that will only ask them
- *     to fill the form in is a slower path, not a warmer one.
  *   - No service-centre address. It is given when a ticket is raised, because
  *     a published one invites units to arrive with no ticket and nothing to
  *     match them to. See WARRANTY.inboundShipping.
  *
+ * THE PHONE NUMBER IS HERE NOW, beside the email in "How to make a claim"
+ * and in "Questions". It was deliberately left off while this page routed
+ * every claimant to a form — a call that only asks you to fill the form in
+ * is a slower path, not a warmer one. The sale invoice publishes the number
+ * as the support contact, so the page that the invoice points at has to
+ * carry it too. The form is still named first; the number is the second
+ * option on the same line, not a replacement for it.
+ *
  * Jurisdiction is Coimbatore, where the entity is registered, and is the same
  * clause as every other policy page (COMPANY.jurisdiction).
  */
+/**
+ * The customer care line, or null. Read through primarySupportPhone() so this
+ * page cannot publish a number the rest of the site is withholding — if the
+ * number is ever withdrawn, both sentences below lose it with no edit here.
+ */
+const PHONE = primarySupportPhone();
+const PHONE_SUFFIX = PHONE ? ` or call ${PHONE.number}` : '';
+
 const SECTIONS = [
   {
     heading: 'What this warranty is',
@@ -63,21 +73,39 @@ const SECTIONS = [
   {
     heading: 'Cover period',
     body: [
-      `${WARRANTY.label} from the date of purchase shown on your invoice. The invoice date is what counts — not the delivery date, and not the date you registered the product.`,
+      `${WARRANTY.labelFull} from the date of purchase shown on your invoice. The invoice date is what counts — not the delivery date, and not the date you registered the product.`,
       WARRANTY.afterService,
     ],
     // A PULL-QUOTE, not a second source of truth: both halves read the same
     // WARRANTY object the bullets above interpolate, so the box cannot drift
     // from the policy and no new wording was written to produce it.
     highlight: {
-      label: `${WARRANTY.label} from the invoice date`,
+      label: `${WARRANTY.labelFull} from the invoice date`,
       value: 'Not the delivery date, and not the date you registered the product.',
     },
   },
   {
     heading: 'Who and what is covered',
     body: WARRANTY.eligibility,
-    note: `An authorised seller means BluNeuron, or a marketplace listing we run ourselves — ${authorisedSellersPhrase()}. A unit bought anywhere else cannot be verified as genuine or as new, so this warranty does not apply to it. See ${ROUTES.whereToBuy}.`,
+    /*
+     * STATED POSITIVELY — this warranty APPLIES TO purchases from an
+     * authorised seller with a valid invoice.
+     *
+     * It used to end "a unit bought anywhere else cannot be verified as
+     * genuine or as new, so this warranty does not apply to it", which is a
+     * broader exclusion than the sale invoice makes and reads as an
+     * accusation aimed at the customer rather than a statement of scope. The
+     * invoice defines who is covered; it does not undertake to tell a
+     * grey-market buyer what they have bought. Saying which purchases are
+     * covered leaves the same units outside the cover without the site
+     * passing judgement on them.
+     */
+    note: `An authorised seller means BluNeuron, a marketplace listing we run ourselves, or an authorised BluNeuron dealer — ${authorisedSellersPhrase()}. This warranty applies to units bought from those sellers, with a valid invoice. See ${ROUTES.whereToBuy}.`,
+  },
+  {
+    heading: 'Who provides this warranty',
+    body: WARRANTY.soleProvider,
+    note: `If you bought from a dealer or a shop, their part of the transaction ended at the sale — they cannot process a claim, authorise a repair or issue a refund on our behalf. Bring the claim to us with your invoice and we will handle it from there. Start at ${ROUTES.warrantyClaim}.`,
   },
   {
     heading: 'What is covered',
@@ -95,20 +123,21 @@ const SECTIONS = [
     note: 'A faulty remote, cable or adapter inside the cover period is still worth telling us about. Write to us and we will say what we can do, even where the standard warranty does not reach it.',
   },
   {
-    // THE SAME THREE STRINGS /legal/returns renders. See DELIVERY_WINDOWS in
-    // lib/site-config.js, and do not reword either of them here.
-    heading: 'On delivery, and in the first week',
-    body: [
-      DELIVERY_WINDOWS.damaged,
-      DELIVERY_WINDOWS.earlyFailure,
-      DELIVERY_WINDOWS.marketplaceNote,
-    ],
-    note: `Photograph the outer packaging before you open it, and the unit before you set it up. Whether a projector arrived damaged stops being answerable almost immediately, which is why that window is short and why the photographs matter. The full replacement terms are at ${ROUTES.returns}.`,
+    /*
+     * THIS SECTION NO LONGER STATES A WINDOW OF OURS, because there is not
+     * one to state: the two clocks that used to live here (48 hours for
+     * damage on arrival, 7 days for an early failure) are gone. What a
+     * customer needs instead is to be sent to the right counter, and that
+     * depends on where they bought — so WARRANTY.onArrival routes by channel.
+     */
+    heading: 'If a unit arrives damaged or faulty',
+    body: WARRANTY.onArrival,
+    note: `A marketplace return and this warranty are different things with different processes — the full split is at ${ROUTES.returns}. If a marketplace return window has already closed and the unit has a manufacturing defect, this warranty still runs for ${WARRANTY.label} from the invoice date.`,
   },
   {
     heading: 'How to make a claim',
     body: WARRANTY_CLAIM_STEPS,
-    note: `The serial number is on the carton and on the sticker on the product itself. Support hours are ${SUPPORT.hours} — a claim raised outside them is picked up the next working day. The claim form is at ${ROUTES.warrantyClaim}, and registration is at ${ROUTES.warrantyRegistration}.`,
+    note: `The serial number is on the carton and on the sticker on the product itself. Write to ${SUPPORT.email}${PHONE_SUFFIX} — support hours are ${SUPPORT.hours}, and a claim raised outside them is picked up the next working day. The claim form is at ${ROUTES.warrantyClaim}, and registration is at ${ROUTES.warrantyRegistration}.`,
   },
   {
     heading: 'Sending a unit in for service',
@@ -134,7 +163,7 @@ const SECTIONS = [
   },
   {
     heading: 'Questions',
-    body: `Email ${SUPPORT.email}, or use the form at ${ROUTES.contact}. A ${sellersOr()} order also carries the marketplace's own return and replacement policy, which runs alongside this warranty rather than instead of it.`,
+    body: `Email ${SUPPORT.email}${PHONE_SUFFIX}, or use the form at ${ROUTES.contact}. Support hours are ${SUPPORT.hours}. A ${sellersOr()} order also carries the marketplace's own return and replacement policy, which runs alongside this warranty rather than instead of it.`,
   },
 ];
 
