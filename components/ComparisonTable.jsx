@@ -48,6 +48,11 @@ const GLYPHS = {
   os: 'M8 8h8v8H8zM4 10V9m0 6v-1M20 10V9m0 6v-1M10 4h1m3 0h1M10 20h1m3 0h1M4 9h16v6H4z',
   // Keystone: a trapezoid squared to a rectangle — the correction itself.
   keystone: 'M4 7l16-3v16L4 17zM20 4v16',
+  // Focus: a lens ring closing on a point. Drawn as a circle inside a circle
+  // with four short tick marks, which reads as "focusing" rather than as a
+  // camera — the row is about the picture coming sharp, not about optics
+  // hardware. Added 30 Oct 2026 with the "Auto focus" row.
+  focus: 'M12 5a7 7 0 1 1 0 14 7 7 0 0 1 0-14ZM12 9.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM12 2v2M12 20v2M2 12h2M20 12h2',
   // Audio: a speaker with one arc. One arc, not three: this is a 5W mono
   // speaker and a three-arc "loud" glyph would overstate it.
   audio: 'M4 9v6h3l4 4V5L7 9H4zM15.5 9.5a3.5 3.5 0 0 1 0 5',

@@ -13,6 +13,7 @@ import BuyProvider from '@/components/buy/BuyProvider';
 import MetaPixel from '@/components/MetaPixel';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL } from '@/lib/site';
+import { OG_IMAGE } from '@/lib/seo';
 import { ANIM_GATE } from '@/lib/anim-gate';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -120,14 +121,9 @@ export const metadata = {
     description: DESCRIPTION,
     url: '/',
     siteName: 'BluNeuron',
-    images: [
-      {
-        url: '/media/iriz/product/iriz-og.jpg',
-        width: 1600,
-        height: 1600,
-        alt: 'The BluNeuron IRIZ mini projector for home, three-quarter view, lens forward',
-      },
-    ],
+    // ONE declaration, shared with every other page's metadata — see
+    // OG_IMAGE in lib/seo.js for why this is no longer written out here.
+    images: [OG_IMAGE],
     locale: 'en_IN',
     type: 'website',
   },
@@ -135,7 +131,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
-    images: ['/media/iriz/product/iriz-og.jpg'],
+    images: [OG_IMAGE.url],
   },
 };
 

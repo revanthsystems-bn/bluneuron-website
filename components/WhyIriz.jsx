@@ -41,15 +41,20 @@ import { BRAND, THROW_RANGE } from '@/lib/iriz';
  * longest piece of copy on the site and therefore the easiest place for an
  * unsourced spec to hide. Each card below names the row it came from.
  *
- * AUTO FOCUS IS NOT CLAIMED HERE, AND THAT IS A DECISION, NOT AN OMISSION.
- * Card 5 is the keystone alone. dc45c7a removed auto-focus from this site
- * everywhere — copy, specs, compare table, FAQ, meta, JSON-LD and alt text
- * — because the carton prints "4pt Auto Keystone" and names no focus
- * behaviour. FULL_SPEC_SHEET has no focus row, HIGHLIGHTS says "4-point
- * Auto Keystone", COMPARISON's row is "Keystone correction". Two mentions
- * survive that cleanup by accident (components/TechSpecs alt text, and
- * SETUP_STEPS in lib/iriz.js) and they are leftovers, not licence. Do not
- * put focus back without the box in your hand.
+ * AUTO FOCUS IS CLAIMED HERE, CONFIRMED BY THE PRODUCT OWNER ON 30 Oct 2026.
+ * It was not, and the history is worth keeping: dc45c7a had swept auto focus
+ * off this site entirely — copy, specs, compare table, FAQ, meta, JSON-LD
+ * and alt text — because the carton prints "4pt Auto Keystone" and names no
+ * focus behaviour, and an unsourced spec is not allowed to hide in the
+ * longest copy on the site. That sweep was right on the evidence available;
+ * the evidence changed. The two mentions it left behind
+ * (components/TechSpecs alt text, SETUP_STEPS in lib/iriz.js) turned out to
+ * be correct rather than leftovers.
+ *
+ * It is sourced the same way every other claim in this file is: card 5 now
+ * reads FULL_SPEC_SHEET > Optics & Display > Focus, which exists. The rule
+ * the old note was protecting still stands — nothing here may claim a
+ * behaviour with no row behind it.
  */
 
 /**
@@ -95,12 +100,15 @@ const CARDS = [
     source: 'Throw & Screen > Angle Adjustment: "Stepless, 0°–180°"',
   },
   {
-    // KEYSTONE ONLY — see the auto-focus note in the file header.
-    stat: '4-pt',
-    unit: 'Auto keystone',
-    title: 'Squares itself',
-    body: 'Straight picture at any angle.',
-    source: 'Optics & Display > Keystone Correction: "4-point automatic"',
+    // BOTH automatic behaviours — see the auto-focus note in the file header.
+    // The stat is the word rather than a figure because the two rows behind
+    // this card have no single number between them: "4-pt" described the
+    // keystone alone and would now under-read the card.
+    stat: 'Auto',
+    unit: 'Focus + keystone',
+    title: 'Sharpens and squares itself',
+    body: 'Auto focus + 4-point auto keystone.',
+    source: 'Optics & Display > Focus + Keystone Correction',
   },
   {
     stat: '14',
@@ -155,7 +163,7 @@ const POINTS = [
     heading: 'Set up in about five minutes',
     body: [
       `Put it on something flat between ${THROW_RANGE.min.distance} and ${THROW_RANGE.max.distance} m from the wall, angle it, and plug it in. Android 14 walks you through joining Wi-Fi and signing in, the auto keystone squares the picture while you do, and that is setup finished.`,
-      'If a tricky room defeats the automatic correction, the F+ and F− keys on the remote trim the focus and the keystone can be nudged in Settings.',
+      'If a tricky room defeats the automatic correction, the F+ and F− keys on the remote fine-tune the focus and the keystone can be nudged in Settings.',
     ],
   },
   {

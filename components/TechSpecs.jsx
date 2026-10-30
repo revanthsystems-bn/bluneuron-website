@@ -14,6 +14,14 @@ import { MEDIA } from '@/lib/iriz';
  * focus, 0.9-5m, 35-200", and 1:1; 07-latency carries the 0.004s lockup. The
  * tiles were the same claims a second time, smaller.
  *
+ * THE "AUTO FOCUS" IN THAT LIST AND IN THE ALT TEXT BELOW IS CORRECT, and was
+ * once thought not to be. A sweep (dc45c7a) removed auto focus from the whole
+ * site because the carton prints 4-point auto KEYSTONE and names no focus
+ * behaviour, and these two mentions were recorded as leftovers that had
+ * escaped it. They had not: the product owner CONFIRMED AUTO FOCUS ON
+ * 30 Oct 2026, so the board's pixels were right all along. FULL_SPEC_SHEET
+ * now carries a Focus row, and the alt text below needs no change.
+ *
  * `SPECS` in lib/iriz.js is UNTOUCHED — /specs and the comparison table still
  * read it. This component simply no longer maps over it, which is why it takes
  * no `specs` prop any more. The two surviving numbers are written out here

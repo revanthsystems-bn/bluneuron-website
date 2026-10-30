@@ -107,8 +107,14 @@ export const metadata = {
  * rich result led to the marketing page rather than to the thing being
  * offered. Organization stays on the homepage; it describes the site.
  *
- * Still null, and still emitting nothing, whenever there is no confirmed
- * price — see the reasoning in lib/seo.js.
+ * NO LONGER NULLABLE. It used to return null whenever the price was
+ * unconfirmed, because the block was all-or-nothing on its `offers` member.
+ * `offers` was removed on 30 Oct 2026 — this site takes no orders, so it
+ * cannot truthfully carry one — and with it went the only reason to withhold
+ * the whole Product. See the block comment on productJsonLd() in lib/seo.js,
+ * which also states what declining `offers` costs in Search Console.
+ *
+ * The `&&` guard below is kept as cheap defensiveness, not as live logic.
  */
 const PRODUCT_JSON_LD = productJsonLd();
 

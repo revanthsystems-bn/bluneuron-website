@@ -14,23 +14,32 @@ ruled "Available on" lockup are all taken from it.
 
 **Its LAYOUT was copied. Its CLAIMS were not.** Every value in the rendered
 section comes from `COMPARISON` / `FULL_SPEC_SHEET` in `lib/iriz.js`, and in
-five places the poster and the site disagree. The site wins each time:
+four places the poster and the site still disagree. The site wins each time:
 
 | Poster says | Site says | What ships |
 |---|---|---|
-| `Auto Focus — Yes` | no focus row anywhere; the carton states 4-point auto **keystone** only | **row omitted** |
 | `Supports 4K Decoding` | `Up to 8K (playback/decode only)` | the site's value |
 | typical audio `10W — Thin Sound` | `1–3W, thin sound` | the site's value |
 | `Screen Mirroring` use case | not confirmed by box, spec sheet or any manufacturer material | **omitted** — see the standing note at `USE_CASES` in `lib/iriz.js` |
 | `Native 1080P Full HD` | `Native 1080P` | the site's value |
 
+`Auto Focus — Yes` USED TO BE A FIFTH DISAGREEMENT and is no longer one.
+The site had no focus row at all, on the reasoning that the carton prints
+4-point auto **keystone** and names no focus behaviour. **Auto focus was
+confirmed by the product owner on 30 Oct 2026**, so the poster was right and
+the omission was the error: `FULL_SPEC_SHEET` > Optics & Display > Focus now
+reads `Auto focus (fine-tune with F+ / F− on the remote)`, `HIGHLIGHTS` says
+"Auto focus + 4-point auto keystone", and `COMPARISON` carries its own
+"Auto focus" row. The poster and the site agree on this line now.
+
 `Movies & Gaming` IS kept, and is sourced: `FAQS` answers "Can I connect a
 game console or laptop?" with a plain yes on the strength of the HDMI input,
 and "Your home cinema awaits" is the product tagline.
 
-**Do not ship this file as a press or download asset** until those claims are
-reconciled — publishing it would put the auto-focus and 4K lines back in front
-of customers in a form the site deliberately does not state.
+**Do not ship this file as a press or download asset** until the remaining
+claims are reconciled — publishing it would put the 4K line and the
+screen-mirroring use case back in front of customers in a form the site
+deliberately does not state.
 
 The poster also shows an Amazon logo. Amazon is withheld sitewide while
 `AMAZON.live` is false (`lib/site-config.js`).

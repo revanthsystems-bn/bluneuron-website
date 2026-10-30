@@ -93,9 +93,36 @@ this is a record, not a reconciliation.
 
 | What the board prints | What else says | Status |
 |---|---|---|
-| Minimum screen **35"** | `FULL_SPEC_SHEET` says `35" – 200"`; the **printed carton says `40 - 200.00 inches`** | board agrees with the site; both disagree with the box |
+| Minimum screen **35"** | `FULL_SPEC_SHEET` says `35" – 200"`; the **printed carton says `40 - 200.00 inches`** | board agrees with the site; **the BOX is the one to change** — see below |
 | Headline **"1.4–5 meters optimal projection distance"** | the board's OWN distance scale beneath it reads `0.9m, 1.5m, 2.5m, 5m`, and `FULL_SPEC_SHEET` says `0.9m – 5m` | the board contradicts itself |
 | Throw ratio **1:1** | `FULL_SPEC_SHEET` > Throw Ratio | match |
 
 The `75'` label on the third screen uses a single prime (feet) where the
 other three use a double prime (inches). A typo in the artwork.
+
+## THE RETAIL BOX PRINTS `40 - 200.00 inches` AND MUST BE CORRECTED
+
+**Confirmed by the product owner on 30 Oct 2026: the screen size range is
+35" – 200".** The site states that everywhere, `02-spec-sheet.png` prints
+`35-200 Inch`, and `09-screen-size.png` plots 35" at 0.9 m. The printed
+carton is the only source that disagrees, and it is the one that is wrong.
+
+**Action: correct the carton artwork to `35 - 200 inches` at the next print
+run.** Until then the discrepancy is visible to customers in two places and
+neither is fixable from this repository:
+
+- the photograph `public/media/iriz/product/iriz-with-box.jpg`, whose box
+  panel reads `40" - 200"` and which is rendered on `/`, `/about`,
+  `/shop/iriz` and `/where-to-buy`;
+- the physical box in the customer's hands.
+
+Do not "fix" this by editing the photograph or by changing the site to 40".
+The site is right. `iriz-box-front.png` above is the printed-spec reference
+to check the new artwork against, and this note is what tells the next person
+that the mismatch is known and which side is authoritative.
+
+A geometric note, because it is the thing that makes 40" look defensible: a
+1:1 throw ratio conventionally relates projection distance to screen WIDTH,
+which at 0.9 m gives roughly a 40" diagonal on a 16:9 screen. The 35" figure
+treats the distance as the diagonal. Both readings exist in the supplied
+material; the product owner's confirmation is what settles it at 35".
