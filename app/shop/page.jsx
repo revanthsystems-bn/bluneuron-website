@@ -6,7 +6,13 @@ import AddToCart from '@/components/shop/AddToCart';
 import { BRAND, GALLERY, HERO, MEDIA } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { MARKETPLACE, WARRANTY, formatInr, sellersAnd } from '@/lib/site-config';
+import {
+  MARKETPLACE,
+  WARRANTY,
+  formatInr,
+  marketplacePriceCaveat,
+  sellersAnd,
+} from '@/lib/site-config';
 
 /**
  * /shop — a shop landing page for a catalogue of one.
@@ -104,6 +110,12 @@ export default function ShopPage() {
                     {formatInr(MARKETPLACE.priceInr)}
                   </p>
                   <p className="mt-1.5 text-xs text-white/50">{MARKETPLACE.priceNote}</p>
+                  {/* Same caveat as the product page carries, for the same
+                      reason — this card quotes a price too. See
+                      marketplacePriceCaveat() in lib/site-config.js. */}
+                  <p className="mt-1 text-xs leading-relaxed text-white/55">
+                    {marketplacePriceCaveat()}
+                  </p>
                 </div>
 
                 <dl className="mt-7 grid gap-x-6 gap-y-3 border-t border-border-subtle pt-6 sm:grid-cols-3">

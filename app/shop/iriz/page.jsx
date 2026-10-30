@@ -18,7 +18,13 @@ import {
 } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata, productJsonLd } from '@/lib/seo';
-import { MARKETPLACE, WARRANTY, formatInr, sellersAnd } from '@/lib/site-config';
+import {
+  MARKETPLACE,
+  WARRANTY,
+  formatInr,
+  marketplacePriceCaveat,
+  sellersAnd,
+} from '@/lib/site-config';
 
 /**
  * /shop/iriz — the product page.
@@ -205,6 +211,15 @@ export default function ProductPage() {
                   {formatInr(MARKETPLACE.priceInr)}
                 </p>
                 <p className="mt-1.5 text-xs text-white/50">{MARKETPLACE.priceNote}</p>
+                {/* THE PRICE ABOVE IS NOT WHAT THE CUSTOMER PAYS, and this is
+                    the page where that matters most: it is the one a buyer
+                    reads the price off before tapping Buy. Flipkart sets the
+                    selling price on its own listing. The homepage and
+                    /where-to-buy already said so; this panel did not.
+                    See marketplacePriceCaveat() in lib/site-config.js. */}
+                <p className="mt-1 text-xs leading-relaxed text-white/55">
+                  {marketplacePriceCaveat()}
+                </p>
               </div>
 
               {/* ONE ACTION.
