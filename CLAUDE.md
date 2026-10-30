@@ -8,16 +8,40 @@ this before believing any sentence elsewhere in this file that says the live
 site runs on Vercel — several do, they describe how it used to be, and they
 are being corrected section by section rather than all at once.
 
+**What is live right now: the launched Flipkart-only site.** Worker version
+`f4adc2df-69e0-412e-b80c-e25e4d386a63`, deployed 2026-10-30 from the
+`club-v1` launch branch after a pre-launch audit. `club-v1` was merged into
+`cloudflare` and into `main` immediately afterwards, so all three now carry
+the same code and `cloudflare` again matches what is deployed. The rollback
+target — the pre-launch site, with the DRAFT legal pages — is
+`npx wrangler rollback 1867b9b4-d8b4-4d75-9213-af0235868031`.
+
+THE DEPLOY DID NOT COME FROM `cloudflare`, and that is worth knowing because
+it is the one time the rule below was not how it happened: the Worker was
+built and deployed from `club-v1`, and `cloudflare` was brought up to match
+afterwards rather than before. Nothing is wrong with the result — the two
+branches are identical — but if the two ever disagree again, believe
+`npx wrangler deployments list`, not the branch name.
+
 - **Vercel no longer serves the domain.** A Vercel deployment may still
   exist and still build, but nothing a visitor sees comes from it.
-- **`main` and `iriz-launch` are not live.** Neither branch is deployed
-  anywhere a customer can reach. Merging into `main` ships nothing.
+- **`main` is not live, and still is not.** It now carries the same code as
+  the live Worker, which it did not before 2026-10-30 — but nothing deploys
+  from it and merging into it still ships nothing. `iriz-launch` is older
+  than all of this and is not live either.
 - **Workers Builds is not connected to the repo.** Pushing to `cloudflare`
   does **not** redeploy. Every deployment is a manual `wrangler deploy` from
   a developer's machine, which means a `wrangler deploy` run here changes
   the live site immediately — treat it as shipping, and confirm before
   running it. `npx wrangler deployments list` shows what is actually out
   there.
+- **One thing is live and broken, and it is not in this repository.** The
+  Google Apps Script behind warranty registration still refuses the
+  `Authorised dealer / store` and `Other seller` purchase sources with a
+  502, so those customers cannot register. `Code.gs` here has all four
+  sources and `npm run test:codegs` passes against it — the deployed Web App
+  is an older version. Fixing it means redeploying the Apps Script (Deploy →
+  Manage deployments → edit → Version: New version), not editing this repo.
 
 ## Building locally on this machine
 
