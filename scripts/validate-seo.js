@@ -87,9 +87,30 @@ const FORBIDDEN_ALWAYS = [
  * four specific tags out of Next's own output, which is well-formed.
  * ------------------------------------------------------------------ */
 
+/*
+ * HTML entities are DECODED before anything measures or compares the value,
+ * and that is not cosmetic: these strings are length-checked against Google’s
+ * limits, and an attribute arrives here encoded. A description containing one
+ * apostrophe reaches us as `&#x27;` — six characters where the reader sees
+ * one — so an exactly-conformant 161-character description was reported as 166
+ * and over the limit. The same inflation hits `&amp;` in a title (five for one)
+ * and in any canonical or href this compares.
+ *
+ * Only the five XML predefined entities plus the numeric forms are handled,
+ * which is all an HTML-escaped attribute can contain.
+ */
+function decodeEntities(value) {
+  if (typeof value !== 'string') return value;
+  const named = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+  return value
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec)))
+    .replace(/&([a-z]+);/gi, (match, name) => named[name.toLowerCase()] ?? match);
+}
+
 function attr(tag, name) {
   const m = tag.match(new RegExp(`${name}="([^"]*)"`, 'i'));
-  return m ? m[1] : null;
+  return m ? decodeEntities(m[1]) : null;
 }
 
 function head(html) {
@@ -111,7 +132,7 @@ function metaContent(html, nameValue) {
 
 function titleOf(html) {
   const m = head(html).match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  return m ? m[1].trim() : null;
+  return m ? decodeEntities(m[1].trim()) : null;
 }
 
 function isNoindex(html) {

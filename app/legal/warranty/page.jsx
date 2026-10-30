@@ -7,8 +7,8 @@ import {
   SUPPORT,
   WARRANTY,
   WARRANTY_CLAIM_STEPS,
-  authorisedSellersPhrase,
   primarySupportPhone,
+  sellersAnd,
   sellersOr,
 } from '@/lib/site-config';
 
@@ -100,7 +100,24 @@ const SECTIONS = [
      * covered leaves the same units outside the cover without the site
      * passing judgement on them.
      */
-    note: `An authorised seller means BluNeuron, a marketplace listing we run ourselves, or an authorised BluNeuron dealer — ${authorisedSellersPhrase()}. This warranty applies to units bought from those sellers, with a valid invoice. See ${ROUTES.whereToBuy}.`,
+    /*
+     * THE MARKETPLACE IS NAMED FROM sellersAnd(), not typed here. While
+     * Flipkart is the only live listing this reads "— Flipkart —"; the day
+     * AMAZON.live flips in lib/site-config.js it reads "— Amazon and
+     * Flipkart —" with no edit on this page. That is what stops the
+     * warranty's covered channels from naming a seller the buy buttons
+     * refuse to link to, which is the exact defect this replaced.
+     *
+     * "a marketplace listing we run ourselves" carries weight and is not
+     * padding: it distinguishes OUR listing from a third-party reseller on
+     * the same marketplace, whose units this warranty does not cover.
+     *
+     * Dealers are named once, in the sentence's own words. An earlier version
+     * appended a helper that named them a second time, so the line read
+     * "...or an authorised BluNeuron dealer — Flipkart, and authorised
+     * BluNeuron dealers."
+     */
+    note: `An authorised seller means BluNeuron, a marketplace listing we run ourselves — ${sellersAnd()} — or an authorised BluNeuron dealer. This warranty applies to units bought from those sellers, with a valid invoice. See ${ROUTES.whereToBuy}.`,
   },
   {
     heading: 'Who provides this warranty',
