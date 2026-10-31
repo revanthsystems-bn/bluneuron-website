@@ -68,7 +68,7 @@ const FORBIDDEN_WHEN_INDEXABLE = [
  * rendered them on purpose so a reviewer could see the rows — so this entry
  * was a production-only assertion and a preview tripped it by design.
  *
- * There is one real, confirmed number now (+91 91509 94000) and no masked
+ * There is one real, confirmed number now (+91 91509 94099) and no masked
  * row on any channel: `visibleSupportPhones()` drops a masked number from
  * every build, preview included. So a preview no longer trips this, and the
  * needle has gone from "expected on one channel" to a plain leak detector —
