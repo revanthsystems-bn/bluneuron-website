@@ -26,6 +26,21 @@
  * FILES, not occurrences, so the declaration and the trailing
  * "WHERE TO CHANGE" comment on the same line are fine.
  *
+ * IT CHECKS THE SOURCE, AND THE NETWORK PANEL WILL SHOW TWO. Verified on a
+ * preview deployment: the browser makes TWO gtag/js requests, one for the GA4
+ * measurement ID and one for the Ads ID. The second is injected by gtag.js
+ * ITSELF — Google's loader fetches a per-destination config bundle once a
+ * `config` call names an Ads destination — and it is not what this check is
+ * about. In the DOM, only one script tag has an id (`ga4-src`, ours); the
+ * `AW-` one has none, because nothing in this repository wrote it.
+ *
+ * It is also not the defect: a page load sends ONE page_view per destination
+ * (one to google-analytics.com for the G- id, one to google.com/ccm/collect
+ * for the AW- id), which is correct, not double-counted. The failure this
+ * check exists to prevent is a SECOND BOOTSTRAP from a pasted snippet, and
+ * that is a source-level fact. So do not "fix" this check to count network
+ * requests — it would fail on a correct site, which is the worst kind of gate.
+ *
  * HOW IT READS THE SOURCE: by scanning app/, components/, lib/ and scripts/
  * as text. Nothing here imports lib/site-config.js — that file is ESM and
  * `package.json` declares no `"type": "module"`, so Node would throw on its
