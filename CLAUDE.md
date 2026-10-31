@@ -13,10 +13,11 @@ Worker version `094f0de3-6ff3-46a7-9749-c5a14e138649`, deployed 2026-10-31
 from the `google-ads-tag` branch — the Google Ads conversion ID on the
 existing GA4 tag, and the new customer care number (+91 91509 94099).
 `google-ads-tag` was fast-forwarded into `cloudflare` BEFORE the deploy, so
-`cloudflare` matches what is deployed. **`main` was NOT updated and is now
-behind by four commits** — it still sits at `b097257`, the pre-Ads launch
-code. The rollback target — the launched site before the Ads tag, with the
-old 94000 number — is
+`cloudflare` matches what is deployed, and `main` was fast-forwarded to the
+same commit immediately afterwards on an explicit "ship to main" — so all
+three branches carry the live code again. All three are pushed to `origin`.
+The rollback target — the launched site before the Ads tag, with the old
+94000 number — is
 `npx wrangler rollback f4adc2df-69e0-412e-b80c-e25e4d386a63`.
 
 IT WAS PROMOTED, NOT REBUILT. `wrangler versions upload` put the version up
@@ -35,12 +36,12 @@ believe the latter.
 
 - **Vercel no longer serves the domain.** A Vercel deployment may still
   exist and still build, but nothing a visitor sees comes from it.
-- **`main` is not live, and is now BEHIND the live Worker.** It carried the
-  same code from 2026-10-30 until the Ads tag shipped on 2026-10-31; it no
-  longer does, because that deploy was authorised as "approve live" and not
-  as "ship to main". Nothing deploys from `main` and merging into it still
-  ships nothing — but it is no longer a readable substitute for what is
-  live. `iriz-launch` is older than all of this and is not live either.
+- **`main` is not live, though it does carry the live code.** It was caught
+  up to the live Worker on 2026-10-31, as it was on 2026-10-30 — but only
+  ever on a separate, explicit "ship to main", because the deploy itself was
+  authorised as "approve live" and that phrase moves nothing into `main`.
+  Nothing deploys from `main` and merging into it still ships nothing.
+  `iriz-launch` is older than all of this and is not live either.
 - **Workers Builds is not connected to the repo.** Pushing to `cloudflare`
   does **not** redeploy. Every deployment is a manual `wrangler deploy` from
   a developer's machine, which means a `wrangler deploy` run here changes
