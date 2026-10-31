@@ -20,7 +20,9 @@
  *   3. Demo account data is UNREACHABLE. Not "Supabase is configured" —
  *      see the long note on that check, which is the one that changed.
  *   4. Every referenced image exists. Delegated to scripts/check-media.js.
- *   5. No [TBD], no masked phone, canonicals and sitemap sane. Delegated to
+ *   5. One gtag.js, and the Google Ads ID in one file. Delegated to
+ *      scripts/check-google-tag.js.
+ *   6. No [TBD], no masked phone, canonicals and sitemap sane. Delegated to
  *      scripts/validate-seo.js, which checks the BUILT site.
  *
  * WHAT IT REPORTS BUT DOES NOT FAIL ON: an unconfirmed support phone number,
@@ -344,7 +346,7 @@ function readConfig(label, pattern) {
 }
 
 /* ------------------------------------------------------------------ *
- * 5 & 6. The other two scripts, run as themselves.
+ * 5, 6 & 7. The other scripts, run as themselves.
  * ------------------------------------------------------------------ */
 function runScript(name, script, args = []) {
   try {
@@ -363,6 +365,12 @@ function runScript(name, script, args = []) {
 }
 
 runScript('every referenced image exists in public/', 'check-media.js');
+
+// Not behind --skip-seo: it reads source text, boots no server and takes
+// milliseconds, so there is no fast/slow split to make. A duplicated gtag.js
+// is also exactly the kind of defect that ships during a hurried release,
+// which is when --skip-seo gets used.
+runScript('one gtag.js, and the Google Ads ID in one file', 'check-google-tag.js');
 
 if (skipSeo) {
   checks.push('  --   SEO validation skipped (--skip-seo)');

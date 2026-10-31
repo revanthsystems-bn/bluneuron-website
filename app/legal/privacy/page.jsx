@@ -1,4 +1,4 @@
-import { Inbox, BarChart3, Megaphone, Table2, Database } from 'lucide-react';
+import { Inbox, BarChart3, Megaphone, Table2, Database, Target } from 'lucide-react';
 import PageShell from '@/components/PageShell';
 import PageHeading from '@/components/PageHeading';
 import PolicyToc from '@/components/legal/PolicyToc';
@@ -92,12 +92,24 @@ const CONTACT_EMAIL = SUPPORT.email;
  * lib/warranty-registration.js; adding a fourth means editing both.
  *
  * The analytics paragraph under "How we use it" is new and is a commitment,
- * not a description: no name, email, phone or serial reaches GA4 or the Meta
- * Pixel, in an event, a URL or a page title. The Club's pages carry no
- * identifier at all — membership is a signed cookie, never a query string —
- * so there is nothing for a Referer header to leak either.
+ * not a description: no name, email, phone, invoice number or serial reaches
+ * GA4, GOOGLE ADS or the Meta Pixel, in an event, a URL or a page title. The
+ * Club's pages carry no identifier at all — membership is a signed cookie,
+ * never a query string — so there is nothing for a Referer header to leak
+ * either.
+ *
+ * GOOGLE ADS, added 31 October 2026, is the newest entry and the one whose
+ * disclosure needed the most care, because what it CAN do and what it IS
+ * doing differ. It rides on the single Google tag already loaded for GA4 (one
+ * gtag.js, two `config` calls — see components/GoogleAnalytics), and ad
+ * personalisation, cross-device signals and enhanced conversions are all
+ * switched off for it explicitly in lib/googleAds.js. The bullet names
+ * remarketing anyway, and then says it is off: a reader deciding whether to
+ * care about a Google advertising cookie should not have to infer the
+ * capability from its absence. If any of those three flags is ever turned on,
+ * THAT BULLET IS WRONG and this page has to change in the same commit.
  */
-const PRIVACY_LAST_UPDATED = '24 October 2026';
+const PRIVACY_LAST_UPDATED = '31 October 2026';
 
 /**
  * The contents list, and the only place section headings are written.
@@ -217,6 +229,11 @@ const SERVICES = [
     icon: BarChart3,
     name: 'Google Analytics 4',
     role: 'Counts visits and which pages people use',
+  },
+  {
+    icon: Target,
+    name: 'Google Ads',
+    role: 'Measures our Google ads — remarketing signals are switched off',
   },
   {
     icon: Megaphone,
@@ -379,15 +396,17 @@ export default function PrivacyPage() {
                 </li>
                 <li>To understand how people use the site and improve it.</li>
                 <li>To measure and improve our advertising on Facebook and Instagram.</li>
+                <li>To measure and improve our advertising on Google.</li>
               </ul>
               <p className="mt-4">
                 We do not sell your personal information, and that includes everything above — the
                 {' '}{CLUB.name} list is not shared with anyone outside BluNeuron.
               </p>
               <p className="mt-4">
-                Nothing you give us is sent to Google Analytics or to the Meta Pixel. Your name,
-                your email address, your phone number and your serial number are not included in
-                any analytics event, in any page address or in any page title, anywhere on this
+                Nothing you give us is sent to Google Analytics, to Google Ads or to the Meta
+                Pixel. Your name, your email address, your phone number, your invoice number and
+                your serial number are not included in any analytics or advertising event, in any
+                page address or in any page title, anywhere on this
                 site — including inside the {CLUB.name}, where the pages carry no identifier at all
                 and your membership is held in a signed cookie rather than in the URL.
               </p>
@@ -433,6 +452,25 @@ export default function PrivacyPage() {
                   your name, email address, phone number, invoice number or serial number to it. Google
                   processes this data under its own privacy policy. You can opt out across all sites
                   with Google&rsquo;s browser add-on at{' '}
+                  <Ext href="https://tools.google.com/dlpage/gaoptout">
+                    tools.google.com/dlpage/gaoptout
+                  </Ext>
+                  .
+                </li>
+                <li>
+                  <strong className="font-semibold text-white">Google Ads:</strong> advertising
+                  measurement. It uses cookies to measure which of our Google ads led to a visit
+                  and to a click through to a marketplace listing. It shares the single Google tag
+                  this site already loads for Google Analytics &mdash; there is no second script.
+                  It is also the tool Google would use for remarketing &mdash; showing our ads to
+                  you again on other sites &mdash; and ad personalisation and cross-device signals
+                  are switched off for it, so it does not build those audiences and the data is not
+                  linked to a Google account. Enhanced conversions are off: we never send your
+                  name, email address, phone number, invoice number or serial number to it, hashed
+                  or otherwise. Google processes this data under its own privacy policy. You can
+                  turn off personalised Google ads at{' '}
+                  <Ext href="https://myadcenter.google.com/">myadcenter.google.com</Ext> and opt out
+                  of measurement across all sites with Google&rsquo;s browser add-on at{' '}
                   <Ext href="https://tools.google.com/dlpage/gaoptout">
                     tools.google.com/dlpage/gaoptout
                   </Ext>

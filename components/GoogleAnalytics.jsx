@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { GA_MEASUREMENT_ID, isGaEnabled, trackGaEvent } from '@/lib/googleAnalytics';
+import { googleAdsConfigSnippet } from '@/lib/googleAds';
 
 /**
  * Google Analytics 4, rendered once from app/layout so it is present on every
@@ -61,6 +62,24 @@ import { GA_MEASUREMENT_ID, isGaEnabled, trackGaEvent } from '@/lib/googleAnalyt
  * call sends the first page view itself — exactly as the pixel's base code
  * fires its own first PageView. The effect below handles every navigation
  * after that.
+ *
+ * ---------------------------------------------------------------------------
+ * GOOGLE ADS RIDES ON THIS TAG — THE `${googleAdsConfigSnippet()}` AT THE END
+ * ---------------------------------------------------------------------------
+ * gtag.js is multi-destination: ONE script, one `config` call per ID. So the
+ * Google Ads conversion ID is appended as a second `config` on this same
+ * bootstrap rather than as the second gtag.js that Google's own Ads snippet
+ * would have pasted in. Two gtag.js loads double-count page views and
+ * conversions, and scripts/check-google-tag.js fails the build if one ever
+ * appears.
+ *
+ * The snippet is EMPTY when GOOGLE_ADS_ID is blank (lib/site-config.js), so
+ * the Ads destination vanishes with no other edit and this component is
+ * unchanged. It carries its own copy of the two privacy flags above plus
+ * `allow_enhanced_conversions: false`, because a flag passed to `config`
+ * applies to that destination only and is NOT inherited — the whole reason
+ * lib/googleAds.js exists is to keep that explanation next to the flags. Read
+ * its header before touching either `config` call.
  */
 const BOOTSTRAP = `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
@@ -70,7 +89,7 @@ gtag('config', '${GA_MEASUREMENT_ID}', {
   anonymize_ip: true,
   allow_google_signals: false,
   allow_ad_personalization_signals: false
-});`;
+});${googleAdsConfigSnippet()}`;
 
 export default function GoogleAnalytics() {
   const pathname = usePathname();

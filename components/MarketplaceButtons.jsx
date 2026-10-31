@@ -3,6 +3,7 @@
 import { track } from '@vercel/analytics';
 import Magnetic from './Magnetic';
 import { trackGaEvent } from '@/lib/googleAnalytics';
+import { trackGoogleAdsBuyClick } from '@/lib/googleAds';
 import { trackMetaPixelCustom } from '@/lib/metaPixel';
 import { trackBeginCheckout } from '@/lib/shop-analytics';
 import {
@@ -171,6 +172,10 @@ export default function MarketplaceButtons({
                 trackGaEvent('buy_click', { marketplace: marketplace.name });
                 track('buy_click', { marketplace: marketplace.name });
                 trackMetaPixelCustom('ClickToBuy', { marketplace: marketplace.name });
+                // Google Ads, same event, same moment — a no-op until
+                // GOOGLE_ADS_BUY_LABEL is set (lib/site-config.js). `send_to`
+                // only; the marketplace name is not sent.
+                trackGoogleAdsBuyClick();
                 if (isCheckout) {
                   trackBeginCheckout({ unitPrice, quantity, marketplace: marketplace.name });
                 }

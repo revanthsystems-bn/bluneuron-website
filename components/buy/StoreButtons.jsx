@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { track } from '@vercel/analytics';
 import { buyDestinations } from '@/lib/buy-destinations';
 import { trackGaEvent } from '@/lib/googleAnalytics';
+import { trackGoogleAdsBuyClick } from '@/lib/googleAds';
 import { trackMetaPixelCustom } from '@/lib/metaPixel';
 
 /**
@@ -53,6 +54,13 @@ export default function StoreButtons({
     trackGaEvent('buy_click', { store });
     track('buy_click', { store });
     trackMetaPixelCustom('ClickToBuy', { store });
+    // The Google Ads conversion, which is a NO-OP until a conversion label is
+    // filled in (GOOGLE_ADS_BUY_LABEL in lib/site-config.js). It is called
+    // here, beside the other three, so a buy click cannot be counted by GA4
+    // and Meta but missed by Ads. It sends `send_to` and nothing else — not
+    // even `store`, which would be a custom parameter on a conversion action
+    // that has not asked for one.
+    trackGoogleAdsBuyClick();
   };
 
   return (
