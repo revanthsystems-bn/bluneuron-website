@@ -8,27 +8,39 @@ this before believing any sentence elsewhere in this file that says the live
 site runs on Vercel — several do, they describe how it used to be, and they
 are being corrected section by section rather than all at once.
 
-**What is live right now: the launched Flipkart-only site.** Worker version
-`f4adc2df-69e0-412e-b80c-e25e4d386a63`, deployed 2026-10-30 from the
-`club-v1` launch branch after a pre-launch audit. `club-v1` was merged into
-`cloudflare` and into `main` immediately afterwards, so all three now carry
-the same code and `cloudflare` again matches what is deployed. The rollback
-target — the pre-launch site, with the DRAFT legal pages — is
-`npx wrangler rollback 1867b9b4-d8b4-4d75-9213-af0235868031`.
+**What is live right now: the Flipkart-only site, with the Google Ads tag.**
+Worker version `094f0de3-6ff3-46a7-9749-c5a14e138649`, deployed 2026-10-31
+from the `google-ads-tag` branch — the Google Ads conversion ID on the
+existing GA4 tag, and the new customer care number (+91 91509 94099).
+`google-ads-tag` was fast-forwarded into `cloudflare` BEFORE the deploy, so
+`cloudflare` matches what is deployed. **`main` was NOT updated and is now
+behind by four commits** — it still sits at `b097257`, the pre-Ads launch
+code. The rollback target — the launched site before the Ads tag, with the
+old 94000 number — is
+`npx wrangler rollback f4adc2df-69e0-412e-b80c-e25e4d386a63`.
 
-THE DEPLOY DID NOT COME FROM `cloudflare`, and that is worth knowing because
-it is the one time the rule below was not how it happened: the Worker was
-built and deployed from `club-v1`, and `cloudflare` was brought up to match
-afterwards rather than before. Nothing is wrong with the result — the two
-branches are identical — but if the two ever disagree again, believe
-`npx wrangler deployments list`, not the branch name.
+IT WAS PROMOTED, NOT REBUILT. `wrangler versions upload` put the version up
+as a preview, it was verified there, and `wrangler versions deploy
+094f0de3...@100` then sent production traffic to those exact bytes. That is
+worth preferring over `wrangler deploy` whenever a preview has already been
+checked: a rebuild between verifying and shipping is a rebuild nobody looked
+at. `npx wrangler deployments list` remains the only authority on what is
+actually out there.
+
+THE PREVIOUS DEPLOY DID NOT COME FROM `cloudflare` — version `f4adc2df` was
+built and deployed from `club-v1`, with `cloudflare` brought up to match
+afterwards rather than before. That is no longer the live version, but the
+lesson holds: if a branch name and `wrangler deployments list` ever disagree,
+believe the latter.
 
 - **Vercel no longer serves the domain.** A Vercel deployment may still
   exist and still build, but nothing a visitor sees comes from it.
-- **`main` is not live, and still is not.** It now carries the same code as
-  the live Worker, which it did not before 2026-10-30 — but nothing deploys
-  from it and merging into it still ships nothing. `iriz-launch` is older
-  than all of this and is not live either.
+- **`main` is not live, and is now BEHIND the live Worker.** It carried the
+  same code from 2026-10-30 until the Ads tag shipped on 2026-10-31; it no
+  longer does, because that deploy was authorised as "approve live" and not
+  as "ship to main". Nothing deploys from `main` and merging into it still
+  ships nothing — but it is no longer a readable substitute for what is
+  live. `iriz-launch` is older than all of this and is not live either.
 - **Workers Builds is not connected to the repo.** Pushing to `cloudflare`
   does **not** redeploy. Every deployment is a manual `wrangler deploy` from
   a developer's machine, which means a `wrangler deploy` run here changes
