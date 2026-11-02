@@ -71,7 +71,17 @@ export default function Hero() {
    * component without the tag having to be rendered somewhere it would be
    * illegal.
    */
-  preload(HERO_IMAGE.src, { as: 'image', type: 'image/webp', fetchPriority: 'high' });
+  preload(HERO_IMAGE.src, {
+    as: 'image',
+    type: 'image/webp',
+    fetchPriority: 'high',
+    // The SET and the SIZES, not the bare src. Preloading one fixed file
+    // while the <img> resolves `sizes` to the other candidate downloads both
+    // — which is worse than not preloading at all. These two strings are the
+    // same ones the <picture> below uses, read from the same constant.
+    imageSrcSet: HERO_IMAGE.srcSet,
+    imageSizes: HERO_IMAGE.sizes,
+  });
 
   // Replace dotted 'i' with dotless 'ı' (U+0131) so height aligns perfectly
   // with 'r' and 'z'. Unchanged from the previous hero — this is the same
@@ -169,11 +179,21 @@ export default function Hero() {
               it as a rectangle, with no cutout and no keying. */}
           <div className="hero-photo">
             <picture>
-              <source srcSet={HERO_IMAGE.src} type="image/webp" />
+              <source
+                type="image/webp"
+                srcSet={HERO_IMAGE.srcSet}
+                sizes={HERO_IMAGE.sizes}
+              />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={HERO_IMAGE.fallback}
+                srcSet={HERO_IMAGE.fallbackSrcSet}
+                sizes={HERO_IMAGE.sizes}
                 alt={HERO_IMAGE.alt}
+                // The WIDEST file's pixels, which is the intrinsic ratio for
+                // every candidate in the set — so the box is reserved before
+                // any bytes arrive and is the same box whichever width the
+                // browser picks. That is what holds CLS at zero.
                 width={HERO_IMAGE.width}
                 height={HERO_IMAGE.height}
                 // The LCP element: fetched at high priority and never lazy.

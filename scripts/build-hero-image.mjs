@@ -72,8 +72,28 @@ const PASTE_BLUR = 0.5;
 /** White margin around the product, as a fraction of the product's width. */
 const MARGIN_RATIO = 0.055;
 
-/** Output width. The card never renders wider than ~620 CSS px, so 1400 is 2x+. */
-const OUT_WIDTH = 1400;
+/**
+ * THE TWO OUTPUT WIDTHS, and why there are two.
+ *
+ * The card never renders wider than ~560 CSS px, so 1400 covers a 2x display
+ * at full desktop size. It is also about four times more pixels than a 390px
+ * phone can use, and Lighthouse said so out loud: "properly size images, est.
+ * savings 44 KiB" — on the LCP element.
+ *
+ * 700 is the second candidate, and between them they cover everything the
+ * `sizes` attribute in components/Hero asks for: a phone at 2x wants ~610px
+ * and takes the 700; a 1440 desktop at 1x wants ~560px and takes the 700 as
+ * well; only a 2x desktop reaches for the 1400.
+ *
+ * TWO FIXED FILES RATHER THAN next/image, deliberately — see HERO_IMAGE in
+ * lib/iriz.js. On Workers every `/_next/image` width is a billed
+ * transformation and a Worker invocation; these are static assets off the
+ * edge, free and unmetered, and the browser still picks between them.
+ *
+ * WIDEST FIRST in this array is not required, but `Math.max` decides which
+ * one keeps the unsuffixed filename, so order is free to change.
+ */
+const OUT_WIDTHS = [1400, 700];
 
 const QUALITY = 85;
 
@@ -228,28 +248,45 @@ async function main() {
       + ` on rgb(${background.r},${background.g},${background.b})`
   );
 
-  const scaled = sharp(framed).resize({ width: OUT_WIDTH, withoutEnlargement: true });
-  const out = await scaled.clone().png().toBuffer();
-  const outMeta = await sharp(out).metadata();
-
   fs.mkdirSync(OUT_DIR, { recursive: true });
-  const webp = path.join(OUT_DIR, `${OUT_BASE}.webp`);
-  const jpg = path.join(OUT_DIR, `${OUT_BASE}.jpg`);
-  await sharp(out).webp({ quality: QUALITY }).toFile(webp);
-  // `mozjpeg` for the fallback: it is the one encoder sharp ships that gets a
-  // large flat white seamless down without the blocking that shows up against
-  // a light card. Chroma subsampling left at the default.
-  await sharp(out).jpeg({ quality: QUALITY, mozjpeg: true }).toFile(jpg);
+  const widest = Math.max(...OUT_WIDTHS);
+  let widestMeta = null;
 
-  for (const file of [webp, jpg]) {
-    console.log(
-      `wrote         ${path.relative(ROOT, file)} ${outMeta.width}x${outMeta.height}`
-        + ` ${(fs.statSync(file).size / 1024).toFixed(1)} KB`
-    );
+  for (const width of OUT_WIDTHS) {
+    // The widest output keeps the bare name; narrower ones are suffixed. That
+    // way the <img>'s own `src` — the candidate a browser with no srcset
+    // support falls back to — is a stable path that does not move when
+    // another width is added to the list.
+    const stem = width === widest ? OUT_BASE : `${OUT_BASE}-${width}`;
+    const out = await sharp(framed)
+      .resize({ width, withoutEnlargement: true })
+      .png()
+      .toBuffer();
+    const outMeta = await sharp(out).metadata();
+    if (width === widest) widestMeta = outMeta;
+
+    const files = [
+      [path.join(OUT_DIR, `${stem}.webp`), sharp(out).webp({ quality: QUALITY })],
+      // `mozjpeg` for the fallback: it is the one encoder sharp ships that
+      // gets a large flat white seamless down without the blocking that shows
+      // up against a light card. Chroma subsampling left at the default.
+      [path.join(OUT_DIR, `${stem}.jpg`), sharp(out).jpeg({ quality: QUALITY, mozjpeg: true })],
+    ];
+    for (const [file, pipeline] of files) {
+      await pipeline.toFile(file);
+      console.log(
+        `wrote         ${path.relative(ROOT, file)} ${outMeta.width}x${outMeta.height}`
+          + ` ${(fs.statSync(file).size / 1024).toFixed(1)} KB`
+      );
+    }
   }
 
+  const webp = path.join(OUT_DIR, `${OUT_BASE}.webp`);
+  const outMeta = widestMeta;
+
   console.log(
-    `\nDIMENSIONS FOR THE COMPONENT: width={${outMeta.width}} height={${outMeta.height}}`
+    `
+DIMENSIONS FOR THE COMPONENT: width={${outMeta.width}} height={${outMeta.height}}`
   );
 
   if (proofDir) {
