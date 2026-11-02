@@ -1978,3 +1978,257 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
     transition: none;
   }
 }
+
+@layer components {
+  /* ================================================================ *
+   * THE IMAGE HERO — components/Hero.
+   *
+   * It replaced a full-bleed <video> loop with white type over white
+   * studio footage. The whole apparatus that treatment needed —
+   * `.hero-media`'s grade, two scrims, the text plate, and the entire
+   * `[data-hero-theme='light']` block further up this file — is now
+   * UNUSED. It is left in place rather than deleted in the same pass
+   * that rewrote the component; nothing renders those classes.
+   * `.hero-header-frost` is the one exception and is still live:
+   * components/Header draws it whenever it floats over a dark hero.
+   * ================================================================ */
+
+  /* The only colour behind the type, and it is deliberately not behind
+     the type at all: a soft blue wash centred on the RIGHT column,
+     where the product card sits, decaying to nothing well before the
+     left edge. The headline, the eyebrow, the tagline and the stats
+     therefore all measure against a flat #030303 — the contrast of the
+     left column is a constant, not a function of where a gradient
+     happened to land. */
+  .hero-aura {
+    background: radial-gradient(
+      56% 52% at 74% 44%,
+      rgba(59, 130, 246, 0.2) 0%,
+      rgba(59, 130, 246, 0.07) 42%,
+      transparent 72%
+    );
+  }
+
+  /* The four figures. One step under `.type-lede` at the small end and
+     a little over it at the large, so a number reads as a number
+     rather than as another line of copy. */
+  .hero-stat {
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  /* ---------------------------------------------------------------- *
+   * THE PRODUCT CARD
+   *
+   * `isolation: isolate` IS LOAD-BEARING. `.hero-photo` below carries
+   * `mix-blend-mode: multiply`, and a blend mode composites against
+   * the backdrop up to the nearest ISOLATED stacking context. Without
+   * this line the only thing creating one would be the card's own
+   * entrance transform — which expires when the animation reaches its
+   * `transform: none` end state, at which point the blend's backdrop
+   * silently becomes the #030303 page behind the card and the
+   * photograph multiplies to solid black. Declaring the isolation
+   * outright makes the group permanent and independent of any
+   * animation state.
+   * ---------------------------------------------------------------- */
+  .hero-card {
+    position: relative;
+    isolation: isolate;
+    border-radius: 28px;
+    padding: clamp(1.1rem, 2.6vw, 2.1rem);
+    background: radial-gradient(
+      118% 100% at 28% 14%,
+      #ffffff 0%,
+      #f2f4f7 52%,
+      #e4e8ee 100%
+    );
+    /* A hairline, the blue outer glow, and a plain dark lift under it so
+       the card has weight as well as colour. */
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 40px 90px -40px rgba(59, 130, 246, 0.55),
+      0 18px 60px -30px rgba(0, 0, 0, 0.75);
+  }
+
+  /* MULTIPLY, and that one declaration is what removes the
+     photograph's background. The frame is a studio seamless at
+     rgb(254,254,254); multiplying it against the card's white-to-grey
+     gradient returns the gradient essentially unchanged, so the
+     seamless vanishes into the card with no cutout, no keying and no
+     transparent PNG to commission. The chassis and the black front
+     panel multiply down normally and keep their modelling.
+
+     It sits on the WRAPPER rather than the <img> so the <picture> and
+     its fallback are one blended box however the browser resolves the
+     source. */
+  .hero-photo {
+    mix-blend-mode: multiply;
+    /* `top`, NOT `transform`, AND THAT IS NOT A STYLE PREFERENCE.
+       ====================================================================
+       An animated `transform` promotes its element to its own compositing
+       layer, and a `mix-blend-mode` on that same element then has nothing
+       in its layer to blend against: Chromium renders the photograph
+       INVISIBLE — a card containing only its own gradient. Observed on this
+       build at 1440 while the identical markup rendered correctly at 390,
+       which is the tell that it is a compositing decision rather than a
+       cascade one.
+
+       Moving the blend to an inner element does not fix it either, it
+       inverts it: the transformed ancestor becomes the isolation boundary,
+       the blend finds a transparent backdrop, and the seamless comes back
+       as a plain white rectangle on the card. Both failure modes were
+       reproduced before this line was written.
+
+       `top` on a `position: relative` element is not composited and creates
+       no stacking context (z-index stays `auto`), so the blend keeps
+       resolving against `.hero-card`'s gradient on every frame. It costs a
+       repaint of the card's own box twice per 6s cycle, which is the price
+       of the effect working at all. */
+    position: relative;
+    animation: hero-float 6s ease-in-out 0.6s infinite both;
+  }
+
+  /* The lens light. Placed from HERO_IMAGE.lens (lib/iriz.js), which is
+     where the glass measures in this frame, so re-running
+     scripts/build-hero-image.mjs moves the glow with the photograph
+     instead of leaving it on a patch of chassis.
+
+     A SIBLING of `.hero-photo`, not a child: inside the blend wrapper a
+     blue glow over a light card would multiply into a blue stain rather
+     than reading as light. It carries the same float, with the same
+     duration, easing and delay, so it starts in the same frame and
+     travels with the lens rather than drifting across it. It floats with a
+     `transform` where the photograph has to use `top` — nothing here is
+     blended, so there is no compositing trap to avoid and the cheaper
+     property is the right one. */
+  .hero-lens {
+    position: absolute;
+    left: var(--lens-x);
+    top: var(--lens-y);
+    width: clamp(86px, 17%, 200px);
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    /* The resting transform. The float keyframes restate the -50%
+       centring because an animated `transform` replaces this outright —
+       they are the same two values plus the 6px. */
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      circle,
+      rgba(147, 197, 253, 0.6) 0%,
+      rgba(59, 130, 246, 0.34) 34%,
+      rgba(59, 130, 246, 0) 70%
+    );
+    opacity: 0.85;
+    animation:
+      hero-lens-float 6s ease-in-out 0.6s infinite both,
+      hero-lens-pulse 3.2s ease-in-out 0.6s infinite both;
+  }
+
+  /* ---------------------------------------------------------------- *
+   * THE ENTRANCE — two keyframes, the brief's numbers, no JavaScript.
+   *
+   * Everything is on screen by 600ms: the card at 500ms from 0, the
+   * text block at 400ms from 100ms. The buttons and the stats are
+   * inside the text block, so they arrive with it rather than needing
+   * a stagger of their own.
+   *
+   * NOTHING IS EVER MADE UNCLICKABLE. These animate `opacity` and
+   * `transform` only — no `visibility`, no `pointer-events`, no
+   * `disabled` — so the buy button is a real, focusable, hit-testable
+   * element in the first painted frame and stays one throughout.
+   * ---------------------------------------------------------------- */
+  .hero-in-text {
+    animation: hero-in-text 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+
+  .hero-in-card {
+    animation: hero-in-card 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes hero-in-text {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes hero-in-card {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* The two loops. ±6px over 6s, and a glow that breathes. Both are
+     delayed past the entrance and filled BACKWARDS, so each element
+     rests on its own first keyframe until it starts — a plain
+     `animation-delay` would snap from 0 to -6px at the moment the loop
+     began. */
+  @keyframes hero-float {
+    0%,
+    100% {
+      top: -6px;
+    }
+    50% {
+      top: 6px;
+    }
+  }
+
+  @keyframes hero-lens-float {
+    0%,
+    100% {
+      transform: translate(-50%, calc(-50% - 6px));
+    }
+    50% {
+      transform: translate(-50%, calc(-50% + 6px));
+    }
+  }
+
+  /* OPACITY ONLY. A `scale` here would be a second animation writing
+     `transform`, and the later one in the shorthand list wins outright
+     — the glow would stop floating with the lens. */
+  @keyframes hero-lens-pulse {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* NO MOTION AT ALL, and the final state — not `animation: none` on a
+     rule whose from-state is `opacity: 0`, which would leave the hero
+     permanently invisible for exactly the people who cannot be shown a
+     fallback. The lens keeps its resting centring transform and a
+     mid-pulse opacity, so the light is there; it simply does not
+     breathe. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-in-text,
+    .hero-in-card {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+
+    .hero-photo {
+      animation: none;
+    }
+
+    .hero-lens {
+      animation: none;
+      transform: translate(-50%, -50%);
+      opacity: 0.7;
+    }
+  }
+}

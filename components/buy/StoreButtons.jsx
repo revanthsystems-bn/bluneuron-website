@@ -2,11 +2,8 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { track } from '@vercel/analytics';
+import { trackBuyClick } from '@/lib/buy-click';
 import { buyDestinations } from '@/lib/buy-destinations';
-import { trackGaEvent } from '@/lib/googleAnalytics';
-import { trackGoogleAdsBuyClick } from '@/lib/googleAds';
-import { trackMetaPixelCustom } from '@/lib/metaPixel';
 
 /**
  * The two store buttons, and the one rule about them.
@@ -39,29 +36,14 @@ export default function StoreButtons({
   const destinations = buyDestinations();
 
   /**
-   * ONE EVENT, ONE PROPERTY.
-   *
-   * `store` is the marketplace id ('amazon' / 'flipkart'), and it is the
-   * only thing sent. No email, no name, no address, no order identifier —
-   * nothing that is or could become personal data goes to GA4 or the Meta
-   * Pixel from this site.
-   *
-   * It fires for a pending destination too: the intent to buy is real
-   * whether or not the listing is live yet, and a hole in the funnel on
-   * launch day would read as a conversion problem rather than a missing URL.
+   * The four analytics calls now live in lib/buy-click.js, because the
+   * homepage hero has a buy button of its own and a second hand-written copy
+   * of them is how one vendor eventually goes missing from one surface.
+   * WHAT IS SENT DID NOT CHANGE — same four calls, same order, same payload;
+   * read the note there for what that payload is and what it deliberately
+   * never contains.
    */
-  const fire = (store) => {
-    trackGaEvent('buy_click', { store });
-    track('buy_click', { store });
-    trackMetaPixelCustom('ClickToBuy', { store });
-    // The Google Ads conversion, which is a NO-OP until a conversion label is
-    // filled in (GOOGLE_ADS_BUY_LABEL in lib/site-config.js). It is called
-    // here, beside the other three, so a buy click cannot be counted by GA4
-    // and Meta but missed by Ads. It sends `send_to` and nothing else — not
-    // even `store`, which would be a custom parameter on a conversion action
-    // that has not asked for one.
-    trackGoogleAdsBuyClick();
-  };
+  const fire = trackBuyClick;
 
   return (
     <div>

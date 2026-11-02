@@ -12,7 +12,6 @@ import BuySection from '@/components/BuySection';
 import Footer from '@/components/Footer';
 import StickyBuyBar from '@/components/StickyBuyBar';
 import { COMMERCE_ENABLED } from '@/lib/launch';
-import { resolveHeroTheme } from '@/lib/heroTheme';
 import { ROUTES } from '@/lib/routes';
 import { SHOW_BUY } from '@/lib/site-config';
 import { ORGANIZATION_JSON_LD, pageMetadata } from '@/lib/seo';
@@ -71,19 +70,25 @@ export const metadata = pageMetadata({
  */
 
 /**
- * `searchParams` is a Promise in Next 16 and is a request-time API, so reading
- * it here opts this page into DYNAMIC RENDERING — the homepage is server-
- * rendered per request instead of being prerendered at build.
+ * THE HOMEPAGE IS STATIC AGAIN.
  *
- * That cost is accepted deliberately and temporarily: `?hero=light` exists so
- * both hero treatments can be opened side by side without a rebuild, which is
- * the entire point of the test. When the test is settled, delete the
- * `searchParams` prop and read `HERO_THEME` directly — the page goes back to
- * static with no other change. See lib/heroTheme.js.
+ * It took `searchParams` — a request-time API in Next 16 — purely to read
+ * `?hero=light`, which opted the whole route into DYNAMIC RENDERING so that
+ * the light and dark treatments of the VIDEO hero could be opened side by
+ * side without a rebuild. lib/heroTheme.js said what to do when that test was
+ * settled: delete the `searchParams` prop and the page goes back to static
+ * with no other change. That is this edit.
+ *
+ * The test is settled by the hero itself. The light theme existed to stop
+ * white type fighting white studio FOOTAGE; there is no footage any more, and
+ * the photograph now sits on a card of its own instead of under the type. See
+ * components/Hero.
+ *
+ * lib/heroTheme.js and the `[data-hero-theme='light']` block in
+ * app/globals.css are left in place and are now inert — nothing renders
+ * either, and components/Header still defaults `heroTheme` to 'dark'.
  */
-export default async function Home({ searchParams }) {
-  const heroTheme = resolveHeroTheme((await searchParams)?.hero);
-
+export default function Home() {
   return (
     <>
       {/* Organization, and only Organization: it describes the site as a
@@ -94,12 +99,12 @@ export default async function Home({ searchParams }) {
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
       />
-      {/* No AnnouncementBar here: the cinematic hero has to be the first
-          visible thing on the page, and its eyebrow + tagline already carry
-          the line the bar was running. The header floats over the video. */}
-      <Header overlay heroTheme={heroTheme} />
+      {/* No AnnouncementBar here: the hero has to be the first visible thing
+          on the page, and its eyebrow + tagline already carry the line the
+          bar was running. The header floats over the hero's dark ground. */}
+      <Header overlay />
       <main>
-        <Hero theme={heroTheme} />
+        <Hero />
         <StickyBuyBar />
         {/* Every one of the four trust tiles is a commerce promise — a 30-day
             return, 24h dispatch, encrypted checkout, and the concierge that

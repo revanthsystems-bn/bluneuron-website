@@ -1,192 +1,206 @@
-import HeroBackdrop from './HeroBackdrop';
-import Reveal from './Reveal';
-import BuyButton from '@/components/buy/BuyButton';
-import { HERO } from '@/lib/iriz';
+import Link from 'next/link';
+import { preload } from 'react-dom';
+import HeroBuyButton from '@/components/hero/HeroBuyButton';
+import { HERO, HERO_IMAGE, HERO_STATS } from '@/lib/iriz';
+import { ROUTES } from '@/lib/routes';
 import { SHOW_BUY } from '@/lib/site-config';
 
 /**
- * The one section that breaks the page grid: a full-bleed 100svh cinematic
- * frame with the product loop running edge to edge behind it.
+ * The homepage hero: a dark two-column frame with the product photographed on
+ * a light card.
  *
- * `min-h-svh`, not `h-screen` — 100vh jumps by the height of the browser
- * chrome the moment a mobile browser hides its address bar, which shunts the
- * headline mid-scroll.
+ * ---------------------------------------------------------------------------
+ * WHAT REPLACED WHAT
+ * ---------------------------------------------------------------------------
+ * This used to be a full-bleed 100svh <video> loop with the type stacked over
+ * it (components/HeroBackdrop, still on disk and no longer mounted anywhere).
+ * Three things came with that arrangement and none of them is here any more:
  *
- * Stacking is DOM order only — every layer is positioned and they paint in
- * source order. Deliberately no z-index inside this section; mixing the two
- * is how these stacks rot.
+ *   - 1.4 MB of mp4 + webm + poster fetched before anything could be read,
+ *     for four seconds of motion nobody asked for;
+ *   - white type held over WHITE STUDIO FOOTAGE, which needed a veil, two
+ *     scrims and a text plate to stay legible, and still measured differently
+ *     on different frames of the loop;
+ *   - an LCP that was whatever frame happened to decode first.
  *
- * A 218-LINE COMMENTED-OUT COPY of this component used to sit above these
- * imports. It was an older revision kept "just in case", and it had already
- * started collecting live code by accident — two imports landed inside it
- * during this pass and were valid JavaScript at module scope, interleaved
- * with the comments, which is exactly the hazard a commented-out file
- * creates. Git has the old revision; the file does not need to.
+ * The photograph is a static asset with known pixels, so the type sits on a
+ * flat #030303 that cannot change behind it, and the largest paint is one
+ * 53 KB WebP that is preloaded and sized in the markup.
+ *
+ * ---------------------------------------------------------------------------
+ * DOM ORDER IS THE MOBILE ORDER
+ * ---------------------------------------------------------------------------
+ * Copy first, card second — eyebrow, wordmark, tagline, buttons, stats, then
+ * the product. That is the reading order on a phone and it is the source
+ * order, with no `order:` anywhere: the two-column desktop layout is a grid
+ * that puts the second child in the second column, which leaves the
+ * accessibility tree and the visual order identical at every width.
+ *
+ * ---------------------------------------------------------------------------
+ * THE ENTRANCE IS CSS, NOT HYDRATED
+ * ---------------------------------------------------------------------------
+ * `.hero-in-text` / `.hero-in-card` are keyframes that start at first paint
+ * (app/globals.css), carrying the brief's own numbers. The previous version
+ * of this file already recorded why a keyframe and not a component:
+ * components/Reveal is framer-motion with `initial={{opacity: 0}}`, which
+ * SERVER-RENDERS its children invisible and waits for the bundle — measured
+ * at 4.3s LCP with 89% render delay on a tagline that was in the HTML all
+ * along. Nothing above the fold on this page may use it.
+ *
+ * Everything is on screen inside 0.6s, the buy button is a real focusable,
+ * clickable element from the first paint, and the whole thing collapses to
+ * its end state under `prefers-reduced-motion`.
  */
-export default function Hero({ theme = 'dark' }) {
-  const light = theme === 'light';
+export default function Hero() {
+  /*
+   * THE PRELOAD, and it lives here rather than in app/page.jsx on purpose:
+   * next to the <picture> it belongs to, so the two cannot drift apart when
+   * the asset is replaced.
+   *
+   * WHY IT IS NEEDED AT ALL. `fetchPriority="high"` on the <img> raises the
+   * priority of a request the parser has already reached; it does not start
+   * it any earlier. This hint goes in the <head>, so the bytes are in flight
+   * before the body is parsed — which is the whole point for an LCP element.
+   *
+   * `type: 'image/webp'` is the token that keeps a browser WITHOUT WebP
+   * support from preloading a file it would then throw away and fetch the
+   * JPEG instead. Same reason the <source> carries it.
+   *
+   * React's own resource API rather than a hand-written <link>: it
+   * de-duplicates, and it emits into the document head from a server
+   * component without the tag having to be rendered somewhere it would be
+   * illegal.
+   */
+  preload(HERO_IMAGE.src, { as: 'image', type: 'image/webp', fetchPriority: 'high' });
 
-  const eyebrowClass = light ? 'text-black-obsidian/75' : 'text-white';
-  const displayClass = light ? 'text-black-obsidian' : 'text-white';
-  const taglineClass = light ? 'text-black-obsidian/90' : 'text-white/85';
-  const cueClass = light
-    ? 'text-black-obsidian/75 group-hover:text-black-obsidian'
-    : 'text-white hero-cue';
-
-  // Replace dotted 'i' with dotless 'ı' (U+0131) so height aligns perfectly with 'r' and 'z'
+  // Replace dotted 'i' with dotless 'ı' (U+0131) so height aligns perfectly
+  // with 'r' and 'z'. Unchanged from the previous hero — this is the same
+  // wordmark, drawn by the same two classes from the same string.
   const rawText = HERO.display || 'iriz';
   const wordmarkText = rawText.toLowerCase().replace(/i/g, 'ı');
 
   return (
     <section
       id="showcase"
-      data-hero-theme={theme}
-      className={`relative flex min-h-svh flex-col justify-end overflow-hidden ${
-        light ? 'bg-white' : 'bg-black-obsidian'
-      }`}
+      className="relative isolate overflow-hidden bg-black-obsidian"
     >
-      <div className={`absolute inset-0 ${light ? 'hero-light-media' : 'hero-media'}`}>
-        <HeroBackdrop />
-      </div>
+      {/* THE PAGE GROUND, and the only colour behind the type: a very soft
+          blue wash sitting behind the RIGHT column, where the card is. It
+          never reaches the text, which keeps the left column measuring
+          against a flat #030303 rather than against a gradient. */}
+      <span aria-hidden="true" className="hero-aura pointer-events-none absolute inset-0" />
 
-      {light ? (
-        <>
-          <span aria-hidden className="hero-light-scrim pointer-events-none absolute inset-x-0 bottom-0 h-[62%]" />
-          <span aria-hidden className="hero-light-scrim-top pointer-events-none absolute inset-x-0 top-0 h-40" />
-          <span aria-hidden className="hero-light-blend pointer-events-none absolute inset-x-0 bottom-0 h-[19svh]" />
-        </>
-      ) : (
-        <>
-          <span aria-hidden className="hero-scrim-top pointer-events-none absolute inset-x-0 top-0" />
-          <span aria-hidden className="hero-scrim-bottom pointer-events-none absolute inset-x-0 bottom-0" />
-        </>
-      )}
+      <div className="section-container relative grid items-center gap-12 pb-20 pt-28 sm:gap-14 lg:min-h-svh lg:grid-cols-2 lg:gap-16 lg:pb-28 lg:pt-32">
+        {/* ONE animated block for the whole left column, which is what makes
+            the buttons and the stats "come in with" the text rather than
+            needing a stagger of their own. */}
+        <div className="hero-in-text">
+          <p className="type-label text-white/70">{HERO.eyebrow}</p>
 
-      <div
-        className={`section-container relative ${
-          light ? 'pb-[32svh] sm:pb-[30svh]' : 'pb-32 sm:pb-36'
-        }`}
-      >
-        <div className="relative">
-          {light ? (
-            <span aria-hidden className="hero-light-plate pointer-events-none absolute -inset-y-28 -left-[50vw] -right-[6vw] sm:-right-[12vw]" />
-          ) : (
-            // The plate's right-hand falloff reaches further on phones than it
-            // used to: the eyebrow is now "Mini projector for home",
-            // 265px of it at 390px wide, and at -6vw the gradient had already
-            // decayed to ~0.08 alpha under its last third — which measured
-            // 4.36:1 against the brightest frame of the loop and missed AA. At
-            // -25vw the same text measures 5.58:1. Phones only (sm: restores
-            // -6vw): desktop never had the problem, and a wider wash there
-            // would do nothing but dim the footage.
-            <span aria-hidden className="hero-text-plate pointer-events-none absolute -inset-y-20 -left-[50vw] -right-[25vw] sm:-right-[6vw]" />
-          )}
+          {/* TWO CHILDREN, one for each audience — unchanged, and
+              deliberately so: this is the page's only <h1> and the strongest
+              on-page heading signal a crawler reads.
 
-          {/* `.rise-in`, NOT <Reveal>, for all three.
+              The name the machines read is a real text node in an `sr-only`
+              span, not an `aria-label`: an aria-label would have worked for
+              the accessible name, but it OVERRIDES the contents rather than
+              supplementing them, which is how this element once ended up
+              announcing "iriz".
 
-              Reveal is framer-motion with `initial={{opacity: 0}}`: it
-              server-renders its children INVISIBLE and fades them in once the
-              bundle has hydrated and an IntersectionObserver has fired. The
-              hero is above the fold by definition, so that made the page's
-              largest paint wait on its JavaScript — measured at 4.3s LCP with
-              89% render delay, on a tagline that was in the HTML all along.
+              That text node is HERO.accessibleName ("IRIZ mini projector for
+              home"), not HERO.display — "IRIZ" alone names the product
+              without saying what it is. The visual span draws HERO.display,
+              so the two cannot drift: the sentence is read, the four letters
+              are seen. The glyphs are the dotless U+0131 wordmark in an
+              `aria-hidden` span, so it is pruned from the accessibility tree
+              and cannot be announced as "ırız".
 
-              A CSS keyframe starts at first paint instead, and the stagger is
-              three `--rise-delay` values rather than three components. See
-              `.rise-in` in app/globals.css; it collapses to the end state
-              under prefers-reduced-motion. */}
-          <p className={`type-label relative rise-in ${eyebrowClass}`}>{HERO.eyebrow}</p>
+              The styling stays on the <h1> and the visual span INHERITS it —
+              family, size, weight, tracking, leading, colour and the
+              `text-transform: none` all cascade down. */}
+          <h1
+            className="type-display font-iriz mt-5 text-white"
+            style={{ textTransform: 'none' }}
+          >
+            <span className="sr-only">{HERO.accessibleName}</span>
+            <span aria-hidden="true">{wordmarkText}</span>
+          </h1>
 
-          <div className="rise-in" style={{ '--rise-delay': '80ms' }}>
-            {/* TWO CHILDREN, one for each audience.
+          <p className="type-lede mt-5 max-w-md text-white/85">{HERO.tagline}</p>
 
-                The name the machines read is a real text node in an
-                `sr-only` span — not an `aria-label`. An aria-label would have
-                worked for the accessible name, but it OVERRIDES the contents
-                rather than supplementing them, which is how this element ended
-                up announcing "iriz" in the first place.
-
-                That text node is HERO.accessibleName ("IRIZ mini projector for
-                home"), not HERO.display. The h1 is the single strongest
-                on-page heading signal a crawler reads, and "IRIZ" alone names
-                the product without saying what it is. The visual span below
-                still draws HERO.display, so the two cannot drift: the sentence
-                is read, the four letters are seen.
-
-                The glyphs the eye reads are the dotless U+0131 wordmark, in an
-                `aria-hidden` span so it is pruned from the accessibility tree
-                and cannot be announced as "ırız".
-
-                The styling stays on the <h1> and the visual span INHERITS it —
-                family, size, weight, tracking, leading, colour and the
-                `text-transform: none` all cascade down. Restating the classes
-                on the span would be a second place for them to drift, and the
-                rendered box is identical either way: verified pixel-for-pixel
-                against the previous build at 390 and 1440. */}
-            <h1
-              className={`type-display font-iriz relative mt-5 ${displayClass}`}
-              style={{ textTransform: 'none' }}
-            >
-              <span className="sr-only">{HERO.accessibleName}</span>
-              <span aria-hidden="true">{wordmarkText}</span>
-            </h1>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            {/* SHOW_BUY gates the buy button and nothing else. With it off the
+                row is "See specs" alone, which still fills a row and still
+                gives the first screen something to do — see lib/site-config. */}
+            {SHOW_BUY && <HeroBuyButton className="btn-primary" />}
+            <Link href={ROUTES.specs} className="btn-secondary">
+              See specs
+            </Link>
           </div>
 
-          <p
-            className={`type-lede relative mt-5 max-w-xl rise-in ${taglineClass}`}
-            style={{ '--rise-delay': '160ms' }}
-          >
-            {HERO.tagline}
-          </p>
+          {/* A <dl>, because each one of these IS a term and its value. Four
+              <p>s would read as eight unrelated fragments; this announces
+              "Native Full HD, 1080P" as one pair.
 
-          {/* THE HERO'S OWN BUY.
-              ====================================================
-              The first screen had no way to act on the product it is
-              showing. The masthead CTA is `hidden sm:inline-flex`, so on a
-              phone it does not exist at all, and the sticky bar only
-              appears once the hero has been scrolled past — which left a
-              375x812 viewport with a product, a price nowhere, and nothing
-              to press.
+              The VALUE is first visually and second in the DOM, because a
+              description list has to be term-then-description to be valid —
+              `flex-col-reverse` paints the big number above its label without
+              reordering the markup. */}
+          <dl className="mt-10 grid max-w-md grid-cols-2 gap-x-6 gap-y-6 sm:gap-x-10 lg:max-w-none lg:grid-cols-4 lg:gap-x-6">
+            {HERO_STATS.map((stat) => (
+              <div key={stat.label} className="flex flex-col-reverse gap-1.5">
+                <dt className="type-label text-white/60">{stat.label}</dt>
+                <dd className="hero-stat text-white">{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
 
-              The sticky bar is unchanged and still takes over on scroll;
-              this is the one that is there on arrival. Both open the same
-              sheet (components/buy/BuyProvider), so there is one buy
-              surface however it is reached.
+        {/* THE CARD. `isolation: isolate` on it is load-bearing, not tidiness
+            — see `.hero-card` in app/globals.css: it is what the photograph's
+            `mix-blend-mode: multiply` blends against, and without it the
+            white seamless would multiply against the black page the moment
+            the entrance animation's transform expired. */}
+        <div className="hero-in-card hero-card">
+          {/* THE BLEND WRAPPER. The photograph's ground is the studio's own
+              near-white (rgb 254,254,254), and multiplying it against the
+              card's white-to-grey gradient leaves the gradient untouched —
+              so the seamless disappears into the card instead of sitting on
+              it as a rectangle, with no cutout and no keying. */}
+          <div className="hero-photo">
+            <picture>
+              <source srcSet={HERO_IMAGE.src} type="image/webp" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={HERO_IMAGE.fallback}
+                alt={HERO_IMAGE.alt}
+                width={HERO_IMAGE.width}
+                height={HERO_IMAGE.height}
+                // The LCP element: fetched at high priority and never lazy.
+                // The matching <head> preload is at the top of this
+                // component — `fetchPriority` alone does not start the
+                // request any earlier than the parser reaches this tag.
+                fetchPriority="high"
+                decoding="async"
+                className="h-auto w-full"
+              />
+            </picture>
+          </div>
 
-              `rise-in` rather than <Reveal> for the same reason as the
-              three blocks above it: this is above the fold, and Reveal
-              server-renders its children invisible until framer-motion has
-              hydrated. */}
-          {SHOW_BUY && (
-            <div className="relative mt-7 rise-in" style={{ '--rise-delay': '240ms' }}>
-              <BuyButton className="btn-primary" />
-            </div>
-          )}
+          {/* The lens glow. Positioned from HERO_IMAGE.lens, which is where
+              the glass actually is in this frame, so re-running the image
+              script moves the light with the photograph. A sibling of the
+              blend wrapper rather than a child, because `multiply` over a
+              light card would turn a blue glow into a blue stain — and it
+              carries the same float animation, so it travels with the lens
+              instead of drifting across it. */}
+          <span
+            aria-hidden="true"
+            className="hero-lens pointer-events-none"
+            style={{ '--lens-x': HERO_IMAGE.lens.x, '--lens-y': HERO_IMAGE.lens.y }}
+          />
         </div>
       </div>
-
-      <a
-        href={HERO.scrollTo}
-        className={`group absolute inset-x-0 mx-auto flex w-fit flex-col items-center gap-2.5 rounded-full px-4 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-          light ? 'bottom-[21svh] focus-visible:outline-accent' : 'bottom-8 focus-visible:outline-accent-soft'
-        }`}
-      >
-        <span className={`type-label transition-colors ${cueClass}`}>Scroll</span>
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 16 22"
-          className={`scroll-cue h-5 w-4 transition-colors ${cueClass}`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M8 1v14" />
-          <path d="m3.5 11.5 4.5 4.5 4.5-4.5" />
-        </svg>
-        <span className="sr-only">Skip to why shop BluNeuron</span>
-      </a>
     </section>
   );
 }
