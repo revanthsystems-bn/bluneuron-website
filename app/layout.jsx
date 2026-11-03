@@ -3,7 +3,6 @@ import { Inter, Inter_Tight, Zen_Dots } from 'next/font/google';
 import { MotionConfig } from 'framer-motion';
 import './globals.css';
 import SmoothScroll from '@/components/SmoothScroll';
-import PageIntro from '@/components/PageIntro';
 import ConsentNotice from '@/components/ConsentNotice';
 import { AccountProvider } from '@/components/account/AccountContext';
 import { CartProvider } from '@/components/cart/CartContext';
@@ -179,7 +178,29 @@ export default function RootLayout({ children }) {
                     nothing until opened. See components/buy/BuyProvider. */}
                 <BuyProvider>
                 <SmoothScroll />
-                <PageIntro />
+                {/* components/PageIntro IS NOT MOUNTED, AND MUST NOT BE.
+                    ----------------------------------------------------
+                    It is a `fixed inset-0 z-[100]` black overlay that
+                    covers the whole viewport while the logo mark fades in,
+                    then lifts — 1100ms of timer plus a 500ms exit, and all
+                    of it gated behind a `useEffect` in a client component.
+                    So the overlay cannot even START until the bundle has
+                    downloaded, parsed and hydrated, and on a 375px phone
+                    on a real connection the measured result was a sheet of
+                    near-black for 8-10 SECONDS before the hero appeared.
+
+                    It also made the intro the Largest Contentful Paint on
+                    every cold visit: the hero image can be preloaded,
+                    decoded and painted on time and still be invisible
+                    behind this, which scores as render delay on the one
+                    element the page is optimised around.
+
+                    The component file is deliberately left on disk — it is
+                    a finished piece of work and the decision here is about
+                    mounting it, not about deleting it. Mounting it again
+                    means first solving "the page is black until JS runs",
+                    which a CSS-only overlay that reveals on `animation-end`
+                    would, and this component does not. */}
                 {children}
                 <ConsentNotice />
                 <CartDrawer />
