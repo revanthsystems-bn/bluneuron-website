@@ -1810,6 +1810,35 @@
          stay proportional at every step of the clamp. */
       font-size: clamp(2.4rem, 7.5vw, 7.5rem);
     }
+
+    /* THE PHONE WORDMARK, 1.6x the ramp above, and it is a media query
+       rather than a wider clamp because the two ends want opposite
+       things. The ramp above is right from the tablet up, where the
+       wordmark shares a row with the product card and cannot grow into
+       it. Below 700px the card is BELOW the type, the whole viewport
+       width is the measure, and the four letters were landing at the
+       clamp's 2.4rem floor — 38px of brand name over a 17px tagline,
+       which reads as a label rather than as the product.
+
+       Every term of the clamp is multiplied, the same way `.font-iriz`
+       itself scaled `.type-display`: 2.4->3.84rem, 7.5->12vw,
+       7.5->12rem. At 375px that is 61px (the floor; 12vw is 45px) and
+       at 699px it is 84px, so the ceiling is unreachable inside this
+       query and is carried only to keep the three terms in step if the
+       breakpoint ever moves.
+
+       Leading and tracking are again NOT restated — both are relative
+       and scale with the font-size on their own.
+
+       THE BUY BUTTON STAYS ABOVE THE FOLD, which is the constraint
+       this had to be checked against rather than a hope: measured in
+       the browser at 375x667, the extra 23px of wordmark puts the
+       bottom of the Buy button at 346px, roughly half the viewport. */
+    @media (max-width: 699px) {
+      .font-iriz {
+        font-size: clamp(3.84rem, 12vw, 12rem);
+      }
+    }
   } /* <--- Check if this outer bracket or an inner one is missing */
 }
 
@@ -2127,44 +2156,47 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
   }
 
   /* ---------------------------------------------------------------- *
-   * THE ENTRANCE — two keyframes, the brief's numbers, no JavaScript.
+   * THE ENTRANCE — two keyframes, no JavaScript, AND NO OPACITY.
    *
-   * Everything is on screen by 600ms: the card at 500ms from 0, the
-   * text block at 400ms from 100ms. The buttons and the stats are
-   * inside the text block, so they arrive with it rather than needing
-   * a stagger of their own.
+   * NOT ONE FRAME OF THIS IS TRANSPARENT, and that is the whole point
+   * of the rule rather than a detail of it. Both keyframes used to
+   * start at `opacity: 0` — the card at 500ms, the text at 400ms after
+   * a 100ms delay — and that is a fade on the LARGEST CONTENTFUL PAINT
+   * element. Chromium does not credit an element while its computed
+   * opacity is 0 and takes the LCP timestamp from the frame it becomes
+   * visible in, so the hero photograph could be preloaded, fetched at
+   * high priority, decoded and composited on time and STILL report its
+   * LCP ~500ms late, filed as render delay. The page is built around
+   * that one image; the entrance was the only thing hiding it.
    *
-   * NOTHING IS EVER MADE UNCLICKABLE. These animate `opacity` and
-   * `transform` only — no `visibility`, no `pointer-events`, no
-   * `disabled` — so the buy button is a real, focusable, hit-testable
-   * element in the first painted frame and stays one throughout.
+   * What is left is a 12px rise over 0.4s on each block — under the
+   * brief's ceiling, enough to read as an entrance, and invisible to
+   * LCP because a translated element is a painted element. The card
+   * and the text now share a duration and a curve and both start at
+   * 0ms, so they rise together; the stagger was only ever legible
+   * because of the fade that is gone.
+   *
+   * Nothing is `transform: translate3d(...)` any more either — plain
+   * `translateY` keeps the card off its own compositing layer, which
+   * matters here and nowhere else: `.hero-photo` inside it carries
+   * `mix-blend-mode: multiply` and blends against this element's
+   * gradient. See the long note on `.hero-photo` above.
+   *
+   * NOTHING IS EVER MADE UNCLICKABLE. These animate `transform` only —
+   * no `opacity`, no `visibility`, no `pointer-events`, no `disabled`
+   * — so the buy button is a real, focusable, hit-testable element in
+   * the first painted frame and stays one throughout.
    * ---------------------------------------------------------------- */
-  .hero-in-text {
-    animation: hero-in-text 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
-  }
-
+  .hero-in-text,
   .hero-in-card {
-    animation: hero-in-card 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: hero-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  @keyframes hero-in-text {
+  @keyframes hero-rise {
     from {
-      opacity: 0;
-      transform: translate3d(0, 14px, 0);
+      transform: translateY(12px);
     }
     to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  @keyframes hero-in-card {
-    from {
-      opacity: 0;
-      transform: translate3d(0, 20px, 0);
-    }
-    to {
-      opacity: 1;
       transform: none;
     }
   }
@@ -2207,17 +2239,19 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
     }
   }
 
-  /* NO MOTION AT ALL, and the final state — not `animation: none` on a
-     rule whose from-state is `opacity: 0`, which would leave the hero
-     permanently invisible for exactly the people who cannot be shown a
-     fallback. The lens keeps its resting centring transform and a
-     mid-pulse opacity, so the light is there; it simply does not
-     breathe. */
+  /* NO MOTION AT ALL, and the final state stated outright rather than
+     left to `animation: none` on its own. It costs nothing now that
+     neither keyframe touches opacity — the worst a bare
+     `animation: none` could do is leave the hero sitting 12px low —
+     but it is what makes the end state independent of the keyframe,
+     which is the property that mattered when the from-state was
+     invisible and may matter again. The lens keeps its resting
+     centring transform and a mid-pulse opacity, so the light is there;
+     it simply does not breathe. */
   @media (prefers-reduced-motion: reduce) {
     .hero-in-text,
     .hero-in-card {
       animation: none;
-      opacity: 1;
       transform: none;
     }
 

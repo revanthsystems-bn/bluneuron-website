@@ -40,16 +40,21 @@ import { SHOW_BUY } from '@/lib/site-config';
  * THE ENTRANCE IS CSS, NOT HYDRATED
  * ---------------------------------------------------------------------------
  * `.hero-in-text` / `.hero-in-card` are keyframes that start at first paint
- * (app/globals.css), carrying the brief's own numbers. The previous version
- * of this file already recorded why a keyframe and not a component:
- * components/Reveal is framer-motion with `initial={{opacity: 0}}`, which
- * SERVER-RENDERS its children invisible and waits for the bundle — measured
- * at 4.3s LCP with 89% render delay on a tagline that was in the HTML all
- * along. Nothing above the fold on this page may use it.
+ * (app/globals.css). The previous version of this file already recorded why a
+ * keyframe and not a component: components/Reveal is framer-motion with
+ * `initial={{opacity: 0}}`, which SERVER-RENDERS its children invisible and
+ * waits for the bundle — measured at 4.3s LCP with 89% render delay on a
+ * tagline that was in the HTML all along. Nothing above the fold on this page
+ * may use it.
  *
- * Everything is on screen inside 0.6s, the buy button is a real focusable,
- * clickable element from the first paint, and the whole thing collapses to
- * its end state under `prefers-reduced-motion`.
+ * AND NEITHER KEYFRAME FADES. Both used to open at `opacity: 0`, which is a
+ * CSS version of the same mistake: an element at opacity 0 is not a candidate
+ * for Largest Contentful Paint, so the photograph below could arrive on time
+ * and still have its LCP timestamped at the end of the card's fade. What is
+ * left is a 12px rise over 0.4s on each block — everything is on screen
+ * inside 0.4s, every pixel of it is painted from the first frame, the buy
+ * button is a real focusable, clickable element throughout, and the whole
+ * thing collapses to its end state under `prefers-reduced-motion`.
  */
 export default function Hero() {
   /*
@@ -150,7 +155,14 @@ export default function Hero() {
 
           {/* A <dl>, because each one of these IS a term and its value. Four
               <p>s would read as eight unrelated fragments; this announces
-              "Native Full HD, 1080P" as one pair.
+              "Native Full HD, 1080p" as one pair.
+
+              THE FIGURES ARE NOT TRANSFORMED. `.hero-stat` sets size, weight,
+              leading and tracking and deliberately no `text-transform` — the
+              casing and the inch mark are decided in the data (lib/iriz.js,
+              HERO_STATS), where a screen reader and a copy-paste see the same
+              characters the page draws. The LABELS are uppercased, by
+              `.type-label`, and they are the only thing here that is.
 
               The VALUE is first visually and second in the DOM, because a
               description list has to be term-then-description to be valid —
