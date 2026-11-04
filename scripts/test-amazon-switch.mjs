@@ -525,15 +525,23 @@ const ROUTES = [
  *
  * Those pages are not exempted — that would hide a real prose leak on the
  * very pages where two of them were found. Instead the exact `<option>` is
- * cut out of the HTML, the test asserts it WAS there (so the deliberate
- * exception cannot quietly disappear either), and everything else on the page
- * is held to the same "says nothing about Amazon" rule as every other route.
+ * cut out of the HTML and everything else on the page is held to the same
+ * "says nothing about Amazon" rule as every other route.
+ *
+ * WHETHER IT IS THERE AT ALL DEPENDS ON THE BUILD, which is why its presence
+ * is not asserted here. components/SupportForm is a client component reading
+ * `useSearchParams()` inside a <Suspense> boundary: `next dev` renders the
+ * <select> into the HTML, and a prerendered production build defers the whole
+ * boundary to the client, so the markup is in one and not the other. Both are
+ * correct. Part A asserts SUPPORT_PURCHASE_SOURCES directly, which is the
+ * real guard and does not care how the page was built.
  */
 const FORM_ROUTES = ['/support/warranty-registration', '/support/warranty-claim'];
 const PURCHASE_SOURCE_OPTION = /<option value="Amazon"[^>]*>Amazon<\/option>/g;
 
 async function checkRendered(base, expectAmazon) {
   const root = base.replace(/\/+$/, '');
+  const notes = [];
   for (const route of ROUTES) {
     let html;
     try {
@@ -551,11 +559,7 @@ async function checkRendered(base, expectAmazon) {
     let body = html;
     if (FORM_ROUTES.includes(route)) {
       const options = html.match(PURCHASE_SOURCE_OPTION) ?? [];
-      check(
-        `HTML ${route} still offers Amazon as a purchase source (deliberate)`,
-        options.length === 1,
-        `${options.length} matching <option>, want 1`
-      );
+      if (options.length) notes.push(`${route}: purchase-source <option> present, ignored`);
       body = html.replace(PURCHASE_SOURCE_OPTION, '');
     }
 
@@ -572,10 +576,11 @@ async function checkRendered(base, expectAmazon) {
       check(
         `HTML ${route} says nothing about Amazon`,
         hits.length === 0,
-        hits.length ? `${hits.length} occurrence(s), e.g. …${context(html, hits[0].index)}…` : ''
+        hits.length ? `${hits.length} occurrence(s), e.g. …${context(body, hits[0].index)}…` : ''
       );
     }
   }
+  return notes;
 }
 
 function context(html, at) {
@@ -638,8 +643,10 @@ console.log(`   ${ALLOWED.length} documented exceptions, ${literals.length} new\
 /* --- PART C --- */
 if (renderedAt) {
   console.log(`C. the rendered pages at ${renderedAt} (expecting AMAZON.live = ${liveNow})`);
-  await checkRendered(renderedAt, liveNow === 'true');
-  console.log(`   ${ROUTES.length} routes\n`);
+  const notes = await checkRendered(renderedAt, liveNow === 'true');
+  console.log(`   ${ROUTES.length} routes`);
+  for (const note of notes) console.log(`   note: ${note}`);
+  console.log('');
 } else {
   console.log('C. the rendered pages — SKIPPED');
   console.log('   Start the site and pass --rendered <url> to run it:');
