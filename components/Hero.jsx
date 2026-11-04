@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { preload } from 'react-dom';
 import HeroBuyButton from '@/components/hero/HeroBuyButton';
-import { HERO, HERO_IMAGE, HERO_STATS } from '@/lib/iriz';
+import { HERO, HERO_STATS } from '@/lib/iriz';
+// The hero photograph's own config — the file `npm run hero:image` rewrites.
+// See the WHERE TO CHANGE THE HERO IMAGE banner at the top of it.
+import { HERO_IMAGE } from '@/lib/hero-image';
 import { ROUTES } from '@/lib/routes';
 import { SHOW_BUY } from '@/lib/site-config';
 
@@ -225,12 +228,22 @@ export default function Hero() {
               blend wrapper rather than a child, because `multiply` over a
               light card would turn a blue glow into a blue stain — and it
               carries the same float animation, so it travels with the lens
-              instead of drifting across it. */}
-          <span
-            aria-hidden="true"
-            className="hero-lens pointer-events-none"
-            style={{ '--lens-x': HERO_IMAGE.lens.x, '--lens-y': HERO_IMAGE.lens.y }}
-          />
+              instead of drifting across it.
+
+              `lens: null` RENDERS NOTHING, and that is a supported state
+              rather than a missing value to paper over. `npm run hero:image`
+              writes null when it cannot find the glass with confidence and
+              nobody told it where the glass is — because a glow a few
+              percent off the lens reads as a bug in the page, while no glow
+              reads as a design decision. So the element is absent, not
+              present at a guessed position and not present at (50%, 50%). */}
+          {HERO_IMAGE.lens ? (
+            <span
+              aria-hidden="true"
+              className="hero-lens pointer-events-none"
+              style={{ '--lens-x': HERO_IMAGE.lens.x, '--lens-y': HERO_IMAGE.lens.y }}
+            />
+          ) : null}
         </div>
       </div>
     </section>

@@ -6,7 +6,7 @@ import SupportForm from '@/components/SupportForm';
 import { BRAND } from '@/lib/iriz';
 import { ROUTES, routeRobots } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
-import { WARRANTY } from '@/lib/site-config';
+import { WARRANTY, sellersOr } from '@/lib/site-config';
 
 export const metadata = {
   ...pageMetadata({
@@ -61,9 +61,19 @@ export default function WarrantyRegistrationPage() {
                   className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-accent-soft"
                   aria-hidden="true"
                 />
+                {/* The sellers are INTERPOLATED. This sentence is a second
+                    copy of INVOICE_NO_HINT (lib/warranty.js), which the form
+                    field itself renders a few hundred pixels below it, and it
+                    used to name Amazon as a literal while every other surface
+                    on the site had withdrawn it — see the note on that
+                    constant. Two copies of a sentence is its own problem, but
+                    they are worded differently on purpose (this one is a
+                    bullet in a "what you will need" list, that one is a hint
+                    under an input), so what matters is that both read the
+                    seller list from the same switch. */}
                 <span>
                   Your <strong className="font-semibold text-white/85">invoice number</strong> —
-                  printed on your invoice from Flipkart, Amazon or the dealer you bought from.
+                  printed on your invoice from {sellersOr()}, or from the dealer you bought from.
                 </span>
               </li>
               <li className="flex gap-2.5">
