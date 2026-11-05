@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { preload } from 'react-dom';
 import HeroBuyButton from '@/components/hero/HeroBuyButton';
-import { HERO, HERO_STATS } from '@/lib/iriz';
+import NeuronNetwork from '@/components/hero/NeuronNetwork';
+import { HERO, HERO_CHIPS, HERO_STATS } from '@/lib/iriz';
 // The hero photograph's own config — the file `npm run hero:image` rewrites.
 // See the WHERE TO CHANGE THE HERO IMAGE banner at the top of it.
 import { HERO_IMAGE } from '@/lib/hero-image';
@@ -9,55 +10,67 @@ import { ROUTES } from '@/lib/routes';
 import { SHOW_BUY } from '@/lib/site-config';
 
 /**
- * The homepage hero: a dark two-column frame with the product photographed on
- * a light card.
+ * The homepage hero — the NEURON NETWORK treatment: a dark two-column frame
+ * with the product photographed on a light card, over a canvas field of blue
+ * nodes that fire signals into the projector's lens.
  *
  * ---------------------------------------------------------------------------
- * WHAT REPLACED WHAT
+ * WHAT CHANGED FROM THE PREVIOUS HERO, AND WHAT DELIBERATELY DID NOT
  * ---------------------------------------------------------------------------
- * This used to be a full-bleed 100svh <video> loop with the type stacked over
- * it (components/HeroBackdrop, still on disk and no longer mounted anywhere).
- * Three things came with that arrangement and none of them is here any more:
+ * ADDED: components/hero/NeuronNetwork (the canvas), a visual headline built
+ * from HERO.tagline with its last word in a shimmering blue gradient, three
+ * glass chips around the card from HERO_CHIPS, and a pulsing blue ring on the
+ * card. The eyebrow is set in light blue instead of white/70.
  *
- *   - 1.4 MB of mp4 + webm + poster fetched before anything could be read,
- *     for four seconds of motion nobody asked for;
- *   - white type held over WHITE STUDIO FOOTAGE, which needed a veil, two
- *     scrims and a text plate to stay legible, and still measured differently
- *     on different frames of the loop;
- *   - an LCP that was whatever frame happened to decode first.
+ * UNCHANGED, and each one for a reason already paid for once:
  *
- * The photograph is a static asset with known pixels, so the type sits on a
- * flat #030303 that cannot change behind it, and the largest paint is one
- * 53 KB WebP that is preloaded and sized in the markup.
+ *   THE WORDMARK. The <h1> below is byte-for-byte the element the previous
+ *   hero shipped — same two children, same `type-display font-iriz` pair,
+ *   same `textTransform: none`, same dotless-ı substitution off HERO.display.
+ *   There is NO wordmark asset on this site: the four letters are live text
+ *   in Zen Dots (next/font/google, wired up in app/layout.jsx as
+ *   `--font-iriz`) dressed by the `.font-iriz` utility in app/globals.css,
+ *   which owns the size ramp, the 400 weight and the 0.02em tracking. So
+ *   "the same wordmark" means the same string through the same two classes —
+ *   nothing here retypes it, re-draws it, re-weights it or re-colours it, and
+ *   the only thing this rebuild may change about it is its size, which it
+ *   does not.
+ *
+ *   THE <picture> AND ITS PRELOAD. Still the LCP element, still four
+ *   pre-built static files out of lib/hero-image, still preloaded in the
+ *   <head> with `imageSrcSet`/`imageSizes` that agree with the <img>.
+ *
+ *   THE BUY BUTTON. components/hero/HeroBuyButton, untouched: the label is
+ *   `buyDestinations()[0].label` out of the store registry, the href is that
+ *   destination's, and the click still calls `trackBuyClick`.
+ *
+ *   DOM ORDER IS STILL THE MOBILE ORDER. Copy first, card second — eyebrow,
+ *   wordmark, headline, buttons, stats, then the product and its chips. No
+ *   `order:` anywhere, so the accessibility tree and the visual order stay
+ *   identical at every width.
+ *
+ *   THE ENTRANCE IS STILL CSS AND STILL NEVER TRANSPARENT. `.hero-in-text` /
+ *   `.hero-in-card` are a 12px rise and nothing else (app/globals.css). An
+ *   element at `opacity: 0` is not a candidate for Largest Contentful Paint,
+ *   so a fade on this card once had the photograph's LCP timestamped at the
+ *   end of an animation it had nothing to do with. Nothing above the fold may
+ *   use components/Reveal either — it server-renders its children invisible
+ *   and waits for the bundle.
  *
  * ---------------------------------------------------------------------------
- * DOM ORDER IS THE MOBILE ORDER
+ * THE CANVAS IS THE ONLY CLIENT COMPONENT HERE
  * ---------------------------------------------------------------------------
- * Copy first, card second — eyebrow, wordmark, tagline, buttons, stats, then
- * the product. That is the reading order on a phone and it is the source
- * order, with no `order:` anywhere: the two-column desktop layout is a grid
- * that puts the second child in the second column, which leaves the
- * accessibility tree and the visual order identical at every width.
+ * Everything else on this screen is server-rendered: the chips are real text
+ * in the HTML, the ring and the glow are CSS, the shimmer is a keyframe. The
+ * network is the one thing that genuinely needs a main thread, and it does
+ * not touch it until after the `load` event — see the long note in
+ * components/hero/NeuronNetwork.
  *
- * ---------------------------------------------------------------------------
- * THE ENTRANCE IS CSS, NOT HYDRATED
- * ---------------------------------------------------------------------------
- * `.hero-in-text` / `.hero-in-card` are keyframes that start at first paint
- * (app/globals.css). The previous version of this file already recorded why a
- * keyframe and not a component: components/Reveal is framer-motion with
- * `initial={{opacity: 0}}`, which SERVER-RENDERS its children invisible and
- * waits for the bundle — measured at 4.3s LCP with 89% render delay on a
- * tagline that was in the HTML all along. Nothing above the fold on this page
- * may use it.
- *
- * AND NEITHER KEYFRAME FADES. Both used to open at `opacity: 0`, which is a
- * CSS version of the same mistake: an element at opacity 0 is not a candidate
- * for Largest Contentful Paint, so the photograph below could arrive on time
- * and still have its LCP timestamped at the end of the card's fade. What is
- * left is a 12px rise over 0.4s on each block — everything is on screen
- * inside 0.4s, every pixel of it is painted from the first frame, the buy
- * button is a real focusable, clickable element throughout, and the whole
- * thing collapses to its end state under `prefers-reduced-motion`.
+ * It also owns the CURSOR TILT on the card, by writing `--tilt-x` / `--tilt-y`
+ * onto the `[data-hero-card]` element below. The data attribute, not a ref,
+ * because the card has to stay server-rendered markup: handing it to a client
+ * component as children would work, but a selector costs nothing and keeps
+ * the LCP image out of any client module's tree.
  */
 export default function Hero() {
   /*
@@ -73,11 +86,6 @@ export default function Hero() {
    * `type: 'image/webp'` is the token that keeps a browser WITHOUT WebP
    * support from preloading a file it would then throw away and fetch the
    * JPEG instead. Same reason the <source> carries it.
-   *
-   * React's own resource API rather than a hand-written <link>: it
-   * de-duplicates, and it emits into the document head from a server
-   * component without the tag having to be rendered somewhere it would be
-   * illegal.
    */
   preload(HERO_IMAGE.src, {
     as: 'image',
@@ -97,23 +105,49 @@ export default function Hero() {
   const rawText = HERO.display || 'iriz';
   const wordmarkText = rawText.toLowerCase().replace(/i/g, 'ı');
 
+  /*
+   * THE HEADLINE, SPLIT RATHER THAN RETYPED.
+   *
+   * The visual headline is HERO.tagline ("Your home cinema awaits.") with its
+   * LAST WORD in the shimmering blue gradient. Both halves are sliced off the
+   * one string at render time instead of being two fields in lib/iriz, for
+   * the same reason HERO_STATS reads its figures back out of SPECS: a second
+   * copy of a sentence is a second place for it to go stale. Re-word the
+   * tagline and the gradient follows whatever its last word becomes.
+   *
+   * A one-word tagline degrades to the whole thing shimmering, which is the
+   * sensible reading of "the last word" rather than an edge case to guard.
+   */
+  const taglineWords = HERO.tagline.trim().split(/\s+/);
+  const taglineAccent = taglineWords.pop();
+  const taglineLead = taglineWords.join(' ');
+
   return (
     <section
       id="showcase"
       className="relative isolate overflow-hidden bg-black-obsidian"
     >
-      {/* THE PAGE GROUND, and the only colour behind the type: a very soft
-          blue wash sitting behind the RIGHT column, where the card is. It
-          never reaches the text, which keeps the left column measuring
-          against a flat #030303 rather than against a gradient. */}
+      {/* THE PAGE GROUND: a soft navy radial wash centred on the product, at
+          72% across and 55% down. It never reaches far enough left to sit
+          under the copy, which keeps the left column measuring against a
+          flat #030303 rather than against a gradient. */}
       <span aria-hidden="true" className="hero-aura pointer-events-none absolute inset-0" />
+
+      {/* THE NETWORK. A sibling of the aura and of the grid, so it paints
+          between them: over the wash, under every word. Empty in the
+          server HTML and transparent until its own script starts it after
+          `load` — see components/hero/NeuronNetwork. */}
+      <NeuronNetwork />
 
       <div className="section-container relative grid items-center gap-12 pb-20 pt-28 sm:gap-14 lg:min-h-svh lg:grid-cols-2 lg:gap-16 lg:pb-28 lg:pt-32">
         {/* ONE animated block for the whole left column, which is what makes
             the buttons and the stats "come in with" the text rather than
             needing a stagger of their own. */}
         <div className="hero-in-text">
-          <p className="type-label text-white/70">{HERO.eyebrow}</p>
+          {/* Light blue, where this used to be white/70. Measured at 11.6:1
+              on #030303 — comfortably past AA at `.type-label`'s 11px, which
+              is the size that made the check worth doing. */}
+          <p className="type-label hero-eyebrow">{HERO.eyebrow}</p>
 
           {/* TWO CHILDREN, one for each audience — unchanged, and
               deliberately so: this is the page's only <h1> and the strongest
@@ -144,7 +178,17 @@ export default function Hero() {
             <span aria-hidden="true">{wordmarkText}</span>
           </h1>
 
-          <p className="type-lede mt-5 max-w-md text-white/85">{HERO.tagline}</p>
+          {/* THE VISUAL HEADLINE, and it is a <p> rather than an <h2>: the
+              page's heading outline is unchanged by this rebuild, and
+              promoting a tagline to a second-level heading would put a
+              sentence that states no section into the document structure.
+              `.hero-headline` carries the size; `.hero-shimmer` carries the
+              gradient and the 4s pass. */}
+          <p className="hero-headline mt-5 max-w-md text-white">
+            {taglineLead}
+            {taglineLead ? ' ' : null}
+            <span className="hero-shimmer">{taglineAccent}</span>
+          </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             {/* SHOW_BUY gates the buy button and nothing else. With it off the
@@ -181,69 +225,120 @@ export default function Hero() {
           </dl>
         </div>
 
-        {/* THE CARD. `isolation: isolate` on it is load-bearing, not tidiness
-            — see `.hero-card` in app/globals.css: it is what the photograph's
-            `mix-blend-mode: multiply` blends against, and without it the
-            white seamless would multiply against the black page the moment
-            the entrance animation's transform expired. */}
-        <div className="hero-in-card hero-card">
-          {/* THE BLEND WRAPPER. The photograph's ground is the studio's own
-              near-white (rgb 254,254,254), and multiplying it against the
-              card's white-to-grey gradient leaves the gradient untouched —
-              so the seamless disappears into the card instead of sitting on
-              it as a rectangle, with no cutout and no keying. */}
-          <div className="hero-photo">
-            <picture>
-              <source
-                type="image/webp"
-                srcSet={HERO_IMAGE.srcSet}
-                sizes={HERO_IMAGE.sizes}
+        {/* THE STAGE. It exists for exactly two reasons and holds no styling
+            of its own beyond them: it is the `perspective` the card's 3D tilt
+            is read through, and it is the positioning context the chips hang
+            off. The ENTRANCE lives here too, so the rise and the tilt are on
+            two different elements and cannot overwrite each other's
+            `transform`. */}
+        <div className="hero-in-card hero-stage">
+          {/* THE CARD. `isolation: isolate` on it is load-bearing, not
+              tidiness — see `.hero-card` in app/globals.css: it is what the
+              photograph's `mix-blend-mode: multiply` blends against, and it
+              is also what makes the tilt safe. A transform on an element
+              that does NOT declare its own isolation turns the blend's
+              backdrop transparent and the seamless comes back as a white
+              rectangle; declared here, the blend group is rooted on this
+              element and stays rooted whatever the transform is doing. */}
+          <div className="hero-card" data-hero-card>
+            {/* THE BLEND WRAPPER. The photograph's ground is the studio's own
+                near-white (rgb 254,254,254), and multiplying it against the
+                card's white-to-grey gradient leaves the gradient untouched —
+                so the seamless disappears into the card instead of sitting on
+                it as a rectangle, with no cutout and no keying. */}
+            <div className="hero-photo">
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet={HERO_IMAGE.srcSet}
+                  sizes={HERO_IMAGE.sizes}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={HERO_IMAGE.fallback}
+                  srcSet={HERO_IMAGE.fallbackSrcSet}
+                  sizes={HERO_IMAGE.sizes}
+                  alt={HERO_IMAGE.alt}
+                  // The WIDEST file's pixels, which is the intrinsic ratio for
+                  // every candidate in the set — so the box is reserved before
+                  // any bytes arrive and is the same box whichever width the
+                  // browser picks. That is what holds CLS at zero.
+                  width={HERO_IMAGE.width}
+                  height={HERO_IMAGE.height}
+                  // The LCP element: fetched at high priority and never lazy.
+                  // The matching <head> preload is at the top of this
+                  // component — `fetchPriority` alone does not start the
+                  // request any earlier than the parser reaches this tag.
+                  fetchPriority="high"
+                  decoding="async"
+                  className="h-auto w-full"
+                />
+              </picture>
+            </div>
+
+            {/* The lens glow, and now also THE SIGNALS' DESTINATION.
+                Positioned from HERO_IMAGE.lens, which is where the glass
+                actually is in this frame, so re-running the image script
+                moves the light — and every signal the canvas fires — with the
+                photograph. `data-hero-lens` is the hook
+                components/hero/NeuronNetwork measures; nothing else reads it,
+                and there is no second copy of the coordinate anywhere.
+
+                A sibling of the blend wrapper rather than a child, because
+                `multiply` over a light card would turn a blue glow into a
+                blue stain — and it carries the same float animation, so it
+                travels with the lens instead of drifting across it.
+
+                `lens: null` RENDERS NOTHING, and that is a supported state
+                rather than a missing value to paper over. `npm run
+                hero:image` writes null when it cannot find the glass with
+                confidence and nobody told it where the glass is — because a
+                glow a few percent off the lens reads as a bug in the page,
+                while no glow reads as a design decision. So the element is
+                absent, not present at a guessed position and not present at
+                (50%, 50%); the canvas then aims its signals at the card's
+                centre instead. */}
+            {HERO_IMAGE.lens ? (
+              <span
+                aria-hidden="true"
+                data-hero-lens
+                className="hero-lens pointer-events-none"
+                style={{ '--lens-x': HERO_IMAGE.lens.x, '--lens-y': HERO_IMAGE.lens.y }}
               />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={HERO_IMAGE.fallback}
-                srcSet={HERO_IMAGE.fallbackSrcSet}
-                sizes={HERO_IMAGE.sizes}
-                alt={HERO_IMAGE.alt}
-                // The WIDEST file's pixels, which is the intrinsic ratio for
-                // every candidate in the set — so the box is reserved before
-                // any bytes arrive and is the same box whichever width the
-                // browser picks. That is what holds CLS at zero.
-                width={HERO_IMAGE.width}
-                height={HERO_IMAGE.height}
-                // The LCP element: fetched at high priority and never lazy.
-                // The matching <head> preload is at the top of this
-                // component — `fetchPriority` alone does not start the
-                // request any earlier than the parser reaches this tag.
-                fetchPriority="high"
-                decoding="async"
-                className="h-auto w-full"
-              />
-            </picture>
+            ) : null}
+
+            {/* THE RING, and it is the LAST child on purpose. A blend mode
+                composites against whatever has already been painted beneath
+                it, so a ring drawn BEFORE the photograph would end up inside
+                the photograph's backdrop and be multiplied into it. Drawn
+                after, it sits cleanly on top. It animates `opacity` only —
+                the one property that pulses without a repaint of the card's
+                gradient underneath. */}
+            <span aria-hidden="true" className="hero-ring pointer-events-none" />
           </div>
 
-          {/* The lens glow. Positioned from HERO_IMAGE.lens, which is where
-              the glass actually is in this frame, so re-running the image
-              script moves the light with the photograph. A sibling of the
-              blend wrapper rather than a child, because `multiply` over a
-              light card would turn a blue glow into a blue stain — and it
-              carries the same float animation, so it travels with the lens
-              instead of drifting across it.
+          {/* THE CHIPS. Real text in the server HTML, not decoration: each
+              one states a fact the hero does not otherwise carry, and every
+              one of those facts is read back out of the spec sheet in
+              lib/iriz.js (see the note on HERO_CHIPS) rather than written
+              here. A <ul>, because three parallel facts are a list.
 
-              `lens: null` RENDERS NOTHING, and that is a supported state
-              rather than a missing value to paper over. `npm run hero:image`
-              writes null when it cannot find the glass with confidence and
-              nobody told it where the glass is — because a glow a few
-              percent off the lens reads as a bug in the page, while no glow
-              reads as a design decision. So the element is absent, not
-              present at a guessed position and not present at (50%, 50%). */}
-          {HERO_IMAGE.lens ? (
-            <span
-              aria-hidden="true"
-              className="hero-lens pointer-events-none"
-              style={{ '--lens-x': HERO_IMAGE.lens.x, '--lens-y': HERO_IMAGE.lens.y }}
-            />
-          ) : null}
+              The THIRD is hidden under 700px by `.hero-chip` — `display:
+              none` takes it out of the accessibility tree with it, so a
+              phone never announces a chip it does not draw. */}
+          <ul className="hero-chips" aria-label="At a glance">
+            {HERO_CHIPS.map((chip) => (
+              <li key={chip.lead} className="hero-chip">
+                <span className="hero-chip-lead">{chip.lead}</span>
+                {/* The separator is punctuation, not content: a screen reader
+                    announcing "middle dot" between every chip's two halves is
+                    noise, so it is pruned and the two spans read as one
+                    phrase. */}
+                <span aria-hidden="true" className="hero-chip-sep">·</span>
+                <span className="hero-chip-text">{chip.text}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

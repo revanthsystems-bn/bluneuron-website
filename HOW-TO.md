@@ -62,6 +62,13 @@ The hero image is the big photo of the projector at the top of the home page.
    - The blue ring is **on the lens glass**. If it is not, go to A-ii below.
    - If it says *"the glow is OFF"*, that is fine — read A-ii.
 
+   The blue ring matters for **two** things now, not one. It is where the
+   glow goes, and it is also where the little travelling blue dots in the
+   background fly to — they come in from the edges of the screen and land on
+   the lens. Both are set from the same place, so you do not do anything
+   extra: get the ring on the glass and both follow. If there is no glow, the
+   dots aim at the middle of the white card instead, which still looks right.
+
 5. Look at the real page:
 
    ```bash
@@ -93,6 +100,10 @@ in the project needs editing.
 The glow is the soft blue light on the lens. The command tries to find the
 lens by itself. If it is not sure, **it leaves the glow off on purpose** — a
 glow in the wrong place looks broken, no glow just looks plain.
+
+The travelling blue dots in the background aim at the same spot, so fixing
+the glow fixes them too. With the glow switched off they aim at the middle of
+the white card. Nothing separate to set either way.
 
 - **Ring is in the wrong place, or there is no glow and you want one.**
   Open the preview, work out roughly where the lens is as a percentage —

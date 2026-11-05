@@ -2023,19 +2023,183 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
    * ================================================================ */
 
   /* The only colour behind the type, and it is deliberately not behind
-     the type at all: a soft blue wash centred on the RIGHT column,
-     where the product card sits, decaying to nothing well before the
-     left edge. The headline, the eyebrow, the tagline and the stats
+     the type at all: a soft NAVY wash centred on the product at 72%
+     across and 55% down, decaying to nothing well before the left
+     edge. The wordmark, the eyebrow, the headline and the stats
      therefore all measure against a flat #030303 — the contrast of the
      left column is a constant, not a function of where a gradient
-     happened to land. */
+     happened to land.
+
+     NAVY, not the accent blue this used to run: the canvas field over
+     it is already drawn in rgba(91,157,255), and two blues of the same
+     lightness stacked turned the right half of the hero into one flat
+     wash with the nodes invisible inside it. Dropping the ground to a
+     deeper, darker navy is what gives the network something to read
+     against. */
   .hero-aura {
     background: radial-gradient(
-      56% 52% at 74% 44%,
-      rgba(59, 130, 246, 0.2) 0%,
-      rgba(59, 130, 246, 0.07) 42%,
+      58% 54% at 72% 55%,
+      rgba(30, 64, 175, 0.26) 0%,
+      rgba(30, 64, 175, 0.1) 42%,
       transparent 72%
     );
+  }
+
+  /* ---------------------------------------------------------------- *
+   * THE NEURON NETWORK CANVAS — components/hero/NeuronNetwork.
+   *
+   * The element is server-rendered EMPTY and the component adds
+   * `.is-live` once it has started, after the `load` event. The
+   * opacity lives HERE rather than in an inline style because
+   * scripts/assert-visible-html.mjs fails any route whose markup
+   * carries `style="opacity:0"` — correctly, since that is exactly how
+   * the old framer-motion reveals shipped a blank page to browsers
+   * that never ran the bundle. A class is invisible to that check and
+   * is also the right place for it.
+   *
+   * `pointer-events: none` IS LOAD-BEARING. The canvas covers the
+   * whole hero, including the buy button, and without this line it
+   * would eat every click on the first screen.
+   *
+   * THE MASK IS A CONTRAST CONTROL, NOT A FLOURISH. Measured: white at
+   * 70% opacity over one 0.55-alpha node on #030303 is 4.14:1, which
+   * is under AA for small text — and `.type-label` is 11px. The mask
+   * fades the field to 28% over the left third of the hero, where the
+   * eyebrow, the headline and the stat labels live, which takes that
+   * worst case back over 6:1 while leaving the field at full strength
+   * around the card, where the design wants it. It also happens to be
+   * the right composition: a network densest at the product and
+   * thinning away from it.
+   * ---------------------------------------------------------------- */
+  .hero-network {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    /* 1.2s, and `ease-out` rather than `linear`: the field should arrive
+       and settle, not ramp at a constant rate. */
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.28) 8%,
+      rgba(0, 0, 0, 1) 42%,
+      rgba(0, 0, 0, 1) 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.28) 8%,
+      rgba(0, 0, 0, 1) 42%,
+      rgba(0, 0, 0, 1) 100%
+    );
+  }
+
+  .hero-network.is-live {
+    opacity: 1;
+  }
+
+  /* ONE COLUMN, ONE MASK AXIS. Below 700px the copy sits over the
+     whole canvas rather than beside it, so a horizontal fade protects
+     nothing — the type is at the TOP and the card is at the bottom, so
+     the fade is vertical instead. The component independently drops
+     node alpha to 0.4 on this breakpoint (NODE_ALPHA_MOBILE), which is
+     what actually carries the contrast here; this is the second half of
+     the same measurement. */
+  @media (max-width: 699px) {
+    .hero-network {
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.35) 22%,
+        rgba(0, 0, 0, 1) 62%,
+        rgba(0, 0, 0, 1) 100%
+      );
+      mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.35) 22%,
+        rgba(0, 0, 0, 1) 62%,
+        rgba(0, 0, 0, 1) 100%
+      );
+    }
+  }
+
+  /* The eyebrow, in light blue where it used to be white/70. #9DC4FF
+     measures 10.6:1 on #030303 and 6.1:1 on the worst case the mask
+     above allows, so the one 11px line on this screen that is not
+     white has more headroom than the white/60 stat labels beside it.
+     `.type-label` still owns the size, the uppercasing and the 0.2em
+     tracking; this sets the colour and nothing else. */
+  .hero-eyebrow {
+    color: #9dc4ff;
+  }
+
+  /* ---------------------------------------------------------------- *
+   * THE VISUAL HEADLINE, and the shimmer on its last word.
+   *
+   * One step up from `.type-lede`, which is what this line used to
+   * use: the tagline is now the hero's sentence rather than a caption
+   * under the wordmark, so it is set as a headline and weighted to
+   * match.
+   * ---------------------------------------------------------------- */
+  .hero-headline {
+    font-size: clamp(1.5rem, 3.1vw, 2.375rem);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+  }
+
+  /* THE GRADIENT WORD. Three things here are deliberate:
+     ====================================================================
+     1. `color` IS SET FIRST, to a real, measured colour. Every browser
+        that does not support `background-clip: text` — and every
+        rendering context that reports a computed colour, which is what
+        an automated contrast check reads — gets #5b9dff, measured at
+        7.6:1 on #030303. The clip is applied inside an @supports so
+        the transparent fill can never be the only state.
+     2. EVERY STOP IS LIGHT. #93c5fd, #5b9dff and #bfdbfe are 11.0:1,
+        7.6:1 and 13.1:1 on this ground, so the word stays past AA at
+        every frame of the pass rather than only at its brightest.
+     3. 4s, ONE PASS, and `background-position` is the only thing
+        animated — a 200% background slid across a text-sized box,
+        which is a cheap composited repaint rather than a re-layout. */
+  .hero-shimmer {
+    color: #5b9dff;
+  }
+
+  @supports (-webkit-background-clip: text) or (background-clip: text) {
+    .hero-shimmer {
+      background-image: linear-gradient(
+        100deg,
+        #93c5fd 0%,
+        #5b9dff 28%,
+        #bfdbfe 50%,
+        #5b9dff 72%,
+        #93c5fd 100%
+      );
+      background-size: 220% 100%;
+      background-position: 100% 0;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: hero-shimmer 4s linear infinite both;
+    }
+  }
+
+  /* LINEAR, and this is the one animation on the page that should be:
+     a highlight travelling at a constant rate across a word is exactly
+     the case the easing guidance carves out. Eased, it would appear to
+     stall in the middle of the word. */
+  @keyframes hero-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
   }
 
   /* The four figures. One step under `.type-lede` at the small end and
@@ -2062,6 +2226,25 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
    * outright makes the group permanent and independent of any
    * animation state.
    * ---------------------------------------------------------------- */
+  /* THE STAGE, and it holds exactly two properties because it exists
+     for exactly two jobs: it is the `perspective` the card's 3D tilt
+     is read through, and it is the positioning context the chips hang
+     off.
+
+     THE ENTRANCE IS ON THIS ELEMENT, NOT ON THE CARD, and that split
+     is the point of having a stage at all. `.hero-in-card` animates
+     `transform` and so does the tilt; on one element the later
+     declaration would win outright and the card would either never
+     rise or never tilt. Two elements, one transform each.
+
+     1200px rather than something tighter: at 8° of rotation a short
+     perspective throws the near corner forward hard enough to read as
+     a fisheye on a photograph. */
+  .hero-stage {
+    position: relative;
+    perspective: 1200px;
+  }
+
   .hero-card {
     position: relative;
     isolation: isolate;
@@ -2074,11 +2257,279 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
       #e4e8ee 100%
     );
     /* A hairline, the blue outer glow, and a plain dark lift under it so
-       the card has weight as well as colour. */
+       the card has weight as well as colour. The glow is carried
+       further than it was — the card now sits in a field of blue nodes
+       and has to read as the thing lighting them rather than as another
+       element in the same palette. */
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.1),
-      0 40px 90px -40px rgba(59, 130, 246, 0.55),
+      0 0 70px -10px rgba(59, 130, 246, 0.28),
+      0 46px 110px -45px rgba(59, 130, 246, 0.62),
       0 18px 60px -30px rgba(0, 0, 0, 0.75);
+    /* THE CURSOR TILT. components/hero/NeuronNetwork writes `--tilt-x`,
+       `--tilt-y` and `--tilt-lift` onto this element and never a
+       `transform`, so this declaration owns the composition and the
+       three variables are just numbers. It writes them only when the
+       pointer query matches `(hover: hover) and (pointer: fine)` and
+       never under reduced motion, so a touch screen leaves all three
+       at the fallbacks below and this resolves to no transform at all.
+
+       THE TRANSFORM IS SAFE HERE AND WOULD NOT BE ONE ELEMENT DOWN.
+       `isolation: isolate` above roots the blend group on THIS element,
+       so `.hero-photo`'s `mix-blend-mode: multiply` keeps resolving
+       against this card's own gradient however this transform is
+       composited. On an element without that declaration the
+       transformed ancestor becomes the isolation boundary instead, the
+       blend finds a transparent backdrop, and the studio seamless comes
+       back as a plain white rectangle. Both halves of that were
+       reproduced before this line was written — see the long note on
+       `.hero-photo` below.
+
+       THE TRANSITION IS THE SMOOTHING. `pointermove` fires per frame
+       and the values it writes are instantaneous; a 320ms ease-out
+       lets the card trail the cursor instead of snapping to it, and it
+       is also what makes the return to rest on `pointerleave` a glide
+       rather than a jump. No `will-change`: this element is only
+       composited while the pointer is actually in the hero, and a
+       permanent layer on the card that holds the LCP image is a worse
+       trade than the one repaint. */
+    transform:
+      rotateX(var(--tilt-x, 0deg))
+      rotateY(var(--tilt-y, 0deg))
+      scale(calc(1 + 0.012 * var(--tilt-lift, 0)));
+    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* THE RING. A thin blue hairline around the card that breathes once
+     every 3.6s.
+
+     A SEPARATE ELEMENT RATHER THAN A FOURTH BOX-SHADOW on the card,
+     because a pulsing `box-shadow` repaints the card's whole box —
+     including, on this card, a `mix-blend-mode` subtree — twice a
+     cycle. An absolutely positioned overlay animating OPACITY ONLY is
+     a composited fade over a layer that never changes.
+
+     It is the LAST child of the card in the DOM for a reason stated in
+     components/Hero: a blend mode composites against what has already
+     been painted below it, so a ring drawn before the photograph would
+     be inside the photograph's backdrop and get multiplied into it.
+
+     `inset: -1px` with a matching radius so the 1px border sits ON the
+     card's edge rather than just inside it, where it would read as a
+     seam between the ring and the hairline already in the card's
+     box-shadow. */
+  .hero-ring {
+    position: absolute;
+    inset: -1px;
+    border: 1px solid rgba(118, 169, 255, 0.55);
+    border-radius: 29px;
+    animation: hero-ring-pulse 3.6s ease-in-out 0.8s infinite both;
+  }
+
+  @keyframes hero-ring-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* ---------------------------------------------------------------- *
+   * THE CHIPS — three glass labels around the card.
+   *
+   * THE GLASS IS DARK, AND THAT IS THE WHOLE DESIGN PROBLEM SOLVED.
+   * The first build of this used the conventional light glass — a 10%
+   * WHITE ground with white type — which is correct over a dark page
+   * and illegible the moment a chip crosses the card, because the card
+   * is a near-white photographic surface. Every one of these chips
+   * straddles that edge by design. A LIGHT ground can only ever work on
+   * one of the two surfaces it sits on; a dark one works on both.
+   *
+   * Measured on the WORSE ground, which is the white card:
+   *   ground     rgba(8,12,24,0.72) over #ffffff -> L 0.080
+   *   lead       #ffffff                          8.1:1
+   *   text       rgba(255,255,255,0.88)           6.7:1
+   * Over the dark page both are past 18:1, so the card is the binding
+   * case and both halves clear AA on it with room to spare.
+   *
+   * The rest is ordinary glassmorphism: a 14px backdrop blur, a 1px
+   * light border for the frosted edge to catch, and a drop shadow.
+   *
+   * THE POSITIONS ARE ALL INSIDE THE COLUMN. Each chip is pinned to a
+   * percentage of the stage and the furthest any of them reaches past
+   * the card is 7%, which at the narrowest two-column width (1024px,
+   * column ~460px) is 32px — inside the grid gap, so nothing here can
+   * push the document wider than the viewport. That is checked rather
+   * than reasoned about: scripts/ui-audit.mjs fails on horizontal
+   * scroll at 390, 768 and 1440.
+   * ---------------------------------------------------------------- */
+  .hero-chips {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    /* The <ul> is a full-bleed positioning frame over the card, so it
+       must not intercept anything. The chips themselves put pointer
+       events back, so their text is still selectable. */
+    pointer-events: none;
+  }
+
+  .hero-chip {
+    position: absolute;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    white-space: nowrap;
+    pointer-events: auto;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.88);
+    background: rgba(8, 12, 24, 0.72);
+    border: 1px solid rgba(146, 185, 255, 0.28);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow:
+      0 10px 30px -12px rgba(0, 0, 0, 0.8),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    /* THE POP-IN, one by one — AND NOT ONE FRAME OF IT IS TRANSPARENT.
+       ====================================================================
+       This started life as a fade plus a scale, which is the obvious way
+       to write a pop-in and is wrong on this page for a reason the hero
+       has already paid for twice. `scripts/assert-visible-nojs.mjs`
+       caught it: with the bundle disabled it found two
+       `<li class="hero-chip">` at `opacity=0`, because a `backwards`-
+       filled fade sits at zero for the whole of its delay and a reader
+       whose browser never got that far sees a chip that is simply not
+       there. That is the same defect the framer-motion reveals shipped,
+       and `.hero-in-text` / `.hero-in-card` above are the same fix.
+
+       So the pop is a SCALE AND A RISE and nothing else. Every chip is
+       painted, hit-testable and selectable in the first frame; what the
+       stagger animates is where it is, not whether it exists. `both`
+       still fills backwards so each one rests on its first keyframe
+       rather than snapping into the animation when its delay expires.
+
+       `transform-origin` is set per chip below, so each one grows out of
+       the corner it is pinned to instead of out of its own middle. */
+    animation: hero-chip-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* 0.58s, 0.73s, 0.88s — after the 0.4s entrance has landed, 150ms
+     apart, which is far enough to read as three separate arrivals and
+     close enough to read as one gesture. Set by `nth-child` rather
+     than an inline `style` per chip: three delays are not data, and an
+     inline style on an element whose keyframe starts at opacity 0 is
+     the exact shape scripts/assert-visible-html.mjs exists to catch. */
+  .hero-chip:nth-child(1) {
+    animation-delay: 0.58s;
+    top: 7%;
+    left: -4%;
+    transform-origin: 20% 100%;
+  }
+
+  .hero-chip:nth-child(2) {
+    animation-delay: 0.73s;
+    top: 47%;
+    right: -7%;
+    transform-origin: 80% 50%;
+  }
+
+  .hero-chip:nth-child(3) {
+    animation-delay: 0.88s;
+    bottom: 11%;
+    left: -5%;
+    transform-origin: 20% 0%;
+  }
+
+  /* 0.88, not something smaller: with no opacity doing any of the work
+     the scale is the whole gesture, and under about 0.85 a pill of text
+     reads as blurring rather than as arriving. The 10px rise is what
+     gives it a direction. */
+  @keyframes hero-chip-in {
+    from {
+      transform: translateY(10px) scale(0.88);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* The lead half, which carries the figure: white, uppercased and
+     tracked, so the chip reads as "ANDROID 14 · apps built in" with
+     one clear subject. The source string is sentence case — see the
+     note on HERO_CHIPS in lib/iriz.js. */
+  .hero-chip-lead {
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .hero-chip-sep {
+    color: rgba(147, 197, 253, 0.9);
+  }
+
+  /* EVERY CHIP COMES INBOARD BELOW 1024px, AND THE BREAKPOINT IS THE
+     LAYOUT'S, NOT THE PHONE'S.
+     ====================================================================
+     The negative insets above hang each chip past the card's edge, which
+     works while the card is one of two columns with a 64px grid gap
+     beside it. `lg:grid-cols-2` starts at 1024px — so from 1023px down
+     the card is the FULL WIDTH of the container and the only thing
+     outside its edge is the container's own 24px of padding.
+     scripts/ui-audit.mjs caught exactly that: at 768 the right-hand chip
+     measured 595..776 against a 768px viewport. It did not scroll the
+     document, because the section is `overflow-hidden` — it was simply
+     sliced off, which is the worse of the two failures and the one a
+     screenshot at that width does not make obvious.
+
+     So the positions follow the grid, at 1024, and the chips sit against
+     the card's own corners instead. The THIRD CHIP is a separate
+     question with a separate breakpoint below. */
+  @media (max-width: 1023px) {
+    .hero-chip:nth-child(1) {
+      top: 5%;
+      left: 3%;
+    }
+
+    .hero-chip:nth-child(2) {
+      top: auto;
+      bottom: 7%;
+      right: 3%;
+    }
+
+    .hero-chip:nth-child(3) {
+      bottom: 7%;
+      left: 3%;
+    }
+  }
+
+  /* TWO CHIPS ON A PHONE, NOT THREE. Below 700px the card is narrow
+     enough that the two bottom chips would meet in the middle, and a
+     third label has nowhere to sit that is not on top of another one.
+
+     `display: none` rather than a visual hide, because it takes the
+     chip out of the accessibility tree with it — a phone must not
+     announce a chip it does not draw. */
+  @media (max-width: 699px) {
+    .hero-chip:nth-child(1) {
+      top: 4%;
+      left: 4%;
+    }
+
+    .hero-chip:nth-child(2) {
+      bottom: 6%;
+      right: 4%;
+    }
+
+    .hero-chip:nth-child(3) {
+      display: none;
+    }
   }
 
   /* MULTIPLY, and that one declaration is what removes the
@@ -2263,6 +2714,50 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
       animation: none;
       transform: translate(-50%, -50%);
       opacity: 0.7;
+    }
+
+    /* THE NEURON TREATMENT UNDER REDUCED MOTION. Everything stops and
+       every stopped thing is left in a legible state rather than in
+       whichever keyframe `animation: none` happened to freeze.
+
+       The canvas is NOT hidden — components/hero/NeuronNetwork draws
+       exactly one static frame and never starts its loop, so the field
+       is there and the composition is the one everybody else sees. The
+       1.2s opacity transition is the one piece of motion kept, because
+       a decorative layer snapping in at the end of load is more
+       startling than a fade, and `prefers-reduced-motion` asks for less
+       motion rather than for none. */
+    .hero-shimmer {
+      animation: none;
+      /* The gradient would otherwise freeze wherever its 4s pass had
+         got to, which on a 220% background can leave the word mid-ramp
+         and lighter on one side than the other. A flat, measured
+         colour instead — and the clip has to be unset for `color` to
+         be what paints. */
+      background-image: none;
+      -webkit-text-fill-color: #5b9dff;
+      color: #5b9dff;
+    }
+
+    .hero-ring {
+      animation: none;
+      /* The middle of the pulse, not its trough: the ring is a design
+         element here, not a signal, so it rests visible. */
+      opacity: 0.68;
+    }
+
+    .hero-chip {
+      animation: none;
+      transform: none;
+    }
+
+    /* The tilt is never written under reduced motion (the component
+       checks the same query before touching the card), so the three
+       variables stay at their fallbacks. The transition goes anyway,
+       so nothing can animate this element even if something does set
+       them. */
+    .hero-card {
+      transition: none;
     }
   }
 }
