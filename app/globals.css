@@ -2064,12 +2064,21 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
    * THE MASK IS A CONTRAST CONTROL, NOT A FLOURISH. Measured: white at
    * 70% opacity over one 0.55-alpha node on #030303 is 4.14:1, which
    * is under AA for small text — and `.type-label` is 11px. The mask
-   * fades the field to 28% over the left third of the hero, where the
-   * eyebrow, the headline and the stat labels live, which takes that
-   * worst case back over 6:1 while leaving the field at full strength
-   * around the card, where the design wants it. It also happens to be
-   * the right composition: a network densest at the product and
-   * thinning away from it.
+   * fades the field to 20% over the left third of the hero, where the
+   * eyebrow, the headline and the stat labels live, while leaving it at
+   * full strength around the card where the design wants it. It also
+   * happens to be the right composition: a network densest at the
+   * product and thinning away from it.
+   *
+   * 20%, NOT THE 28% THIS SHIPPED WITH FIRST, and the 8 points came out
+   * of scripts/hero-contrast.mjs rather than out of taste. That tool
+   * captures the canvas alone and finds the brightest pixel it paints
+   * anywhere inside each run of text over a 14-frame window; at 28% the
+   * eyebrow measured 4.46:1 on a real rgb(57,81,123) node, which misses
+   * the 4.5 floor its 11px size carries. The eyebrow's own colour moved
+   * with it — see `.hero-eyebrow` below — because fixing it from either
+   * end alone meant either a near-white "blue" or a network that stops
+   * before the copy does.
    * ---------------------------------------------------------------- */
   .hero-network {
     position: absolute;
@@ -2083,15 +2092,15 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
     pointer-events: none;
     -webkit-mask-image: linear-gradient(
       to right,
-      rgba(0, 0, 0, 0.28) 0%,
-      rgba(0, 0, 0, 0.28) 8%,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.2) 8%,
       rgba(0, 0, 0, 1) 42%,
       rgba(0, 0, 0, 1) 100%
     );
     mask-image: linear-gradient(
       to right,
-      rgba(0, 0, 0, 0.28) 0%,
-      rgba(0, 0, 0, 0.28) 8%,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.2) 8%,
       rgba(0, 0, 0, 1) 42%,
       rgba(0, 0, 0, 1) 100%
     );
@@ -2127,14 +2136,27 @@ html.js-anim [data-reveal][data-reveal-in] .tick-path {
     }
   }
 
-  /* The eyebrow, in light blue where it used to be white/70. #9DC4FF
-     measures 10.6:1 on #030303 and 6.1:1 on the worst case the mask
-     above allows, so the one 11px line on this screen that is not
-     white has more headroom than the white/60 stat labels beside it.
+  /* The eyebrow, in light blue where it used to be white/70.
+     ====================================================================
+     #ADCCFF, and the two steps up from the #9DC4FF this started at were
+     bought with a measurement rather than a preference.
+     scripts/hero-contrast.mjs captures the canvas on its own and finds
+     the BRIGHTEST pixel it paints anywhere inside each text box over a
+     14-frame window — the worst ground a glyph could actually land on,
+     not an average. #9DC4FF came back at 4.46:1 against a measured
+     rgb(57,81,123), which is a miss at `.type-label`'s 11px, where the
+     floor is 4.5 rather than 3.
+
+     Two things moved together: this colour, and the mask floor on
+     `.hero-network` above, which went from 0.28 to 0.2 so the brightest
+     node the left column can carry is dimmer to begin with. Fixing it
+     from one end alone would have meant either a near-white "blue" or a
+     network that stops before the copy does.
+
      `.type-label` still owns the size, the uppercasing and the 0.2em
      tracking; this sets the colour and nothing else. */
   .hero-eyebrow {
-    color: #9dc4ff;
+    color: #adccff;
   }
 
   /* ---------------------------------------------------------------- *
