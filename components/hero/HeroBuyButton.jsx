@@ -11,11 +11,17 @@ import { buyDestinations } from '@/lib/buy-destinations';
  * ONE BUTTON, AND IT NAMES ITSELF
  * ---------------------------------------------------------------------------
  * The label is NOT the string "Buy on Flipkart". It is
- * `buyDestinations()[0].label`, which today resolves to exactly that because
- * Flipkart is the only listed marketplace — and which becomes "Buy on Amazon"
- * by itself on the day `AMAZON.live` flips, because MARKETPLACES puts Amazon
- * first (lib/site-config.js). Nothing here has to be edited for that, and
- * nothing here can disagree with the buy sheet about where a visitor goes.
+ * `buyDestinations()[0].label`, which resolves to exactly that because
+ * MARKETPLACES puts Flipkart first (lib/site-config.js) — so switching
+ * Amazon on adds a second button to the buy sheet and leaves this one
+ * untouched. Nothing here has to be edited either way, and nothing here can
+ * disagree with the buy sheet about where a visitor goes.
+ *
+ * It read "becomes 'Buy on Amazon' by itself on the day AMAZON.live flips"
+ * until that day arrived, which was the point at which ordering the store
+ * registry for the PROSE turned out to also reorder the hero. The order is
+ * now stated and reasoned about in MARKETPLACES; this component still just
+ * takes index 0.
  *
  * THE FIRST DESTINATION, not all of them, and that is the one thing that
  * makes this different from components/buy/StoreButtons. The hero has room

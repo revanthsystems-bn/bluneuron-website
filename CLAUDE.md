@@ -20,6 +20,30 @@ The rollback target — the launched site before the Ads tag, with the old
 94000 number — is
 `npx wrangler rollback f4adc2df-69e0-412e-b80c-e25e4d386a63`.
 
+**AMAZON IS ON — ON `hero-neuron`, WHICH IS NOT DEPLOYED.** As of 2026-11-26
+`AMAZON.live` is `true` with ASIN `B0HPL9PKP9` (it replaces `B0HPG9T21G`,
+which was never public), so that branch builds a site that sells on **Amazon
+and Flipkart**: a second buy button everywhere, and every "where to buy"
+sentence naming both. **The live site is still Flipkart-only** — the sentence
+above is about `094f0de3` and remains true until something new is promoted.
+Checked against a real local build: 36 assertions of `npm run test:amazon`
+including Part C over all 19 routes, and no `amazon.in` link, button or
+sentence on a page that should not have one.
+
+**Flipkart stays the first and primary button, deliberately.** The order is
+`MARKETPLACES` in `lib/site-config.js`, and `components/hero/HeroBuyButton`
+renders `buyDestinations()[0]` and nothing else — so the array that decides
+which button is blue also decides what the homepage hero says. Amazon used to
+be first in it, which meant switching the listing on silently rewrote the
+hero's only call to action. Flipkart first is what keeps the switch additive.
+`SELLERS` is the other way round ("Amazon and Flipkart") because the prose
+wants that order; the two lists are separate on purpose.
+
+The one thing not verifiable from here: whether that ASIN is public to a
+logged-out customer. `curl` gets a captcha from Amazon, so **somebody has to
+open <https://www.amazon.in/dp/B0HPL9PKP9> in a private window** before this
+ships. The block comment on `AMAZON` says the same thing and says why.
+
 IT WAS PROMOTED, NOT REBUILT. `wrangler versions upload` put the version up
 as a preview, it was verified there, and `wrangler versions deploy
 094f0de3...@100` then sent production traffic to those exact bytes. That is
@@ -60,8 +84,9 @@ believe the latter.
 
 Two things differ from a clean checkout, and both look like project bugs:
 
-- **Node 22 for anything touching wrangler.** The system Node is 20, and
-  wrangler refuses to start below 22. A portable Node 22 lives at
+- **Node 22 for anything touching wrangler — and for `npm run test:amazon`.**
+  The system Node is 20, and wrangler refuses to start below 22. A portable
+  Node 22 lives at
   `C:\Users\MEENA\AppData\Local\node22\node-v22.23.3-win-x64\` — prepend
   **that** to `PATH`, not its parent. `node22\` alone is the extraction
   folder and contains no `node.exe`, so putting it on `PATH` fails with
@@ -71,6 +96,14 @@ Two things differ from a clean checkout, and both look like project bugs:
   ```bash
   export PATH="/c/Users/MEENA/AppData/Local/node22/node-v22.23.3-win-x64:$PATH"
   ```
+
+  `test:amazon` needs it for a different reason, and the failure does not
+  mention Node at all: the test spawns a probe that imports
+  `lib/site-config.js`, a `.js` file holding ESM in a package with no
+  `"type": "module"`. Node 22 detects the module syntax and loads it; Node 20
+  parses it as CommonJS and dies with `SyntaxError: Unexpected token
+  'export'` pointing at line 49 of the config. That reads as a broken config
+  file, which is why it is written down here. Same `PATH` line fixes it.
 - **`.env.local` overrides `.env.production`.** Next loads `.env.local` at
   higher priority, and the local one sets `NEXT_PUBLIC_META_PIXEL_ID` and
   `NEXT_PUBLIC_WEB3FORMS_KEY` to EMPTY — so `scripts/assert-build-env.js`
@@ -436,12 +469,20 @@ needs no R2 bucket, no KV namespace, no queue and no `WORKER_SELF_REFERENCE`
 service binding.
 
 The cost of that choice: **`revalidate`, `revalidatePath` and on-demand
-revalidation do not work.** Every route is prerendered at build time except
-`/`, which reads `searchParams` for the `?hero=` override and is plain SSR,
-so nothing today needs them. If ISR is ever added it will fail *silently* —
-the page will serve its build-time copy forever. Switch to
-`r2IncrementalCache`, add the bucket and the queue, and read
+revalidation do not work.** Nothing today needs them. If ISR is ever added it
+will fail *silently* — the page will serve its build-time copy forever.
+Switch to `r2IncrementalCache`, add the bucket and the queue, and read
 https://opennext.js.org/cloudflare/caching first.
+
+**`/` IS NOW PRERENDERED TOO, on `hero-neuron`.** It used to be the one
+exception: it read `searchParams` for the `?hero=` override, and a
+request-time API opts the whole route into dynamic rendering. That prop is
+gone with the hero rework, and the build confirms it — `┌ ○ /` in the route
+table, `○` being Static. Every route in the app is now prerendered at build
+time. **The live Worker `094f0de3` still SSRs `/`**; this becomes true of
+production the moment `hero-neuron` ships. Nothing needs configuring either
+way, but it changes what a stale page would mean: an SSR `/` could not serve
+a stale copy, and a prerendered one can.
 
 ## Wrangler needs Node 22
 

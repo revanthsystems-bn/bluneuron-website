@@ -266,8 +266,17 @@ function assertOn(c, asin, url) {
     c.amazonCartUrl1
   );
 
-  // AMAZON FIRST, in the prose and in the buttons. The order is the claim
-  // the hero's single buy button makes — it renders buyDestinations()[0].
+  // AMAZON FIRST IN THE PROSE, FLIPKART FIRST IN THE BUTTONS, and the two
+  // lists are separate so they can disagree on purpose.
+  //
+  // THIS BLOCK USED TO ASSERT AMAZON FIRST IN BOTH. It was written while the
+  // switch was off, so the button order was a prediction rather than an
+  // observation — and the prediction was wrong about one thing it could not
+  // see: components/hero/HeroBuyButton renders buyDestinations()[0] and
+  // NOTHING ELSE, so "Amazon first" silently rewrote the homepage hero's
+  // only call to action as a side effect of a listing going live. Flipkart
+  // first in MARKETPLACES is what keeps switching Amazon on additive: it
+  // appends a secondary button and leaves the hero alone.
   is('ON   SELLERS', c.SELLERS, ['Amazon', 'Flipkart']);
   is('ON   sellersAnd()', c.sellersAnd, 'Amazon and Flipkart');
   is('ON   sellersOr()', c.sellersOr, 'Amazon or Flipkart');
@@ -275,11 +284,18 @@ function assertOn(c, asin, url) {
   // Plural agreement now that the subject is two marketplaces.
   is('ON   sellersVerb()', c.sellersVerbSets, 'set their');
 
-  is('ON   MARKETPLACES ids', c.marketplaceIds, ['amazon', 'flipkart']);
+  is('ON   MARKETPLACES ids', c.marketplaceIds, ['flipkart', 'amazon']);
   check(
-    'ON   a buy button names Amazon, and it is the first one',
-    /amazon/i.test(c.buyLabels[0] || ''),
+    'ON   a buy button names Amazon, and it is the SECOND one',
+    /flipkart/i.test(c.buyLabels[0] || '') && /amazon/i.test(c.buyLabels[1] || ''),
     c.buyLabels.join(' | ')
+  );
+  // The hero, stated as its own assertion rather than inferred from the one
+  // above, because it is the surface the order was getting wrong.
+  check(
+    'ON   the hero button is still Flipkart',
+    /flipkart/i.test(c.buyLabels[0] || '') && !/amazon/i.test(c.buyLabels[0] || ''),
+    c.buyLabels[0]
   );
 
   check(
@@ -288,7 +304,9 @@ function assertOn(c, asin, url) {
     c.invoiceHint
   );
 
-  is('ON   demo order marketplace', c.demoMarketplace, 'Amazon');
+  // MARKETPLACES[0] by design (lib/account-demo.js) — so it follows the
+  // button order, not the prose order.
+  is('ON   demo order marketplace', c.demoMarketplace, 'Flipkart');
 }
 
 /* ====================================================================== *
@@ -307,7 +325,7 @@ function assertOn(c, asin, url) {
 const ALLOWED = [
   {
     file: 'lib/site-config.js',
-    match: "url: 'https://www.amazon.in/dp/B0HPG9T21G'",
+    match: "url: 'https://www.amazon.in/dp/B0HPL9PKP9'",
     why: 'the switch itself: the listing URL, gated by AMAZON_LISTED on the way out',
   },
   {

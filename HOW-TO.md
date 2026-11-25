@@ -133,21 +133,36 @@ the white card. Nothing separate to set either way.
 
 ---
 
-## B. Turn Amazon on
+## B. Amazon: it is ON. Turning it off, and back on
 
-Right now the site says **nothing** about Amazon. Not a button, not a greyed-out
-badge, not a sentence. It sells on Flipkart only.
+**Amazon is on, as of 26 November 2026.** The site sells on **Flipkart and
+Amazon**, so there are two buy buttons everywhere, and every sentence that
+names where to buy reads "Amazon and Flipkart".
 
-### B-i. Check the listing is really public first
+The listing is **`B0HPL9PKP9`** — <https://www.amazon.in/dp/B0HPL9PKP9>.
+It replaced `B0HPG9T21G`, which was never public to customers.
 
-**Do this before touching any code.** Open an **incognito / private window**
-and go to:
+**Flipkart is still the first button, and still the blue one.** That is
+deliberate, it is not an accident of the switch, and it is the one thing to
+know before changing anything here: the order comes from `MARKETPLACES` in
+`lib/site-config.js`, and the hero's single button is whatever is **first** in
+that list. Reorder it and the homepage hero changes with it.
 
-<https://www.amazon.in/dp/B0HPG9T21G>
+### B-i. Before you ever switch it ON, check the listing is really public
+
+**This is the only check the code cannot do for you**, and it is why `live` is
+a separate switch from the ASIN. Open an **incognito / private window** and go
+to the listing:
+
+<https://www.amazon.in/dp/B0HPL9PKP9>
 
 - If you can see the product page while **logged out**, carry on.
 - If you see "Page Not Found", **stop.** Do not switch it on. The Seller
   Central preview looks fine to you while showing nothing to customers.
+
+Use the plain `/dp/<ASIN>` address, **not** the `amazon.in/-/hi/dp/…` one
+Amazon copies out of a Hindi browser — that version forces Hindi on every
+visitor who follows it.
 
 ### B-ii. The switch
 
@@ -157,19 +172,20 @@ and go to:
 
    ```js
    export const AMAZON = {
-     asin: 'B0HPG9T21G',
-     url: 'https://www.amazon.in/dp/B0HPG9T21G',
-     live: false,
+     asin: 'B0HPL9PKP9',
+     url: 'https://www.amazon.in/dp/B0HPL9PKP9',
+     live: true,
    };
    ```
 
-3. Change **one word**:
+3. **To turn Amazon off**, change **one word**:
 
    ```js
-     live: true,
+     live: false,
    ```
 
-   That is the whole change. Do not edit anything else, anywhere.
+   That is the whole change. Do not edit anything else, anywhere. Leave the
+   `asin` and `url` alone — they are what it gets switched back on with.
 
    *(If Amazon ever gives you a different listing, change `asin` and `url`
    together — the code after `/dp/` in the URL and the `asin` are the same
@@ -180,6 +196,11 @@ and go to:
    ```bash
    npm run test:amazon
    ```
+
+   **This one needs Node 22**, like wrangler does — the "Before you start"
+   lines at the top of this file are what put it on your PATH. On the system
+   Node 20 it fails with `SyntaxError: Unexpected token 'export'`, which looks
+   like a broken test and is not one.
 
    This flips the switch both ways by itself and checks about 30 things:
    the buy buttons, the Buy menu, `/shop`, `/shop/iriz`, `/where-to-buy`,
@@ -201,8 +222,10 @@ and go to:
    That one fetches all 19 public pages and checks the words on them.
 
    Look at <http://localhost:3000> and <http://localhost:3000/where-to-buy>
-   with your own eyes too. You should see "Buy on Amazon" **first**, then
-   "Buy on Flipkart", and sentences reading "Amazon and Flipkart".
+   with your own eyes too. With Amazon **on** you should see "Buy on
+   Flipkart" **first** and in blue, "Buy on Amazon" second and outlined, and
+   sentences reading "Amazon and Flipkart". The hero keeps its single "Buy on
+   Flipkart" button — the hero is not supposed to change.
 
 6. Save it:
 
@@ -213,9 +236,10 @@ and go to:
 
 7. Ship it with **E. Shipping it** below.
 
-### B-iii. To turn Amazon off again
+### B-iii. To turn Amazon back on
 
-Set `live: false` back. Same four checks. Everything disappears again.
+Set `live: true`, but **do B-i first** — the private-window check. Same four
+checks after. Everything reappears.
 
 ### B-iv. One thing that does NOT change
 
