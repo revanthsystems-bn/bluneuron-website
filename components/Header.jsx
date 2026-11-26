@@ -200,7 +200,7 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
    *
    * Three states, in priority order:
    *
-   *   SHOW_BUY          "Buy", an anchor to the homepage buy card. The product
+   *   SHOW_BUY          "Buy now", which opens the buy sheet. The product
    *                     sells on Amazon and Flipkart, so the masthead's job is
    *                     to get you to the two marketplace buttons — not to
    *                     pick a marketplace for you from up here, which is a
@@ -236,8 +236,21 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
        * BuyButton carries the aria-haspopup that says a dialog is coming,
        * and composes `onNavigate` with its own handler so the mobile menu
        * still closes. See components/buy/BuyButton.
+       *
+       * "BUY NOW" IS PASSED HERE RATHER THAN CHANGED IN BuyButton, whose
+       * default stays "Buy". There is no copy module on this site — no
+       * lib/copy.js, no labels map; `children = 'Buy'` in that component IS
+       * the shared default — and it is shared with the sticky bar and
+       * /shop/iriz, which were not asked to change. Passing it at this one
+       * call site is what keeps the masthead's wording its own, and the
+       * string is still written once: both header CTAs, the bar and the open
+       * mobile panel, come through this function.
        */
-      return <BuyButton className={className} onClick={onNavigate} />;
+      return (
+        <BuyButton className={className} onClick={onNavigate}>
+          Buy now
+        </BuyButton>
+      );
     }
 
     if (COMMERCE_ENABLED) {
@@ -369,8 +382,19 @@ export default function Header({ overlay = false, heroTheme = 'dark' }) {
         <div className="flex items-center gap-1 sm:gap-2">
           <AccountButton ink={ink} />
           <CartButton ink={ink} />
+          {/* THE MASTHEAD PILL. One size at every width — h-[46px], text-sm
+              bold, px-[22px] — rather than the old `text-xs` chip that was
+              also `hidden sm:inline-flex`, i.e. absent from the masthead on
+              a phone entirely. It is the only buy affordance in the bar, so
+              being visible on the device most visitors arrive on is the
+              point of the change, not a side effect of it.
+
+              `.btn-primary` already supplies inline-flex, items-center,
+              rounded-full and the white-on-black fill; the utilities here
+              override only its px-7 and font-semibold, and win on layer
+              order (utilities after components), not class order. */}
           {renderCta(
-            `ml-1 hidden min-h-[44px] px-5 py-2.5 text-xs sm:inline-flex ${ink ? 'btn-primary-ink' : 'btn-primary'}`
+            `ml-1 h-[46px] px-[22px] text-sm font-bold ${ink ? 'btn-primary-ink' : 'btn-primary'}`
           )}
           <button
             aria-label="Toggle menu"
