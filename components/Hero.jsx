@@ -40,9 +40,12 @@ import { SHOW_BUY } from '@/lib/site-config';
  *   pre-built static files out of lib/hero-image, still preloaded in the
  *   <head> with `imageSrcSet`/`imageSizes` that agree with the <img>.
  *
- *   THE BUY BUTTON. components/hero/HeroBuyButton, untouched: the label is
- *   `buyDestinations()[0].label` out of the store registry, the href is that
- *   destination's, and the click still calls `trackBuyClick`.
+ *   THE BUY BUTTONS. components/hero/HeroBuyButton, which renders one per
+ *   listed marketplace out of the store registry — no label, href or store
+ *   name is typed here or there — and every click still calls
+ *   `trackBuyClick`. It was `buyDestinations()[0]` alone until Amazon went
+ *   live; "See specs" moved below the row to make space and is now a text
+ *   link rather than a third pill.
  *
  *   DOM ORDER IS STILL THE MOBILE ORDER. Copy first, card second — eyebrow,
  *   wordmark, headline, buttons, stats, then the product and its chips. No
@@ -190,15 +193,33 @@ export default function Hero() {
             <span className="hero-shimmer">{taglineAccent}</span>
           </p>
 
+          {/* THE BUY ROW IS THE STORES, AND ONLY THE STORES.
+              components/hero/HeroBuyButton renders one button per listed
+              marketplace — "Buy on Flipkart" primary, "Buy on Amazon"
+              secondary — and they share the row evenly. `flex-wrap` is the
+              safety valve under ~352px, where two buttons cannot both hold
+              their minimum width; the note in that component has the
+              measurements. */}
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            {/* SHOW_BUY gates the buy button and nothing else. With it off the
-                row is "See specs" alone, which still fills a row and still
-                gives the first screen something to do — see lib/site-config. */}
-            {SHOW_BUY && <HeroBuyButton className="btn-primary" />}
-            <Link href={ROUTES.specs} className="btn-secondary">
-              See specs
-            </Link>
+            {/* SHOW_BUY gates the store buttons and nothing else. With it off
+                this row is empty and "See specs" below is the first screen's
+                only action — see lib/site-config. */}
+            {SHOW_BUY && <HeroBuyButton />}
           </div>
+
+          {/* "SEE SPECS" IS A TEXT LINK NOW, NOT A THIRD PILL.
+              Two store buttons and a third button do not fit on one row at
+              375px, and three pills of equal weight is three primary actions
+              — which is none. Demoting it keeps it on the first screen and
+              out of the buy decision. It keeps a 44px box because it is a
+              standalone link rather than one inside a sentence, so the WCAG
+              2.2 target-size exemption for inline links does not apply. */}
+          <Link
+            href={ROUTES.specs}
+            className="mt-4 inline-flex min-h-[44px] items-center text-sm font-medium text-white/70 underline decoration-white/25 underline-offset-4 transition-colors hover:text-white hover:decoration-white/60"
+          >
+            See specs
+          </Link>
 
           {/* A <dl>, because each one of these IS a term and its value. Four
               <p>s would read as eight unrelated fragments; this announces

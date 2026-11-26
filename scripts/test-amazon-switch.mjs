@@ -291,9 +291,11 @@ function assertOn(c, asin, url) {
     c.buyLabels.join(' | ')
   );
   // The hero, stated as its own assertion rather than inferred from the one
-  // above, because it is the surface the order was getting wrong.
+  // above, because it is the surface the order was getting wrong. It renders
+  // BOTH destinations now, so what this pins is which one is PRIMARY — the
+  // white pill, and the first in reading order.
   check(
-    'ON   the hero button is still Flipkart',
+    'ON   the hero PRIMARY button is still Flipkart',
     /flipkart/i.test(c.buyLabels[0] || '') && !/amazon/i.test(c.buyLabels[0] || ''),
     c.buyLabels[0]
   );
