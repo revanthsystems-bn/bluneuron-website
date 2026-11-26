@@ -25,24 +25,22 @@ import { buyDestinations } from '@/lib/buy-destinations';
  * it from the buy card.
  *
  * ---------------------------------------------------------------------------
- * WHY THE PADDING IS NARROWER THAN A NORMAL BUTTON UNDER sm:
+ * STACKED ON PHONES, SIDE BY SIDE FROM sm
  * ---------------------------------------------------------------------------
- * MEASURED, not guessed. At a 375px viewport the hero's text column is
- * 327px wide, and at the stock `px-7` the two labels are 157px ("Buy on
- * Flipkart") and 164px ("Buy on Amazon") — 333px with the 12px gap, which is
- * 6px MORE than there is. The row is `flex-wrap`, so the overflow would not
- * have shown up as a horizontal scrollbar: Amazon would simply have dropped
- * onto a second line and nothing would have looked broken.
+ * A phone gets one button per row, each full width: Flipkart on top because
+ * it is the primary, Amazon under it. That replaced an earlier arrangement
+ * that kept them side by side at 375 by shrinking the padding to `px-5` and
+ * splitting the row with `flex-1 basis-0` — which fit, but only by making
+ * both buttons narrower than a button anywhere else on the site, in the one
+ * place where the tap target matters most.
  *
- * `px-5` under `sm` buys back 16px a button and `flex-1 basis-0` then splits
- * the row evenly, so each is 157.5px against a 148px content width — side by
- * side at 375 with room to spare, and back to the stock `px-7` from `sm` up
- * where the column is wide enough not to care.
+ * Full width also removes the measurement the squeeze depended on. The old
+ * note recorded that at 375 the column is 327px and the two labels want
+ * 333px with the gap, so the pair missed by 6px; none of that signifies now,
+ * because neither button has to share a row with anything.
  *
- * `min-w-[136px]` is the floor, and it is what makes narrower phones degrade
- * instead of break: below ~352px the two cannot both clear it, `flex-wrap`
- * puts them on separate lines, and each is full width. A squeezed label is
- * worse than a stacked one.
+ * From `sm` up `w-auto` returns them to their label widths, side by side,
+ * where the column has always been wide enough.
  *
  * ---------------------------------------------------------------------------
  * IT IS NEVER DISABLED AND NEVER HIDDEN
@@ -69,13 +67,18 @@ import { buyDestinations } from '@/lib/buy-destinations';
  * Shared geometry. The tone (`.btn-primary` / `.btn-secondary`) is added per
  * button.
  *
- * THE EVEN SPLIT IS A SMALL-SCREEN MEASURE AND STOPS AT `sm`. `flex-1
- * basis-0` is what makes the pair fit a 327px column; left on at desktop it
- * also made each button 305px wide, stretching a compact pill into a slab
- * for no reason other than that the column was wide. From `sm` up they size
- * to their labels again, which is what every other button on the site does.
+ * `h-[52px]` and `text-base` apply at EVERY width — the hero's buttons are
+ * deliberately a size up from the site's stock button, which is `min-h-44px`
+ * and `text-sm`. `w-full` under `sm` is what puts one per row; `sm:w-auto`
+ * hands sizing back to the label from tablet up. `px-8` overrides the `px-7`
+ * on `.btn-primary` / `.btn-secondary`, and wins because Tailwind's utilities
+ * layer is emitted after its components layer — not because of class order.
+ *
+ * The explicit height overrides nothing it should not: `min-h-[44px]` on the
+ * tone classes is a floor, and 52 clears it, so the WCAG 2.2 target size is
+ * still satisfied by a wider margin than before.
  */
-const SHARED = 'flex-1 basis-0 min-w-[136px] px-5 sm:flex-none sm:basis-auto sm:px-7';
+const SHARED = 'h-[52px] w-full px-8 text-base sm:w-auto';
 
 export default function HeroBuyButton() {
   const [pendingNote, setPendingNote] = useState(null);

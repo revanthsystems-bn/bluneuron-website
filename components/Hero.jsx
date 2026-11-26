@@ -196,11 +196,14 @@ export default function Hero() {
           {/* THE BUY ROW IS THE STORES, AND ONLY THE STORES.
               components/hero/HeroBuyButton renders one button per listed
               marketplace — "Buy on Flipkart" primary, "Buy on Amazon"
-              secondary — and they share the row evenly. `flex-wrap` is the
-              safety valve under ~352px, where two buttons cannot both hold
-              their minimum width; the note in that component has the
-              measurements. */}
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+              secondary. On a phone they are full width and `flex-wrap` puts
+              one per row; from `sm` they sit side by side at their label
+              widths. The geometry is all in that component.
+
+              `gap-2.5` is the 10px between the stacked buttons. It stays
+              `sm:gap-3` above, because that is the gap the row already had
+              and nothing about the wider layout asked for it to change. */}
+          <div className="mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3">
             {/* SHOW_BUY gates the store buttons and nothing else. With it off
                 this row is empty and "See specs" below is the first screen's
                 only action — see lib/site-config. */}
