@@ -31,13 +31,36 @@ including Part C over all 19 routes, and no `amazon.in` link, button or
 sentence on a page that should not have one.
 
 **Flipkart stays the first and primary button, deliberately.** The order is
-`MARKETPLACES` in `lib/site-config.js`, and `components/hero/HeroBuyButton`
-renders `buyDestinations()[0]` and nothing else — so the array that decides
-which button is blue also decides what the homepage hero says. Amazon used to
-be first in it, which meant switching the listing on silently rewrote the
-hero's only call to action. Flipkart first is what keeps the switch additive.
-`SELLERS` is the other way round ("Amazon and Flipkart") because the prose
-wants that order; the two lists are separate on purpose.
+`MARKETPLACES` in `lib/site-config.js`, and it is the render order every buy
+surface maps over: index 0 gets `.btn-primary` (the white pill) and the rest
+`.btn-secondary`, so that array decides which store is the loud one
+everywhere at once. `SELLERS` is the other way round ("Amazon and Flipkart")
+because the prose wants that order; the two lists are separate on purpose,
+and the comment on each says which it is.
+
+It mattered more when `components/hero/HeroBuyButton` rendered
+`buyDestinations()[0]` **and nothing else** — one button, so reordering the
+array for the prose silently rewrote the homepage hero's only call to
+action. **That is no longer how the hero works** (see below), but Flipkart
+first is still what makes switching Amazon on additive rather than a
+promotion, so the array's order is still load-bearing and still commented.
+
+**THE HERO SHOWS BOTH STORES, and the masthead pill says "Buy now".** Also
+`hero-neuron`, also not deployed:
+
+- `HeroBuyButton` renders one button per listed marketplace — "Buy on
+  Flipkart" primary, "Buy on Amazon" secondary — instead of just the first.
+  **Stacked full width, one per row, on phones**; side by side from `sm`.
+  52px tall, 16px label, at every width. "See specs" moved below them and is
+  a text link now, not a third pill. Measured: both buttons sit above the
+  fold at 375x667, 360x640 and 390x844, with no horizontal scroll at 320.
+- The masthead CTA is **"Buy now"**, h-46px / `text-sm` bold / `px-[22px]`,
+  the same size on a phone as on a laptop. It used to be a `text-xs` chip
+  carrying `hidden sm:inline-flex` — i.e. **no buy affordance in the bar on
+  a phone at all**, which is the device most visitors arrive on. The label
+  is passed from `components/Header.jsx`, not changed in
+  `components/buy/BuyButton`, whose `children = 'Buy'` default still serves
+  the sticky bar and /shop/iriz.
 
 The one thing not verifiable from here: whether that ASIN is public to a
 logged-out customer. `curl` gets a captcha from Amazon, so **somebody has to
