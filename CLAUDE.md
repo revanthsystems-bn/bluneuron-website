@@ -8,27 +8,48 @@ this before believing any sentence elsewhere in this file that says the live
 site runs on Vercel — several do, they describe how it used to be, and they
 are being corrected section by section rather than all at once.
 
-**What is live right now: the Flipkart-only site, with the Google Ads tag.**
-Worker version `094f0de3-6ff3-46a7-9749-c5a14e138649`, deployed 2026-10-31
-from the `google-ads-tag` branch — the Google Ads conversion ID on the
-existing GA4 tag, and the new customer care number (+91 91509 94099).
-`google-ads-tag` was fast-forwarded into `cloudflare` BEFORE the deploy, so
-`cloudflare` matches what is deployed, and `main` was fast-forwarded to the
-same commit immediately afterwards on an explicit "ship to main" — so all
-three branches carry the live code again. All three are pushed to `origin`.
-The rollback target — the launched site before the Ads tag, with the old
-94000 number — is
-`npx wrangler rollback f4adc2df-69e0-412e-b80c-e25e4d386a63`.
+**What is live right now: the site selling on FLIPKART AND AMAZON.** Worker
+version `b04019c6-1417-4680-b308-b5dc9d6ca312`, deployed 27 November 2026
+from the `hero-neuron` branch (the version itself was created
+`2026-11-26T15:46Z`; `npx wrangler deployments list` is the authority on
+both). It carries:
 
-**AMAZON IS ON — ON `hero-neuron`, WHICH IS NOT DEPLOYED.** As of 2026-11-26
-`AMAZON.live` is `true` with ASIN `B0HPL9PKP9` (it replaces `B0HPG9T21G`,
-which was never public), so that branch builds a site that sells on **Amazon
-and Flipkart**: a second buy button everywhere, and every "where to buy"
-sentence naming both. **The live site is still Flipkart-only** — the sentence
-above is about `094f0de3` and remains true until something new is promoted.
-Checked against a real local build: 36 assertions of `npm run test:amazon`
-including Part C over all 19 routes, and no `amazon.in` link, button or
-sentence on a page that should not have one.
+- **`AMAZON.live = true`, ASIN `B0HPL9PKP9`** — it replaces `B0HPG9T21G`,
+  which was never public. A second buy button on every buy surface, and
+  every "where to buy" sentence naming both sellers.
+- **A hero with both store buttons** — Flipkart primary, Amazon secondary,
+  stacked full width on phones — and "See specs" below them as a text link.
+- **A masthead "Buy now" pill**, one size on every device, where a phone
+  previously had no buy affordance in the bar at all.
+- Everything `094f0de3` carried: the Google Ads conversion ID on the GA4
+  tag, and the customer care number +91 91509 94099.
+
+Verified against the live domain after the deploy, not just the preview: all
+18 sitemap routes 200, `npm run test:amazon -- --rendered
+https://www.bluneuron.com` passing 36 assertions including Part C over all
+19 routes, and `206 Partial Content` still answered for both hero video
+files.
+
+**THE ROLLBACK TARGET IS THE FLIPKART-ONLY SITE:**
+
+```bash
+npx wrangler rollback 094f0de3-6ff3-46a7-9749-c5a14e138649
+```
+
+That returns the site to Flipkart-only with the Ads tag and the 94099
+number. **Reach for it if the Amazon listing turns out not to be public** —
+that is the one precondition nobody could verify from here. `curl` gets a
+captcha from Amazon, so the check is a person opening
+<https://www.amazon.in/dp/B0HPL9PKP9> in a private window; the block comment
+on `AMAZON` in `lib/site-config.js` says the same thing and says why. The
+Amazon buttons are in front of customers on every page, the hero included,
+until that is confirmed or rolled back.
+
+`hero-neuron` was fast-forwarded into both `cloudflare` and `main` AFTER the
+deploy, on an explicit "merge to main" — so all three branches carry the
+live code and all three are pushed to `origin`. The deploy itself was
+authorised separately, as "approve live", which moves nothing into either
+branch.
 
 **Flipkart stays the first and primary button, deliberately.** The order is
 `MARKETPLACES` in `lib/site-config.js`, and it is the render order every buy
@@ -45,8 +66,8 @@ action. **That is no longer how the hero works** (see below), but Flipkart
 first is still what makes switching Amazon on additive rather than a
 promotion, so the array's order is still load-bearing and still commented.
 
-**THE HERO SHOWS BOTH STORES, and the masthead pill says "Buy now".** Also
-`hero-neuron`, also not deployed:
+**THE HERO SHOWS BOTH STORES, and the masthead pill says "Buy now".** Live
+since `b04019c6`, and the detail behind the summary above:
 
 - `HeroBuyButton` renders one button per listed marketplace — "Buy on
   Flipkart" primary, "Buy on Amazon" secondary — instead of just the first.
@@ -497,15 +518,14 @@ will fail *silently* — the page will serve its build-time copy forever.
 Switch to `r2IncrementalCache`, add the bucket and the queue, and read
 https://opennext.js.org/cloudflare/caching first.
 
-**`/` IS NOW PRERENDERED TOO, on `hero-neuron`.** It used to be the one
+**`/` IS PRERENDERED TOO, AND IS LIVE THAT WAY.** It used to be the one
 exception: it read `searchParams` for the `?hero=` override, and a
 request-time API opts the whole route into dynamic rendering. That prop is
 gone with the hero rework, and the build confirms it — `┌ ○ /` in the route
-table, `○` being Static. Every route in the app is now prerendered at build
-time. **The live Worker `094f0de3` still SSRs `/`**; this becomes true of
-production the moment `hero-neuron` ships. Nothing needs configuring either
-way, but it changes what a stale page would mean: an SSR `/` could not serve
-a stale copy, and a prerendered one can.
+table, `○` being Static. Every route in the app is prerendered at build time
+as of `b04019c6`. Nothing needs configuring either way, but it changes what
+a stale page would mean: an SSR `/` could not serve a stale copy, and a
+prerendered one can.
 
 ## Wrangler needs Node 22
 
